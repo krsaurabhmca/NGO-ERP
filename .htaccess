@@ -1,0 +1,35 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # -------------------------------------------------------
+    # IMPORTANT (Hostinger / subfolder installs):
+    # Do NOT add RewriteBase here — Apache and LiteSpeed
+    # resolve relative paths (index.php) against the directory
+    # that contains this .htaccess file, which is correct.
+    # If you need RewriteBase, set it manually, e.g.:
+    #   RewriteBase /ngo/
+    # -------------------------------------------------------
+
+    # Disable MultiViews — LiteSpeed on Hostinger sometimes uses
+    # content negotiation that pre-empts mod_rewrite and causes 404s.
+    Options -MultiViews
+
+    # Pass through existing files and directories
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # Capture the full request path so index.php always receives it,
+    # even when LiteSpeed's REQUEST_URI handling differs from Apache.
+    RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
+</IfModule>
+
+<IfModule !mod_rewrite.c>
+    # Fallback when URL rewriting is not available.
+    # Only the homepage and already-existing files will work,
+    # but at least visitors get a useful message instead of a bare 404.
+    ErrorDocument 404 "The requested page was not found. Make sure mod_rewrite (or LiteSpeed's rewrite module) is enabled."
+</IfModule>
+
+<FilesMatch "^\.env">
+    Require all denied
+</FilesMatch>
