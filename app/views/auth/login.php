@@ -10,8 +10,26 @@
   <?php if(!empty($globalSettings['ngo_favicon'])): ?>
     <link rel="icon" href="<?php echo file_url($globalSettings['ngo_favicon']); ?>" type="image/x-icon"/>
   <?php endif; ?>
+  <?php if(!empty($globalSettings['theme_primary_color']) || !empty($globalSettings['theme_secondary_color'])): ?>
+  <style>
+      :root {
+          <?php if(!empty($globalSettings['theme_primary_color'])): ?>
+          --primary: <?php echo $globalSettings['theme_primary_color']; ?>;
+          --primary-dark: <?php echo $globalSettings['theme_primary_color']; ?>;
+          <?php endif; ?>
+          <?php if(!empty($globalSettings['theme_secondary_color'])): ?>
+          --accent: <?php echo $globalSettings['theme_secondary_color']; ?>;
+          <?php endif; ?>
+      }
+  </style>
+  <?php endif; ?>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+        --primary: #003566;
+        --primary-dark: #00224d;
+        --accent: #0d9488;
+    }
     body {
       min-height: 100vh;
       display: flex;
@@ -30,9 +48,16 @@
       overflow: hidden;
       box-shadow: 0 2px 12px rgba(0,0,0,0.06), 0 8px 40px rgba(0,0,0,0.04);
     }
+    @keyframes gradientAnimation {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
     .login-brand {
       flex: 1;
-      background-color: var(--primary); background-image: linear-gradient(115deg, var(--primary-dark) 0%, var(--primary-dark) 40%, transparent 40%), linear-gradient(35deg, transparent 60%, var(--accent) 60%, var(--accent) 100%);
+      background: linear-gradient(-45deg, var(--primary-dark), var(--primary), var(--accent), var(--primary));
+      background-size: 400% 400%;
+      animation: gradientAnimation 12s ease infinite;
       display: flex;
       flex-direction: column;
       align-items: center;

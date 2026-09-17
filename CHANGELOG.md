@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.2] - 2026-09-17
+
+### Changed
+- Upgraded the Auth Login Screen to use the new animated vibrant aesthetic and fixed a bug where the text was invisible.
+
+### Fixed
+- Fixed an issue where the System Updater would fail to find the latest GitHub release if the configured repository URL ended with `.git`.
+
 ## [1.0.1] - 2026-09-17
 
 ### Added

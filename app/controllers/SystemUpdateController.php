@@ -38,6 +38,8 @@ class SystemUpdateController extends Controller
         // Extract owner and repo from URL
         $path = parse_url($repoUrl, PHP_URL_PATH);
         $path = trim($path, '/');
+        // Remove .git if present
+        $path = preg_replace('/\.git$/', '', $path);
         
         $apiUrl = "https://api.github.com/repos/{$path}/releases/latest";
         
