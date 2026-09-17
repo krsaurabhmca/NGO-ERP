@@ -41,10 +41,11 @@ class SystemUpdateController extends Controller
         // Remove .git if present
         $path = preg_replace('/\.git$/', '', $path);
         
-        $apiUrl = "https://api.github.com/repos/{$path}/releases/latest";
+        // Fetch config.php from main branch to read APP_VERSION
+        $rawUrl = "https://raw.githubusercontent.com/{$path}/main/config/config.php";
         
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $apiUrl);
+        curl_setopt($ch, CURLOPT_URL, $rawUrl);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_USERAGENT, 'NGO-Management-System-Updater');
         $response = curl_exec($ch);
@@ -52,7 +53,20 @@ class SystemUpdateController extends Controller
         curl_close($ch);
         
         if ($httpCode === 200 && $response) {
-            return json_decode($response, true);
+            // Extract APP_VERSION using regex
+            if (preg_match("/define\('APP_VERSION',\s*'([^']+)'\);/", $response, $matches)) {
+                $version = $matches[1];
+                
+                // Return an array that mocks the GitHub Release API response
+                // so we don't have to rewrite the view template!
+                return [
+                    'tag_name' => 'v' . $version,
+                    'name' => 'Latest Code on Main Branch',
+                    'body' => "This update pulls the latest code directly from the `main` branch. GitHub Releases and Tags are no longer required.\n\nVersion detected: **{$version}**",
+                    'zipball_url' => "https://github.com/{$path}/archive/refs/heads/main.zip",
+                    'html_url' => "https://github.com/{$path}/commits/main"
+                ];
+            }
         }
         
         return null;
