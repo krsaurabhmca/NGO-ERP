@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.3] - 2026-09-17
+
+### Changed
+- Replaced GitHub Releases implementation with a fully automated branch-tracking system.
+- The System Updater now fetches the raw config file directly from the `main` branch to check for updates, eliminating the need to manually create Git Tags and GitHub Releases.
+
 ## [1.0.2] - 2026-09-17
 
 ### Changed
