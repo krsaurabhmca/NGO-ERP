@@ -87,7 +87,7 @@ class SystemUpdateController extends Controller
 
     public function update()
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !verify_csrf('admin/settings/update')) {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $_SESSION['error'] = 'Invalid request.';
             $this->redirect('admin/settings/update');
         }
