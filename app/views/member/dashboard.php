@@ -27,7 +27,7 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="d-flex align-items-center gap-3">
-                                <span class="avatar avatar-lg" style="background: #eef2ff; color: #003566;">
+                                <span class="avatar avatar-lg" style="background: #eef2ff; color: var(--primary);">
                                     <i class="ti ti-id-badge-2" style="font-size: 1.5rem;"></i>
                                 </span>
                                 <div>
@@ -95,7 +95,7 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="d-flex align-items-center gap-3">
-                                <span class="avatar avatar-lg" style="background: #eef2ff; color: #003566;">
+                                <span class="avatar avatar-lg" style="background: #eef2ff; color: var(--primary);">
                                     <i class="ti ti-receipt" style="font-size: 1.5rem;"></i>
                                 </span>
                                 <div>
@@ -173,7 +173,7 @@
                         <div class="card-body text-center py-4">
                             <div class="mb-3">
                                 <span class="avatar avatar-xl"
-                                    style="background: linear-gradient(135deg, #003566 0%, #00224d 100%);">
+                                    style="background-color: var(--primary); background-image: radial-gradient(circle at 10% 20%, var(--accent) 0%, transparent 50%), radial-gradient(circle at 90% 80%, var(--accent) 0%, transparent 50%), radial-gradient(circle at 50% 50%, var(--primary-dark) 0%, transparent 70%);">
                                     <i class="ti ti-hand-heart text-white" style="font-size: 2rem;"></i>
                                 </span>
                             </div>
@@ -287,15 +287,15 @@
 </div>
 <style>
     .btn-accent {
-        background: #FFBF00;
+        background: var(--accent);
         border: none;
-        color: #003566;
+        color: var(--primary);
         font-weight: 700;
         border-radius: 50rem;
     }
 
     .btn-accent:hover {
-        background: #e6ac00;
-        color: #003566;
+        background: var(--accent-dark);
+        color: var(--primary);
     }
 </style>

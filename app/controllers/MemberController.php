@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Core\Controller;
 use App\Core\Mailer;
 use App\Models\Member;
+use App\Helpers\UploadHelper;
 use App\Models\AuditLog;
 
 class MemberController extends Controller

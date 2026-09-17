@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Core\Controller;
 use App\Models\Partner;
 use App\Models\AuditLog;
+use App\Helpers\UploadHelper;
 
 class PartnerController extends Controller
 {
@@ -52,11 +53,9 @@ class PartnerController extends Controller
                 exit;
             }
             $uploadDir = UPLOAD_PATH . 'partners/';
-            if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
-            $ext = strtolower(pathinfo($_FILES['logo']['name'], PATHINFO_EXTENSION));
-            $filename = 'partner_' . time() . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
-            if (move_uploaded_file($_FILES['logo']['tmp_name'], $uploadDir . $filename)) {
-                $logoPath = 'uploads/partners/' . $filename;
+            $fileName = \App\Helpers\UploadHelper::processImage($_FILES['logo'], $uploadDir);
+            if ($fileName) {
+                $logoPath = 'uploads/partners/' . $fileName;
             }
         }
 
@@ -115,11 +114,9 @@ class PartnerController extends Controller
                 exit;
             }
             $uploadDir = UPLOAD_PATH . 'partners/';
-            if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
-            $ext = strtolower(pathinfo($_FILES['logo']['name'], PATHINFO_EXTENSION));
-            $filename = 'partner_' . time() . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
-            if (move_uploaded_file($_FILES['logo']['tmp_name'], $uploadDir . $filename)) {
-                $logoPath = 'uploads/partners/' . $filename;
+            $fileName = \App\Helpers\UploadHelper::processImage($_FILES['logo'], $uploadDir);
+            if ($fileName) {
+                $logoPath = 'uploads/partners/' . $fileName;
             }
         }
 

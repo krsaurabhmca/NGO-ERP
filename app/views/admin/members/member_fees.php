@@ -78,7 +78,7 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="text-muted small text-uppercase fw-semibold">Monthly Fee</div>
-                            <div class="h2 mt-1 mb-0" style="color: #003566;">
+                            <div class="h2 mt-1 mb-0" style="color: var(--primary);">
                                 <?php echo $monthlyFee > 0 ? '₹' . number_format($monthlyFee, 2) : '<span class="text-muted fs-4">N/A</span>'; ?>
                             </div>
                         </div>

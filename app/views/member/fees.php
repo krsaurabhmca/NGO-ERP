@@ -73,7 +73,7 @@ if ($activeGw === 'razorpay') {
                         <div class="card">
                             <div class="card-body text-center py-3">
                                 <div class="text-muted small text-uppercase fw-semibold tracking-wide">Monthly Fee</div>
-                                <div class="fs-3 fw-bold mt-1" style="color: #003566;">
+                                <div class="fs-3 fw-bold mt-1" style="color: var(--primary);">
                                     <?php echo '₹'; ?>    <?php echo number_format($designationAmount, 2); ?></div>
                             </div>
                         </div>
@@ -233,7 +233,7 @@ if ($activeGw === 'razorpay') {
 
                         <div class="d-flex align-items-center justify-content-center gap-2 mb-4">
                             <div
-                                style="width: 32px; height: 32px; background: #eef2ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: #003566;">
+                                style="width: 32px; height: 32px; background: #eef2ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: var(--primary);">
                                 <?php echo strtoupper(substr($member->name, 0, 1)); ?></div>
                             <div class="text-start">
                                 <div class="fw-semibold" style="font-size: 14px; color: #1a1a2e;">
@@ -488,16 +488,16 @@ if ($activeGw === 'razorpay') {
 </script>
 <style>
     .btn-accent {
-        background: #FFBF00;
+        background: var(--accent);
         border: none;
-        color: #003566;
+        color: var(--primary);
         font-weight: 700;
         border-radius: 50rem;
     }
 
     .btn-accent:hover {
-        background: #e6ac00;
-        color: #003566;
+        background: var(--accent-dark);
+        color: var(--primary);
     }
 
     .tracking-wide {

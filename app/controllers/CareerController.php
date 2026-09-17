@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Core\Controller;
 use App\Core\Mailer;
 use App\Models\Career;
+use App\Helpers\UploadHelper;
 use App\Models\JobApplication;
 use App\Models\AuditLog;
 

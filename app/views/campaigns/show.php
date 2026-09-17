@@ -18,19 +18,19 @@ if ($campaign->end_date) {
 ?>
 
 <section class="position-relative overflow-hidden"
-    style="background: linear-gradient(135deg, #003566 0%, #00224d 100%);">
+    style="background-color: var(--primary); background-image: radial-gradient(circle at 10% 20%, var(--accent) 0%, transparent 50%), radial-gradient(circle at 90% 80%, var(--accent) 0%, transparent 50%), radial-gradient(circle at 50% 50%, var(--primary-dark) 0%, transparent 70%);">
     <div class="container-fluid px-lg-5 py-5 text-center position-relative" style="z-index: 1;">
         <h1 class="display-5 fw-bold text-white mb-0"><?php echo htmlspecialchars($campaign->title); ?></h1>
     </div>
     <div class="position-absolute top-0 end-0 opacity-10 hero-svg-circle">
         <svg width="400" height="400" viewBox="0 0 400 400" fill="none">
-            <circle cx="300" cy="100" r="200" fill="#FFBF00" />
-            <circle cx="100" cy="350" r="150" fill="#0d9488" />
+            <circle cx="300" cy="100" r="200" fill="var(--accent)" />
+            <circle cx="100" cy="350" r="150" fill="var(--accent)" />
         </svg>
     </div>
     <div class="position-absolute bottom-0 start-0 opacity-10 hero-svg-circle">
         <svg width="300" height="300" viewBox="0 0 300 300" fill="none">
-            <circle cx="50" cy="250" r="120" fill="#FFBF00" />
+            <circle cx="50" cy="250" r="120" fill="var(--accent)" />
         </svg>
     </div>
 </section>
@@ -60,7 +60,7 @@ if ($campaign->end_date) {
                     <div class="card-body p-4 p-lg-5">
                         <div class="d-flex flex-wrap align-items-center gap-3 mb-4 pb-3 border-bottom text-muted"
                             style="font-size: 0.85rem;">
-                            <span><i class="far fa-calendar-alt me-1" style="color: #0d9488;"></i>
+                            <span><i class="far fa-calendar-alt me-1" style="color: var(--accent);"></i>
                                 <?php echo $campaign->start_date ? date('d M Y', strtotime($campaign->start_date)) : 'N/A'; ?>
                                 -
                                 <?php echo $campaign->end_date ? date('d M Y', strtotime($campaign->end_date)) : 'Ongoing'; ?></span>
@@ -69,9 +69,9 @@ if ($campaign->end_date) {
                                         class="far fa-clock me-1"></i> <?php echo $daysLeft; ?></span>
                             <?php endif; ?>
                             <span class="badge px-3 py-2 rounded-pill fw-semibold"
-                                style="background: #00356615; color: #003566; font-size: 0.72rem;">Active</span>
+                                style="background: var(--primary)15; color: var(--primary); font-size: 0.72rem;">Active</span>
                         </div>
-                        <h2 class="fw-bold h4 mb-3" style="color: #003566;">About This Campaign</h2>
+                        <h2 class="fw-bold h4 mb-3" style="color: var(--primary);">About This Campaign</h2>
                         <div class="lh-lg text-muted" style="text-align: justify; white-space: pre-wrap;">
                             <?php echo htmlspecialchars($campaign->description ?? 'No description available.'); ?>
                         </div>
@@ -89,28 +89,28 @@ if ($campaign->end_date) {
                         <div class="mb-3">
                             <div class="progress" style="height: 10px; border-radius: 1rem;">
                                 <div class="progress-bar"
-                                    style="width: <?php echo $progress; ?>%; background: linear-gradient(90deg, #003566, #0d9488); border-radius: 1rem;">
+                                    style="width: <?php echo $progress; ?>%; background-color: var(--primary); border-radius: 1rem;">
                                 </div>
                             </div>
                             <div class="d-flex justify-content-between small mt-2">
                                 <span class="fw-bold fs-3"
-                                    style="color: #003566;"><?php echo '₹'; ?><?php echo number_format($campaign->raised_amount); ?></span>
+                                    style="color: var(--primary);"><?php echo '₹'; ?><?php echo number_format($campaign->raised_amount); ?></span>
                                 <span class="text-muted small mt-2">of
                                     <?php echo '₹'; ?><?php echo number_format($campaign->goal_amount); ?></span>
                             </div>
                         </div>
                         <div class="row g-2 mb-4 p-3 bg-light rounded-3 text-center">
                             <div class="col-4">
-                                <div class="fw-bold fs-5" style="color: #003566;"><?php echo $progress; ?>%</div>
+                                <div class="fw-bold fs-5" style="color: var(--primary);"><?php echo $progress; ?>%</div>
                                 <div class="text-muted" style="font-size: 0.7rem;">Funded</div>
                             </div>
                             <div class="col-4">
-                                <div class="fw-bold fs-5" style="color: #0d9488;">
+                                <div class="fw-bold fs-5" style="color: var(--accent);">
                                     <?php echo $campaign->donor_count ?? 0; ?></div>
                                 <div class="text-muted" style="font-size: 0.7rem;">Donors</div>
                             </div>
                             <div class="col-4">
-                                <div class="fw-bold fs-5" style="color: #003566;">
+                                <div class="fw-bold fs-5" style="color: var(--primary);">
                                     <?php echo $daysLeft ? explode(' ', $daysLeft)[0] : '∞'; ?></div>
                                 <div class="text-muted" style="font-size: 0.7rem;">Days Left</div>
                             </div>

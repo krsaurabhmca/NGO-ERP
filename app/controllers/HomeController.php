@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Core\Controller;
 use App\Core\Mailer;
 use App\Models\CMS;
+use App\Helpers\UploadHelper;
 use App\Models\Setting;
 use App\Models\Member;
 use App\Models\Donor;
@@ -281,10 +282,8 @@ class HomeController extends Controller
                 return $this->redirect('careers/apply/' . $slug);
             }
             $uploadDir = UPLOAD_PATH . 'careers/resumes/';
-            if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
-            $ext = strtolower(pathinfo($_FILES['resume']['name'], PATHINFO_EXTENSION));
-            $fileName = time() . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
-            if (move_uploaded_file($_FILES['resume']['tmp_name'], $uploadDir . $fileName)) {
+            $fileName = \App\Helpers\UploadHelper::processFile($_FILES['resume'], $uploadDir);
+            if ($fileName) {
                 $resumePath = 'uploads/careers/resumes/' . $fileName;
             }
         }

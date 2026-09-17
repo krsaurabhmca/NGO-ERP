@@ -1,15 +1,15 @@
 <?php require_once 'app/views/layouts/header.php'; ?>
 
-<section class="position-relative overflow-hidden" style="background: linear-gradient(135deg, #003566 0%, #00224d 100%);">
+<section class="position-relative overflow-hidden" style="background-color: var(--primary); background-image: radial-gradient(circle at 10% 20%, var(--accent) 0%, transparent 50%), radial-gradient(circle at 90% 80%, var(--accent) 0%, transparent 50%), radial-gradient(circle at 50% 50%, var(--primary-dark) 0%, transparent 70%);">
     <div class="container-fluid px-3 px-lg-5 py-4 py-lg-5 text-center position-relative" style="z-index: 1;">
         <h1 class="display-6 display-lg-5 fw-bold text-white mb-0"><?php echo $title; ?></h1>
         <p class="text-white-50 mb-0 small">We'd love to hear from you. Get in touch with us.</p>
     </div>
     <div class="position-absolute top-0 end-0 opacity-10 hero-svg-circle d-none d-lg-block">
-        <svg width="400" height="400" viewBox="0 0 400 400" fill="none"><circle cx="300" cy="100" r="200" fill="#FFBF00"/><circle cx="100" cy="350" r="150" fill="#0d9488"/></svg>
+        <svg width="400" height="400" viewBox="0 0 400 400" fill="none"><circle cx="300" cy="100" r="200" fill="var(--accent)"/><circle cx="100" cy="350" r="150" fill="var(--accent)"/></svg>
     </div>
     <div class="position-absolute bottom-0 start-0 opacity-10 hero-svg-circle d-none d-lg-block">
-        <svg width="300" height="300" viewBox="0 0 300 300" fill="none"><circle cx="50" cy="250" r="120" fill="#FFBF00"/></svg>
+        <svg width="300" height="300" viewBox="0 0 300 300" fill="none"><circle cx="50" cy="250" r="120" fill="var(--accent)"/></svg>
     </div>
 </section>
 
@@ -38,13 +38,13 @@
             <div class="row g-3 g-lg-4">
                 <div class="col-lg-5">
                     <div class="card border-0 shadow-sm rounded-4 p-3 p-lg-4 h-100">
-                        <h3 class="fw-bold mb-3" style="color: #003566; font-size: 1.2rem;">Get in Touch</h3>
+                        <h3 class="fw-bold mb-3" style="color: var(--primary); font-size: 1.2rem;">Get in Touch</h3>
                         <p class="text-muted small mb-3">Have questions or want to support our mission? Reach out through any channel below.</p>
 
                         <?php if (!empty($globalSettings['ngo_address'])): ?>
                         <div class="d-flex gap-3 mb-3">
                             <div class="icon-circle flex-shrink-0" style="width: 42px; height: 42px; min-width: 42px; background: rgba(0,53,102,0.1);">
-                                <i class="fas fa-map-marker-alt" style="color: #003566; font-size: 1rem;"></i>
+                                <i class="fas fa-map-marker-alt" style="color: var(--primary); font-size: 1rem;"></i>
                             </div>
                             <div>
                                 <h6 class="fw-bold mb-1" style="font-size: 0.8rem;">Our Location</h6>
@@ -56,7 +56,7 @@
                         <?php if (!empty($globalSettings['ngo_phone'])): ?>
                         <div class="d-flex gap-3 mb-3">
                             <div class="icon-circle flex-shrink-0" style="width: 42px; height: 42px; min-width: 42px; background: rgba(13,148,136,0.1);">
-                                <i class="fas fa-phone" style="color: #0d9488; font-size: 1rem;"></i>
+                                <i class="fas fa-phone" style="color: var(--accent); font-size: 1rem;"></i>
                             </div>
                             <div>
                                 <h6 class="fw-bold mb-1" style="font-size: 0.8rem;">Phone Number</h6>
@@ -68,7 +68,7 @@
                         <?php if (!empty($globalSettings['ngo_email'])): ?>
                         <div class="d-flex gap-3 mb-3">
                             <div class="icon-circle flex-shrink-0" style="width: 42px; height: 42px; min-width: 42px; background: rgba(255,191,0,0.15);">
-                                <i class="fas fa-envelope" style="color: #FFBF00; font-size: 1rem;"></i>
+                                <i class="fas fa-envelope" style="color: var(--accent); font-size: 1rem;"></i>
                             </div>
                             <div>
                                 <h6 class="fw-bold mb-1" style="font-size: 0.8rem;">Email Address</h6>
@@ -87,7 +87,7 @@
                                     <a href="<?php echo htmlspecialchars($globalSettings['social_twitter']); ?>" target="_blank" style="width: 36px; height: 36px; display:inline-flex; align-items:center; justify-content:center; border-radius:50%; background:#000; color:#fff; text-decoration:none; transition:opacity 0.2s;" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1"><i class="fab fa-twitter" style="font-size:0.85rem;"></i></a>
                                 <?php endif; ?>
                                 <?php if (!empty($globalSettings['social_instagram'])): ?>
-                                    <a href="<?php echo htmlspecialchars($globalSettings['social_instagram']); ?>" target="_blank" style="width: 36px; height: 36px; display:inline-flex; align-items:center; justify-content:center; border-radius:50%; background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888); color:#fff; text-decoration:none; transition:opacity 0.2s;" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1"><i class="fab fa-instagram" style="font-size:0.85rem;"></i></a>
+                                    <a href="<?php echo htmlspecialchars($globalSettings['social_instagram']); ?>" target="_blank" style="width: 36px; height: 36px; display:inline-flex; align-items:center; justify-content:center; border-radius:50%; background-color: var(--accent); color:#fff; text-decoration:none; transition:opacity 0.2s;" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1"><i class="fab fa-instagram" style="font-size:0.85rem;"></i></a>
                                 <?php endif; ?>
                                 <?php if (!empty($globalSettings['social_linkedin'])): ?>
                                     <a href="<?php echo htmlspecialchars($globalSettings['social_linkedin']); ?>" target="_blank" style="width: 36px; height: 36px; display:inline-flex; align-items:center; justify-content:center; border-radius:50%; background:#0a66c2; color:#fff; text-decoration:none; transition:opacity 0.2s;" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1"><i class="fab fa-linkedin-in" style="font-size:0.85rem;"></i></a>
@@ -102,9 +102,9 @@
 
                 <div class="col-lg-7">
                     <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
-                        <div class="p-3 p-lg-4 text-white" style="background: linear-gradient(135deg, #003566, #00224d);">
+                        <div class="p-3 p-lg-4 text-white" style="background-color: var(--primary); background-image: radial-gradient(circle at 10% 20%, var(--accent) 0%, transparent 50%), radial-gradient(circle at 90% 80%, var(--accent) 0%, transparent 50%), radial-gradient(circle at 50% 50%, var(--primary-dark) 0%, transparent 70%);">
                             <div class="d-flex align-items-center gap-2">
-                                <i class="fas fa-paper-plane" style="color: #FFBF00;"></i>
+                                <i class="fas fa-paper-plane" style="color: var(--accent);"></i>
                                 <span class="fw-semibold small">Send us a message</span>
                             </div>
                         </div>

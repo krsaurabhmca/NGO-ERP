@@ -1,20 +1,20 @@
 <?php require_once 'app/views/layouts/header.php'; ?>
 
 <section class="position-relative overflow-hidden"
-    style="background: linear-gradient(135deg, #003566 0%, #00224d 100%);">
+    style="background-color: var(--primary); background-image: radial-gradient(circle at 10% 20%, var(--accent) 0%, transparent 50%), radial-gradient(circle at 90% 80%, var(--accent) 0%, transparent 50%), radial-gradient(circle at 50% 50%, var(--primary-dark) 0%, transparent 70%);">
     <div class="container-fluid px-lg-5 py-5 text-center position-relative" style="z-index: 1;">
         <h1 class="display-5 fw-bold text-white mb-0">Make a Donation</h1>
         <p class="text-white-50 mb-0">Your contribution helps us make a difference.</p>
     </div>
     <div class="position-absolute top-0 end-0 opacity-10 hero-svg-circle">
         <svg width="400" height="400" viewBox="0 0 400 400" fill="none">
-            <circle cx="300" cy="100" r="200" fill="#FFBF00" />
-            <circle cx="100" cy="350" r="150" fill="#0d9488" />
+            <circle cx="300" cy="100" r="200" fill="var(--accent)" />
+            <circle cx="100" cy="350" r="150" fill="var(--accent)" />
         </svg>
     </div>
     <div class="position-absolute bottom-0 start-0 opacity-10 hero-svg-circle">
         <svg width="300" height="300" viewBox="0 0 300 300" fill="none">
-            <circle cx="50" cy="250" r="120" fill="#FFBF00" />
+            <circle cx="50" cy="250" r="120" fill="var(--accent)" />
         </svg>
     </div>
 </section>
@@ -32,9 +32,9 @@
 
                 <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
                     <div class="p-4 text-white text-center"
-                        style="background: linear-gradient(135deg, #003566 0%, #00224d 100%);">
+                        style="background-color: var(--primary); background-image: radial-gradient(circle at 10% 20%, var(--accent) 0%, transparent 50%), radial-gradient(circle at 90% 80%, var(--accent) 0%, transparent 50%), radial-gradient(circle at 50% 50%, var(--primary-dark) 0%, transparent 70%);">
                         <div class="icon-circle bg-white bg-opacity-10 mx-auto mb-3" style="width: 64px; height: 64px;">
-                            <i class="fas fa-hand-holding-heart" style="color: #FFBF00; font-size: 1.5rem;"></i>
+                            <i class="fas fa-hand-holding-heart" style="color: var(--accent); font-size: 1.5rem;"></i>
                         </div>
                         <h4 class="fw-bold mb-1">Support Our Mission</h4>
                         <p class="text-white-50 mb-0 small">

@@ -71,7 +71,7 @@ $paymentStatus = $_GET['status'] ?? '';
                                 <div class="row g-3 align-items-center mb-4">
                                     <div class="col-md-3 text-center text-md-start">
                                         <span class="avatar avatar-xl"
-                                            style="background: linear-gradient(135deg, #003566, #00224d);">
+                                            style="background-color: var(--primary); background-image: radial-gradient(circle at 10% 20%, var(--accent) 0%, transparent 50%), radial-gradient(circle at 90% 80%, var(--accent) 0%, transparent 50%), radial-gradient(circle at 50% 50%, var(--primary-dark) 0%, transparent 70%);">
                                             <i class="ti ti-tag text-white" style="font-size: 1.75rem;"></i>
                                         </span>
                                     </div>
@@ -80,7 +80,7 @@ $paymentStatus = $_GET['status'] ?? '';
                                         <div class="text-muted small">Your monthly designation fee</div>
                                     </div>
                                     <div class="col-md-4 text-center text-md-end">
-                                        <div class="fs-1 fw-bold" style="color: #003566;">
+                                        <div class="fs-1 fw-bold" style="color: var(--primary);">
                                             <?php echo '₹'; ?>        <?php echo number_format($designationAmount, 2); ?></div>
                                         <div class="text-muted small">per month</div>
                                     </div>
@@ -215,15 +215,15 @@ $paymentStatus = $_GET['status'] ?? '';
 </script>
 <style>
     .btn-accent {
-        background: #FFBF00;
+        background: var(--accent);
         border: none;
-        color: #003566;
+        color: var(--primary);
         font-weight: 700;
         border-radius: 50rem;
     }
 
     .btn-accent:hover {
-        background: #e6ac00;
-        color: #003566;
+        background: var(--accent-dark);
+        color: var(--primary);
     }
 </style>

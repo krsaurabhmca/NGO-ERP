@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Core\Controller;
 use App\Models\Project;
 use App\Models\AuditLog;
+use App\Helpers\UploadHelper;
 
 class ProjectController extends Controller
 {
@@ -47,10 +48,8 @@ class ProjectController extends Controller
                     return $this->redirect('admin/projects');
                 }
                 $uploadDir = UPLOAD_PATH . 'projects/';
-                if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
-                $ext = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
-                $fileName = time() . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
-                if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $fileName)) {
+                $fileName = UploadHelper::processImage($_FILES['image'], $uploadDir);
+                if ($fileName) {
                     $imagePath = 'uploads/projects/' . $fileName;
                 }
             }
@@ -105,9 +104,8 @@ class ProjectController extends Controller
                             ];
                             $valid = validate_upload($singleFile, ['jpg', 'jpeg', 'png', 'gif', 'webp'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 500 * 1024);
                             if ($valid !== true) continue;
-                            $ext = strtolower(pathinfo($_FILES['gallery']['name'][$key], PATHINFO_EXTENSION));
-                            $fileName = time() . '_' . $key . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
-                            if (move_uploaded_file($tmpName, $uploadDir . $fileName)) {
+                            $fileName = UploadHelper::processImage($singleFile, $uploadDir);
+                            if ($fileName) {
                                 $this->projectModel->addGalleryImage($lastId, 'uploads/projects/gallery/' . $fileName);
                                 AuditLog::log('create', 'project_gallery', $lastId, null, ['image' => 'uploads/projects/gallery/' . $fileName]);
                             }
@@ -174,10 +172,8 @@ class ProjectController extends Controller
                     return $this->redirect('admin/projects');
                 }
                 $uploadDir = UPLOAD_PATH . 'projects/';
-                if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
-                $ext = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
-                $fileName = time() . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
-                if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $fileName)) {
+                $fileName = UploadHelper::processImage($_FILES['image'], $uploadDir);
+                if ($fileName) {
                     safe_unlink($imagePath);
                     $imagePath = 'uploads/projects/' . $fileName;
                 }
@@ -232,9 +228,8 @@ class ProjectController extends Controller
                             ];
                             $valid = validate_upload($singleFile, ['jpg', 'jpeg', 'png', 'gif', 'webp'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 500 * 1024);
                             if ($valid !== true) continue;
-                            $ext = strtolower(pathinfo($_FILES['gallery']['name'][$key], PATHINFO_EXTENSION));
-                            $fileName = time() . '_' . $key . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
-                            if (move_uploaded_file($tmpName, $uploadDir . $fileName)) {
+                            $fileName = UploadHelper::processImage($singleFile, $uploadDir);
+                            if ($fileName) {
                                 $this->projectModel->addGalleryImage($id, 'uploads/projects/gallery/' . $fileName);
                                 AuditLog::log('create', 'project_gallery', $id, null, ['image' => 'uploads/projects/gallery/' . $fileName]);
                             }

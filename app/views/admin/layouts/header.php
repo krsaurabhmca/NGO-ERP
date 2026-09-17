@@ -25,10 +25,35 @@ $theme = $_SESSION['theme'] ?? 'light';
     <meta name="csrf-token-generate-password" content="<?php echo csrf_token('admin/members/generate-password'); ?>">
     <!-- CSS files -->
     <link href="<?php echo url('assets/css/tabler.min.css'); ?>" rel="stylesheet"/>
+    <?php
+    $primaryColor = $globalSettings['theme_primary_color'] ?? '#0054a6';
+    $secondaryColor = $globalSettings['theme_secondary_color'] ?? '#206bc4';
+    
+    if (!function_exists('hexToRgbStr')) {
+        function hexToRgbStr($hex) {
+            $hex = str_replace('#', '', $hex);
+            if(strlen($hex) == 3) {
+                $r = hexdec(substr($hex,0,1).substr($hex,0,1));
+                $g = hexdec(substr($hex,1,1).substr($hex,1,1));
+                $b = hexdec(substr($hex,2,1).substr($hex,2,1));
+            } elseif(strlen($hex) == 6) {
+                $r = hexdec(substr($hex,0,2));
+                $g = hexdec(substr($hex,2,2));
+                $b = hexdec(substr($hex,4,2));
+            } else {
+                return '0, 84, 166';
+            }
+            return "$r, $g, $b";
+        }
+    }
+    $primaryRgb = hexToRgbStr($primaryColor);
+    ?>
     <style>
         @import url('https://rsms.me/inter/inter.css');
         :root {
             --tblr-font-sans-serif: 'Inter var', -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif;
+            --tblr-primary: <?php echo $primaryColor; ?>;
+            --tblr-primary-rgb: <?php echo $primaryRgb; ?>;
         }
         body {
             font-feature-settings: "cv03", "cv04", "cv11";

@@ -1,14 +1,14 @@
 <?php require_once 'app/views/layouts/header.php'; ?>
 
-<section class="position-relative overflow-hidden" style="background: linear-gradient(135deg, #003566 0%, #00224d 100%);">
+<section class="position-relative overflow-hidden" style="background-color: var(--primary); background-image: radial-gradient(circle at 10% 20%, var(--accent) 0%, transparent 50%), radial-gradient(circle at 90% 80%, var(--accent) 0%, transparent 50%), radial-gradient(circle at 50% 50%, var(--primary-dark) 0%, transparent 70%);">
     <div class="container-fluid px-lg-5 py-5 text-center position-relative" style="z-index: 1;">
         <h1 class="display-5 fw-bold text-white mb-0"><?php echo htmlspecialchars($project->title); ?></h1>
     </div>
     <div class="position-absolute top-0 end-0 opacity-10 hero-svg-circle">
-        <svg width="400" height="400" viewBox="0 0 400 400" fill="none"><circle cx="300" cy="100" r="200" fill="#FFBF00"/><circle cx="100" cy="350" r="150" fill="#0d9488"/></svg>
+        <svg width="400" height="400" viewBox="0 0 400 400" fill="none"><circle cx="300" cy="100" r="200" fill="var(--accent)"/><circle cx="100" cy="350" r="150" fill="var(--accent)"/></svg>
     </div>
     <div class="position-absolute bottom-0 start-0 opacity-10 hero-svg-circle">
-        <svg width="300" height="300" viewBox="0 0 300 300" fill="none"><circle cx="50" cy="250" r="120" fill="#FFBF00"/></svg>
+        <svg width="300" height="300" viewBox="0 0 300 300" fill="none"><circle cx="50" cy="250" r="120" fill="var(--accent)"/></svg>
     </div>
 </section>
 
@@ -47,20 +47,20 @@
                     <div class="card-body p-4 p-lg-5">
                         <div class="d-flex flex-wrap align-items-center gap-3 mb-4 pb-3 border-bottom text-muted" style="font-size: 0.85rem;">
                             <div class="d-flex align-items-center gap-2">
-                                <div class="text-center" style="min-width: 24px; color: #0d9488;"><i class="far fa-calendar-alt"></i></div>
+                                <div class="text-center" style="min-width: 24px; color: var(--accent);"><i class="far fa-calendar-alt"></i></div>
                                 <div><small class="text-muted d-block" style="font-size: 0.7rem;">STARTED</small><span class="fw-semibold text-dark"><?php echo date('d M, Y', strtotime($project->start_date)); ?></span></div>
                             </div>
                             <?php if($project->end_date): ?>
                             <div class="d-flex align-items-center gap-2">
-                                <div class="text-center" style="min-width: 24px; color: #0d9488;"><i class="fas fa-flag-checkered"></i></div>
+                                <div class="text-center" style="min-width: 24px; color: var(--accent);"><i class="fas fa-flag-checkered"></i></div>
                                 <div><small class="text-muted d-block" style="font-size: 0.7rem;"><?php echo $project->status === 'completed' ? 'COMPLETED' : 'EXPECTED END'; ?></small><span class="fw-semibold text-dark"><?php echo date('d M, Y', strtotime($project->end_date)); ?></span></div>
                             </div>
                             <?php endif; ?>
-                            <span class="badge px-3 py-2 rounded-pill fw-semibold" style="<?php echo $project->status === 'completed' ? 'background: #2ecc7120; color: #2ecc71;' : ($project->status === 'ongoing' ? 'background: #00356615; color: #003566;' : 'background: #FFBF0020; color: #b89400;'); ?> font-size: 0.75rem;">
+                            <span class="badge px-3 py-2 rounded-pill fw-semibold" style="<?php echo $project->status === 'completed' ? 'background: #2ecc7120; color: #2ecc71;' : ($project->status === 'ongoing' ? 'background: var(--primary)15; color: var(--primary);' : 'background: var(--accent)20; color: #b89400;'); ?> font-size: 0.75rem;">
                                 <?php echo ucfirst($project->status); ?>
                             </span>
                         </div>
-                        <h2 class="fw-bold h4 mb-3" style="color: #003566;">About the Project</h2>
+                        <h2 class="fw-bold h4 mb-3" style="color: var(--primary);">About the Project</h2>
                         <div class="lh-lg text-muted" style="text-align: justify;">
                             <?php echo nl2br(htmlspecialchars($project->description)); ?>
                         </div>
@@ -70,7 +70,7 @@
                 <?php if (!empty($gallery)): ?>
                 <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
                     <div class="card-body p-4 p-lg-5">
-                        <h4 class="fw-bold mb-3" style="color: #003566;"><i class="fas fa-images me-2" style="color: #0d9488;"></i> Project Gallery</h4>
+                        <h4 class="fw-bold mb-3" style="color: var(--primary);"><i class="fas fa-images me-2" style="color: var(--accent);"></i> Project Gallery</h4>
                         <div class="row g-2">
                             <?php foreach ($gallery as $image): ?>
                                 <div class="col-4 col-sm-3">
@@ -90,15 +90,15 @@
             </div>
 
             <div class="col-lg-4">
-                <div class="card border-0 shadow-sm rounded-4 p-4 mb-4" style="position: sticky; top: 100px; background: linear-gradient(135deg, #003566, #00224d);">
+                <div class="card border-0 shadow-sm rounded-4 p-4 mb-4" style="position: sticky; top: 100px; background: linear-gradient(135deg, var(--primary), var(--primary-dark));">
                     <div class="text-white text-center">
                         <div class="icon-circle mx-auto mb-3" style="width: 56px; height: 56px; background: rgba(255,255,255,0.1);">
-                            <i class="fas fa-heart" style="color: #FFBF00; font-size: 1.2rem;"></i>
+                            <i class="fas fa-heart" style="color: var(--accent); font-size: 1.2rem;"></i>
                         </div>
                         <h5 class="fw-bold mb-2">Support This Project</h5>
                         <p class="text-white-50 small mb-3">Your contribution helps us create lasting impact.</p>
                         <a href="<?php echo url('/donate'); ?>" class="btn btn-accent rounded-pill px-4 fw-bold w-100">
-                            <i class="fas fa-heart me-2" style="color: #003566;"></i> Donate Now
+                            <i class="fas fa-heart me-2" style="color: var(--primary);"></i> Donate Now
                         </a>
                     </div>
                 </div>

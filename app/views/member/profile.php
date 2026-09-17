@@ -24,7 +24,7 @@
                         <?php if ($member->image): ?>
                             <span class="avatar avatar-xl rounded" style="background-image: url(<?php echo file_url($member->image); ?>)"></span>
                         <?php else: ?>
-                            <span class="avatar avatar-xl rounded" style="background: #eef2ff; color: #003566; font-size: 2rem; font-weight: 700;">
+                            <span class="avatar avatar-xl rounded" style="background: #eef2ff; color: var(--primary); font-size: 2rem; font-weight: 700;">
                                 <?php echo strtoupper(substr($member->name, 0, 1)); ?>
                             </span>
                         <?php endif; ?>

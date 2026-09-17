@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Core\Controller;
 use App\Core\Mailer;
 use App\Models\Donation;
+use App\Helpers\UploadHelper;
 use App\Models\Expense;
 use App\Models\ExpenseCategory;
 use App\Models\AuditLog;
@@ -156,10 +157,8 @@ class FinanceController extends Controller
                 exit;
             }
             $uploadDir = UPLOAD_PATH . 'receipts/';
-            if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
-            $ext = strtolower(pathinfo($_FILES['receipt']['name'], PATHINFO_EXTENSION));
-            $filename = 'receipt_' . time() . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
-            if (move_uploaded_file($_FILES['receipt']['tmp_name'], $uploadDir . $filename)) {
+            $filename = \App\Helpers\UploadHelper::processFile($_FILES['receipt'], $uploadDir);
+            if ($filename) {
                 $data['receipt'] = 'uploads/receipts/' . $filename;
             }
         }
@@ -221,10 +220,8 @@ class FinanceController extends Controller
                 exit;
             }
             $uploadDir = UPLOAD_PATH . 'receipts/';
-            if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
-            $ext = strtolower(pathinfo($_FILES['receipt']['name'], PATHINFO_EXTENSION));
-            $filename = 'receipt_' . time() . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
-            if (move_uploaded_file($_FILES['receipt']['tmp_name'], $uploadDir . $filename)) {
+            $filename = \App\Helpers\UploadHelper::processFile($_FILES['receipt'], $uploadDir);
+            if ($filename) {
                 $data['receipt'] = 'uploads/receipts/' . $filename;
             }
         }

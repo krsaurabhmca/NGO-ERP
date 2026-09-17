@@ -41,7 +41,7 @@
                     <div class="card">
                         <div class="card-body text-center py-5">
                             <span class="avatar avatar-xl mb-4 rounded-circle shadow-sm d-inline-flex align-items-center justify-content-center" style="width: 120px; height: 120px; border: 4px solid #f0f2f5; background: #e9ecef;">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#003566" width="60" height="60"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="var(--primary)" width="60" height="60"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
 </span>
                             <h3 class="mb-1"><?php echo htmlspecialchars($user->name); ?></h3>
                             <div class="text-muted mb-3"><i class="fas fa-envelope me-1"></i> <?php echo htmlspecialchars($user->email); ?></div>

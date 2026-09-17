@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 use App\Models\News;
+use App\Helpers\UploadHelper;
 use App\Models\AuditLog;
 
 class NewsController extends Controller

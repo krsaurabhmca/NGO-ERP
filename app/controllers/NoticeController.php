@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 use App\Models\Notice;
+use App\Helpers\UploadHelper;
 use App\Models\AuditLog;
 
 class NoticeController extends Controller

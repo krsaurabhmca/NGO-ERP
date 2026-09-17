@@ -198,6 +198,9 @@ $router->add('POST', '/admin/contacts/delete/{id}', [App\Controllers\ContactCont
 $router->add('GET', '/admin/settings/organization', [App\Controllers\SettingsController::class, 'organization']);
 $router->add('POST', '/admin/settings/organization', [App\Controllers\SettingsController::class, 'update']);
 
+$router->add('GET', '/admin/settings/update', [App\Controllers\SystemUpdateController::class, 'index']);
+$router->add('POST', '/admin/settings/update/run', [App\Controllers\SystemUpdateController::class, 'update']);
+
 $router->add('GET', '/admin/settings/smtp', [App\Controllers\SettingsController::class, 'smtp']);
 $router->add('POST', '/admin/settings/smtp', [App\Controllers\SettingsController::class, 'update']);
 $router->add('POST', '/admin/settings/smtp/test', [App\Controllers\SettingsController::class, 'testSmtp']);

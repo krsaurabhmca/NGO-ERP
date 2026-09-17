@@ -1,14 +1,14 @@
 <?php require_once 'app/views/layouts/header.php'; ?>
 
-<section class="position-relative overflow-hidden" style="background: linear-gradient(135deg, #003566 0%, #00224d 100%);">
+<section class="position-relative overflow-hidden" style="background-color: var(--primary); background-image: radial-gradient(circle at 10% 20%, var(--accent) 0%, transparent 50%), radial-gradient(circle at 90% 80%, var(--accent) 0%, transparent 50%), radial-gradient(circle at 50% 50%, var(--primary-dark) 0%, transparent 70%);">
     <div class="container-fluid px-lg-5 py-5 text-center position-relative" style="z-index: 1;">
         <h1 class="display-5 fw-bold text-white mb-0"><?php echo htmlspecialchars($news->title); ?></h1>
     </div>
     <div class="position-absolute top-0 end-0 opacity-10 hero-svg-circle">
-        <svg width="400" height="400" viewBox="0 0 400 400" fill="none"><circle cx="300" cy="100" r="200" fill="#FFBF00"/><circle cx="100" cy="350" r="150" fill="#0d9488"/></svg>
+        <svg width="400" height="400" viewBox="0 0 400 400" fill="none"><circle cx="300" cy="100" r="200" fill="var(--accent)"/><circle cx="100" cy="350" r="150" fill="var(--accent)"/></svg>
     </div>
     <div class="position-absolute bottom-0 start-0 opacity-10 hero-svg-circle">
-        <svg width="300" height="300" viewBox="0 0 300 300" fill="none"><circle cx="50" cy="250" r="120" fill="#FFBF00"/></svg>
+        <svg width="300" height="300" viewBox="0 0 300 300" fill="none"><circle cx="50" cy="250" r="120" fill="var(--accent)"/></svg>
     </div>
 </section>
 
@@ -22,8 +22,8 @@
                     <?php endif; ?>
                     <div class="card-body p-4 p-lg-5">
                         <div class="d-flex flex-wrap align-items-center text-muted small mb-4 gap-3 pb-3 border-bottom">
-                            <span><i class="far fa-calendar-alt me-1" style="color: #0d9488;"></i> <?php echo date('d F, Y', strtotime($news->created_at)); ?></span>
-                            <span><i class="far fa-building me-1" style="color: #0d9488;"></i> Published by <?php echo !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSettings['ngo_name']) : 'NGO HELP'; ?></span>
+                            <span><i class="far fa-calendar-alt me-1" style="color: var(--accent);"></i> <?php echo date('d F, Y', strtotime($news->created_at)); ?></span>
+                            <span><i class="far fa-building me-1" style="color: var(--accent);"></i> Published by <?php echo !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSettings['ngo_name']) : 'NGO HELP'; ?></span>
                         </div>
 
                         <div class="fs-5 lh-lg text-dark" style="text-align: justify;">

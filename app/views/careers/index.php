@@ -1,15 +1,15 @@
 <?php require_once 'app/views/layouts/header.php'; ?>
 
-<section class="position-relative overflow-hidden" style="background: linear-gradient(135deg, #003566 0%, #00224d 100%);">
+<section class="position-relative overflow-hidden" style="background-color: var(--primary); background-image: radial-gradient(circle at 10% 20%, var(--accent) 0%, transparent 50%), radial-gradient(circle at 90% 80%, var(--accent) 0%, transparent 50%), radial-gradient(circle at 50% 50%, var(--primary-dark) 0%, transparent 70%);">
     <div class="container-fluid px-lg-5 py-5 text-center position-relative" style="z-index: 1;">
         <h1 class="display-5 fw-bold text-white mb-0"><?php echo $title; ?></h1>
         <p class="text-white-50 mb-0">Join our team and help us create meaningful impact.</p>
     </div>
     <div class="position-absolute top-0 end-0 opacity-10 hero-svg-circle">
-        <svg width="400" height="400" viewBox="0 0 400 400" fill="none"><circle cx="300" cy="100" r="200" fill="#FFBF00"/><circle cx="100" cy="350" r="150" fill="#0d9488"/></svg>
+        <svg width="400" height="400" viewBox="0 0 400 400" fill="none"><circle cx="300" cy="100" r="200" fill="var(--accent)"/><circle cx="100" cy="350" r="150" fill="var(--accent)"/></svg>
     </div>
     <div class="position-absolute bottom-0 start-0 opacity-10 hero-svg-circle">
-        <svg width="300" height="300" viewBox="0 0 300 300" fill="none"><circle cx="50" cy="250" r="120" fill="#FFBF00"/></svg>
+        <svg width="300" height="300" viewBox="0 0 300 300" fill="none"><circle cx="50" cy="250" r="120" fill="var(--accent)"/></svg>
     </div>
 </section>
 
@@ -23,10 +23,10 @@
                             <div class="col-12">
                                 <div class="card border-0 shadow-sm hover-lift rounded-4 overflow-hidden">
                                     <div class="row g-0 align-items-stretch">
-                                        <div class="col-md-auto d-flex align-items-center justify-content-center p-4" style="background: linear-gradient(135deg, #00356608, #0d948808); min-width: 120px;">
+                                        <div class="col-md-auto d-flex align-items-center justify-content-center p-4" style="background-color: var(--slate-100); border-left: 4px solid var(--primary); min-width: 120px;">
                                             <div class="text-center">
                                                 <div class="icon-circle mx-auto mb-2" style="width: 52px; height: 52px; background: <?php echo $item->job_type === 'Internship' ? 'rgba(13,148,136,0.12)' : 'rgba(0,53,102,0.1)'; ?>;">
-                                                    <i class="fas <?php echo $item->job_type === 'Internship' ? 'fa-graduation-cap' : 'fa-briefcase'; ?>" style="color: <?php echo $item->job_type === 'Internship' ? '#0d9488' : '#003566'; ?>; font-size: 1.2rem;"></i>
+                                                    <i class="fas <?php echo $item->job_type === 'Internship' ? 'fa-graduation-cap' : 'fa-briefcase'; ?>" style="color: <?php echo $item->job_type === 'Internship' ? 'var(--accent)' : 'var(--primary)'; ?>; font-size: 1.2rem;"></i>
                                                 </div>
                                                 <span class="badge <?php echo $item->job_type === 'Internship' ? 'bg-success-lt text-success' : 'bg-primary-lt text-primary'; ?> px-3 py-1 rounded-pill fw-semibold" style="font-size: 0.7rem;">
                                                     <?php echo htmlspecialchars($item->job_type); ?>
@@ -36,7 +36,7 @@
                                         <div class="col p-4">
                                             <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
                                                 <span class="text-muted" style="font-size: 0.78rem;">
-                                                    <i class="fas fa-map-marker-alt me-1" style="color: #0d9488;"></i> <?php echo htmlspecialchars($item->location); ?>
+                                                    <i class="fas fa-map-marker-alt me-1" style="color: var(--accent);"></i> <?php echo htmlspecialchars($item->location); ?>
                                                 </span>
                                                 <?php if($item->deadline): ?>
                                                     <span class="text-muted" style="font-size: 0.78rem;">

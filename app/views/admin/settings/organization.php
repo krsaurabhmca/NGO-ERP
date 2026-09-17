@@ -52,6 +52,14 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 7v-1a2 2 0 0 1 2 -2h2" /><path d="M4 17v1a2 2 0 0 0 2 2h2" /><path d="M16 4h2a2 2 0 0 1 2 2v1" /><path d="M16 20h2a2 2 0 0 0 2 -2v-1" /><path d="M9 12h6" /></svg>
                                     ID Prefixes
                                 </a>
+                                <a href="#tab-theme" class="list-group-item list-group-item-action d-flex align-items-center" data-bs-toggle="tab">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 21a9 9 0 1 1 0 -18a9 8 0 0 1 9 8a4.5 4 0 0 1 -4.5 4h-2.5a2 2 0 0 0 -1 3.75a1.3 1.3 0 0 1 -1 2.25" /><circle cx="7.5" cy="10.5" r=".5" fill="currentColor" /><circle cx="12" cy="7.5" r=".5" fill="currentColor" /><circle cx="16.5" cy="10.5" r=".5" fill="currentColor" /></svg>
+                                    Theme Colors
+                                </a>
+                                <a href="#tab-system-update" class="list-group-item list-group-item-action d-flex align-items-center" data-bs-toggle="tab">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" /><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" /></svg>
+                                    System Updates
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -309,9 +317,108 @@
                                                 Save ID Prefixes
                                             </button>
                                         </div>
+                                </div>
+
+                                <!-- Page 6: Theme Colors -->
+                                <div class="tab-pane" id="tab-theme">
+                                    <form action="<?php echo url('admin/settings/organization'); ?>" method="POST">
+                                        <input type="hidden" name="_csrf_token" value="<?php echo csrf_token(); ?>">
+                                        <input type="hidden" name="active_tab" value="tab-theme">
+                                        
+                                        <h3 class="card-title mb-4">Theme Configuration</h3>
+                                        <p class="text-muted small mb-4">Customize the primary and secondary colors of the admin panel.</p>
+                                        
+                                        <div class="row g-4">
+                                            <div class="col-md-12">
+                                                <label class="form-label fw-bold mb-3">Quick Presets</label>
+                                                <div class="d-flex flex-wrap gap-2 mb-3">
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary theme-preset" data-primary="#003566" data-secondary="#0d9488">
+                                                        <span class="d-inline-flex align-items-center me-2">
+                                                            <span style="background-color: #003566; width: 14px; height: 14px; display: inline-block; border-radius: 50%; z-index: 2; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                                            <span style="background-color: #0d9488; width: 14px; height: 14px; display: inline-block; border-radius: 50%; margin-left: -6px; z-index: 1; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                                        </span> Midnight & Teal
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary theme-preset" data-primary="#1e293b" data-secondary="#3b82f6">
+                                                        <span class="d-inline-flex align-items-center me-2">
+                                                            <span style="background-color: #1e293b; width: 14px; height: 14px; display: inline-block; border-radius: 50%; z-index: 2; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                                            <span style="background-color: #3b82f6; width: 14px; height: 14px; display: inline-block; border-radius: 50%; margin-left: -6px; z-index: 1; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                                        </span> Slate & Neon Blue
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary theme-preset" data-primary="#14532d" data-secondary="#10b981">
+                                                        <span class="d-inline-flex align-items-center me-2">
+                                                            <span style="background-color: #14532d; width: 14px; height: 14px; display: inline-block; border-radius: 50%; z-index: 2; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                                            <span style="background-color: #10b981; width: 14px; height: 14px; display: inline-block; border-radius: 50%; margin-left: -6px; z-index: 1; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                                        </span> Forest & Mint
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary theme-preset" data-primary="#0f172a" data-secondary="#f59e0b">
+                                                        <span class="d-inline-flex align-items-center me-2">
+                                                            <span style="background-color: #0f172a; width: 14px; height: 14px; display: inline-block; border-radius: 50%; z-index: 2; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                                            <span style="background-color: #f59e0b; width: 14px; height: 14px; display: inline-block; border-radius: 50%; margin-left: -6px; z-index: 1; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                                        </span> Obsidian & Amber
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary theme-preset" data-primary="#4c1d95" data-secondary="#fbbf24">
+                                                        <span class="d-inline-flex align-items-center me-2">
+                                                            <span style="background-color: #4c1d95; width: 14px; height: 14px; display: inline-block; border-radius: 50%; z-index: 2; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                                            <span style="background-color: #fbbf24; width: 14px; height: 14px; display: inline-block; border-radius: 50%; margin-left: -6px; z-index: 1; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                                        </span> Royal Purple & Gold
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary theme-preset" data-primary="#881337" data-secondary="#f43f5e">
+                                                        <span class="d-inline-flex align-items-center me-2">
+                                                            <span style="background-color: #881337; width: 14px; height: 14px; display: inline-block; border-radius: 50%; z-index: 2; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                                            <span style="background-color: #f43f5e; width: 14px; height: 14px; display: inline-block; border-radius: 50%; margin-left: -6px; z-index: 1; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                                        </span> Deep Crimson & Rose
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">Primary Color</label>
+                                                    <input type="color" name="theme_primary_color" id="theme_primary_color" class="form-control form-control-color" value="<?php echo $settings['theme_primary_color'] ?? '#0054a6'; ?>" title="Choose your color">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">Secondary Color</label>
+                                                    <input type="color" name="theme_secondary_color" id="theme_secondary_color" class="form-control form-control-color" value="<?php echo $settings['theme_secondary_color'] ?? '#206bc4'; ?>" title="Choose your color">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-4 pt-3 border-top d-flex justify-content-end">
+                                            <button type="submit" class="btn btn-primary px-4 shadow-sm">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-inline me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 4h10l4 4v10a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2" /><path d="M12 14m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M14 4l0 4l-6 0l0 -4" /></svg>
+                                                Save Theme Settings
+                                            </button>
+                                        </div>
                                     </form>
                                 </div>
-                            </div>
+
+                                <!-- Page 7: System Update -->
+                                <div class="tab-pane" id="tab-system-update">
+                                    <form action="<?php echo url('admin/settings/organization'); ?>" method="POST">
+                                        <input type="hidden" name="_csrf_token" value="<?php echo csrf_token(); ?>">
+                                        <input type="hidden" name="active_tab" value="tab-system-update">
+                                        
+                                        <h3 class="card-title mb-4">System Update Configuration</h3>
+                                        <p class="text-muted small mb-4">Configure the GitHub repository for automatic system updates.</p>
+                                        
+                                        <div class="row g-4">
+                                            <div class="col-12">
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">GitHub Repository URL</label>
+                                                    <input type="url" name="github_repo_url" class="form-control" value="<?php echo $settings['github_repo_url'] ?? ''; ?>" placeholder="https://github.com/username/repo">
+                                                    <small class="text-muted">The repository must be public and use GitHub Releases.</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-4 pt-3 border-top d-flex justify-content-between align-items-center">
+                                            <a href="<?php echo url('admin/settings/update'); ?>" class="btn btn-secondary text-white">Go to System Updates</a>
+                                            <button type="submit" class="btn btn-primary px-4 shadow-sm">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-inline me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 4h10l4 4v10a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2" /><path d="M12 14m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M14 4l0 4l-6 0l0 -4" /></svg>
+                                                Save System Update Settings
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
                         </div>
                     </div>
                 </div>
@@ -371,5 +478,22 @@
         setupLivePreview('ngo_logo_input', 'logo-preview', 'logo-placeholder', 200);
         setupLivePreview('ngo_favicon_input', 'favicon-preview', 'favicon-placeholder', 50);
         setupLivePreview('ngo_signature_input', 'signature-preview', 'signature-placeholder', 200);
+        
+        // Theme Presets functionality
+        const presetButtons = document.querySelectorAll('.theme-preset');
+        const primaryColorInput = document.getElementById('theme_primary_color');
+        const secondaryColorInput = document.getElementById('theme_secondary_color');
+        
+        if(presetButtons.length > 0 && primaryColorInput && secondaryColorInput) {
+            presetButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const primary = this.getAttribute('data-primary');
+                    const secondary = this.getAttribute('data-secondary');
+                    
+                    if(primary) primaryColorInput.value = primary;
+                    if(secondary) secondaryColorInput.value = secondary;
+                });
+            });
+        }
     });
 </script>

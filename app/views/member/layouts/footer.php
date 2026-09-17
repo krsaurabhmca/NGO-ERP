@@ -7,7 +7,7 @@
                                 <?php echo $globalSettings['ngo_footer_credits']; ?>
                             <?php else: ?>
                                 Copyright &copy; <?php echo date('Y'); ?>
-                                <a href="." style="color:#003566;text-decoration:none;font-weight:600;"><?php echo htmlspecialchars($globalSettings['ngo_name'] ?? 'NGO HELP'); ?></a>.
+                                <a href="." style="color:var(--primary);text-decoration:none;font-weight:600;"><?php echo htmlspecialchars($globalSettings['ngo_name'] ?? 'NGO HELP'); ?></a>.
                                 All rights reserved.
                             <?php endif; ?>
                         </span>

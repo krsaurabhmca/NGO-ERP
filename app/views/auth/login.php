@@ -32,7 +32,7 @@
     }
     .login-brand {
       flex: 1;
-      background: linear-gradient(135deg, #003566 0%, #001a3a 100%);
+      background-color: var(--primary); background-image: linear-gradient(115deg, var(--primary-dark) 0%, var(--primary-dark) 40%, transparent 40%), linear-gradient(35deg, transparent 60%, var(--accent) 60%, var(--accent) 100%);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -71,7 +71,7 @@
       align-items: center;
       justify-content: center;
       font-size: 2rem;
-      color: #FFBF00;
+      color: var(--accent);
       margin-bottom: 1.25rem;
       position: relative;
       z-index: 1;
@@ -146,7 +146,7 @@
       background: #fff;
     }
     .input-icon-wrap .form-control:focus {
-      border-color: #003566;
+      border-color: var(--primary);
       box-shadow: 0 0 0 3px rgba(0,53,102,0.08);
     }
     .input-icon-wrap .toggle-password {
@@ -162,14 +162,14 @@
       z-index: 2;
     }
     .input-icon-wrap .toggle-password:hover {
-      color: #003566;
+      color: var(--primary);
     }
     .form-check-input:checked {
-      background-color: #003566;
-      border-color: #003566;
+      background-color: var(--primary);
+      border-color: var(--primary);
     }
     .btn-login {
-      background: #003566;
+      background: var(--primary);
       border: none;
       border-radius: 8px;
       padding: 0.7rem;
@@ -200,7 +200,7 @@
       text-decoration: none;
       transition: color 0.2s;
     }
-    .back-link:hover { color: #003566; }
+    .back-link:hover { color: var(--primary); }
 
     @media (max-width: 768px) {
       body { padding: 0; }

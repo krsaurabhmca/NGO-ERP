@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 use App\Models\CMS;
+use App\Helpers\UploadHelper;
 use App\Models\AuditLog;
 
 class CMSController extends Controller
@@ -124,10 +125,8 @@ class CMSController extends Controller
                     return $this->redirect('admin/cms/about');
                 }
                 $uploadDir = UPLOAD_PATH . 'cms/pages/';
-                if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
-                $ext = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
-                $fileName = time() . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
-                if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $fileName)) {
+                $fileName = \App\Helpers\UploadHelper::processFile($_FILES['image'], $uploadDir);
+                if ($fileName) {
                     $imagePath = 'uploads/cms/pages/' . $fileName;
                 }
             }
@@ -143,10 +142,8 @@ class CMSController extends Controller
                         continue;
                     }
                     $uploadDir = UPLOAD_PATH . 'cms/values/';
-                    if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
-                    $ext = strtolower(pathinfo($_FILES[$fileKey]['name'], PATHINFO_EXTENSION));
-                    $fileName = time() . '_' . $vk . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
-                    if (move_uploaded_file($_FILES[$fileKey]['tmp_name'], $uploadDir . $fileName)) {
+                    $fileName = \App\Helpers\UploadHelper::processFile($_FILES[$fileKey], $uploadDir);
+                    if ($fileName) {
                         $values[$vk . '_image'] = 'uploads/cms/values/' . $fileName;
                         AuditLog::log('update', 'cms_value', 0, null, ['image' => 'updated', 'key' => $vk]);
                     }

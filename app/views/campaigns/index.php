@@ -1,20 +1,20 @@
 <?php require_once 'app/views/layouts/header.php'; ?>
 
 <section class="position-relative overflow-hidden"
-    style="background: linear-gradient(135deg, #003566 0%, #00224d 100%);">
+    style="background-color: var(--primary); background-image: radial-gradient(circle at 10% 20%, var(--accent) 0%, transparent 50%), radial-gradient(circle at 90% 80%, var(--accent) 0%, transparent 50%), radial-gradient(circle at 50% 50%, var(--primary-dark) 0%, transparent 70%);">
     <div class="container-fluid px-lg-5 py-5 text-center position-relative" style="z-index: 1;">
         <h1 class="display-5 fw-bold text-white mb-0">Crowdfunding Campaigns</h1>
         <p class="text-white-50 mb-0">Join hands to fund our initiatives. Every contribution counts.</p>
     </div>
     <div class="position-absolute top-0 end-0 opacity-10 hero-svg-circle">
         <svg width="400" height="400" viewBox="0 0 400 400" fill="none">
-            <circle cx="300" cy="100" r="200" fill="#FFBF00" />
-            <circle cx="100" cy="350" r="150" fill="#0d9488" />
+            <circle cx="300" cy="100" r="200" fill="var(--accent)" />
+            <circle cx="100" cy="350" r="150" fill="var(--accent)" />
         </svg>
     </div>
     <div class="position-absolute bottom-0 start-0 opacity-10 hero-svg-circle">
         <svg width="300" height="300" viewBox="0 0 300 300" fill="none">
-            <circle cx="50" cy="250" r="120" fill="#FFBF00" />
+            <circle cx="50" cy="250" r="120" fill="var(--accent)" />
         </svg>
     </div>
 </section>
@@ -49,9 +49,9 @@
                                         style="object-fit: cover; transition: transform 0.4s ease;">
                                 <?php else: ?>
                                     <div class="w-100 h-100 d-flex align-items-center justify-content-center"
-                                        style="background: linear-gradient(135deg, #00356610, #0d948810);">
+                                        style="background-color: var(--slate-100); border: 2px solid var(--primary);">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="48" height="48"
-                                            viewBox="0 0 24 24" stroke-width="1.5" stroke="#003566" fill="none"
+                                            viewBox="0 0 24 24" stroke-width="1.5" stroke="var(--primary)" fill="none"
                                             stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.3;">
                                             <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                             <path d="M3 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
@@ -67,7 +67,7 @@
                                 <?php if ($daysLeft): ?>
                                     <div class="position-absolute top-0 end-0 m-3">
                                         <span class="badge px-3 py-2 rounded-pill fw-semibold shadow-sm"
-                                            style="<?php echo $urgent ? 'background: #e74c3c;' : ($daysLeft === 'Ended' ? 'background: #95a5a6;' : 'background: #003566;'); ?> font-size: 0.7rem;">
+                                            style="<?php echo $urgent ? 'background: #e74c3c;' : ($daysLeft === 'Ended' ? 'background: #95a5a6;' : 'background: var(--primary);'); ?> font-size: 0.7rem;">
                                             <?php if ($urgent): ?><i
                                                     class="fas fa-exclamation-circle me-1"></i><?php endif; ?><?php echo $daysLeft; ?>
                                         </span>
@@ -82,12 +82,12 @@
                                 <div class="mt-auto">
                                     <div class="d-flex justify-content-between small mb-1">
                                         <span class="fw-bold"
-                                            style="color: #003566;"><?php echo '₹'; ?><?php echo number_format($campaign->raised_amount); ?></span>
+                                            style="color: var(--primary);"><?php echo '₹'; ?><?php echo number_format($campaign->raised_amount); ?></span>
                                         <span class="text-muted"><?php echo $progress; ?>%</span>
                                     </div>
                                     <div class="progress mb-3" style="height: 8px; border-radius: 1rem;">
                                         <div class="progress-bar"
-                                            style="width: <?php echo $progress; ?>%; background: linear-gradient(90deg, #003566, #0d9488); border-radius: 1rem;">
+                                            style="width: <?php echo $progress; ?>%; background-color: var(--primary); border-radius: 1rem;">
                                         </div>
                                     </div>
                                     <div class="d-flex justify-content-between text-muted mb-3" style="font-size: 0.72rem;">
@@ -114,7 +114,7 @@
             <div class="text-center py-5">
                 <div class="icon-circle bg-primary-lt mx-auto mb-3" style="width: 80px; height: 80px;">
                     <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="40" height="40" viewBox="0 0 24 24"
-                        stroke-width="1.5" stroke="#003566" fill="none" stroke-linecap="round" stroke-linejoin="round"
+                        stroke-width="1.5" stroke="var(--primary)" fill="none" stroke-linecap="round" stroke-linejoin="round"
                         style="opacity: 0.5;">
                         <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                         <path d="M3 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />

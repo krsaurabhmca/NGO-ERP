@@ -1,15 +1,15 @@
 <?php require_once 'app/views/layouts/header.php'; ?>
 
-<section class="position-relative overflow-hidden" style="background: linear-gradient(135deg, #003566 0%, #00224d 100%);">
+<section class="position-relative overflow-hidden" style="background-color: var(--primary); background-image: radial-gradient(circle at 10% 20%, var(--accent) 0%, transparent 50%), radial-gradient(circle at 90% 80%, var(--accent) 0%, transparent 50%), radial-gradient(circle at 50% 50%, var(--primary-dark) 0%, transparent 70%);">
     <div class="container-fluid px-lg-5 py-5 text-center position-relative" style="z-index: 1;">
         <h1 class="display-5 fw-bold text-white mb-0"><?php echo $title; ?></h1>
         <p class="text-white-50 mb-0">Explore our initiatives making real impact on the ground.</p>
     </div>
     <div class="position-absolute top-0 end-0 opacity-10 hero-svg-circle">
-        <svg width="400" height="400" viewBox="0 0 400 400" fill="none"><circle cx="300" cy="100" r="200" fill="#FFBF00"/><circle cx="100" cy="350" r="150" fill="#0d9488"/></svg>
+        <svg width="400" height="400" viewBox="0 0 400 400" fill="none"><circle cx="300" cy="100" r="200" fill="var(--accent)"/><circle cx="100" cy="350" r="150" fill="var(--accent)"/></svg>
     </div>
     <div class="position-absolute bottom-0 start-0 opacity-10 hero-svg-circle">
-        <svg width="300" height="300" viewBox="0 0 300 300" fill="none"><circle cx="50" cy="250" r="120" fill="#FFBF00"/></svg>
+        <svg width="300" height="300" viewBox="0 0 300 300" fill="none"><circle cx="50" cy="250" r="120" fill="var(--accent)"/></svg>
     </div>
 </section>
 
@@ -38,12 +38,12 @@
                                 <?php if ($item->image): ?>
                                     <img src="<?php echo file_url($item->image); ?>" class="w-100 h-100" alt="<?php echo htmlspecialchars($item->title); ?>" style="object-fit: cover; transition: transform 0.4s ease;">
                                 <?php else: ?>
-                                    <div class="w-100 h-100 d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, #00356610, #0d948810);">
-                                        <i class="fas fa-project-diagram fa-3x opacity-25" style="color: #003566;"></i>
+                                    <div class="w-100 h-100 d-flex align-items-center justify-content-center" style="background-color: var(--slate-100); border: 2px solid var(--primary);">
+                                        <i class="fas fa-project-diagram fa-3x opacity-25" style="color: var(--primary);"></i>
                                     </div>
                                 <?php endif; ?>
                                 <div class="position-absolute top-0 start-0 m-3">
-                                    <span class="badge px-3 py-2 rounded-pill shadow-sm fw-semibold" style="<?php echo $item->status === 'completed' ? 'background: #2ecc71;' : ($item->status === 'ongoing' ? 'background: #003566;' : 'background: #FFBF00; color: #003566;'); ?> font-size: 0.72rem;">
+                                    <span class="badge px-3 py-2 rounded-pill shadow-sm fw-semibold" style="<?php echo $item->status === 'completed' ? 'background: #2ecc71;' : ($item->status === 'ongoing' ? 'background: var(--primary);' : 'background: var(--accent); color: var(--primary);'); ?> font-size: 0.72rem;">
                                         <?php echo $item->status === 'ongoing' ? '<i class="fas fa-spinner me-1"></i>' : ($item->status === 'completed' ? '<i class="fas fa-check me-1"></i>' : '<i class="far fa-clock me-1"></i>'); ?><?php echo ucfirst($item->status); ?>
                                     </span>
                                 </div>
@@ -61,10 +61,10 @@
                                     ?>
                                 </p>
                                 <div class="d-flex align-items-center text-muted gap-3 mb-3" style="font-size: 0.78rem;">
-                                    <span><i class="far fa-calendar-alt me-1" style="color: #0d9488;"></i> <?php echo date('M Y', strtotime($item->start_date)); ?></span>
+                                    <span><i class="far fa-calendar-alt me-1" style="color: var(--accent);"></i> <?php echo date('M Y', strtotime($item->start_date)); ?></span>
                                     <?php if($item->end_date): ?>
                                         <span class="text-muted">→</span>
-                                        <span><i class="fas fa-flag-checkered me-1" style="color: #0d9488;"></i> <?php echo date('M Y', strtotime($item->end_date)); ?></span>
+                                        <span><i class="fas fa-flag-checkered me-1" style="color: var(--accent);"></i> <?php echo date('M Y', strtotime($item->end_date)); ?></span>
                                     <?php endif; ?>
                                 </div>
                                 <a href="<?php echo url('projects/' . $item->slug); ?>" class="btn btn-accent w-100 rounded-pill fw-semibold">

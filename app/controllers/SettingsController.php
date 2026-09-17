@@ -6,6 +6,7 @@ use App\Core\Controller;
 use App\Models\Setting;
 use App\Models\AuditLog;
 use App\Helpers\CryptoHelper;
+use App\Helpers\UploadHelper;
 
 class SettingsController extends Controller
 {
@@ -191,22 +192,25 @@ class SettingsController extends Controller
             
             foreach ($fileFields as $field => $maxSize) {
                 if (isset($_FILES[$field]) && $_FILES[$field]['error'] === UPLOAD_ERR_OK) {
-                    $valid = validate_upload($_FILES[$field], ['jpg', 'jpeg', 'png', 'gif', 'webp'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], $maxSize);
+                    $valid = validate_upload($_FILES[$field], ['jpg', 'jpeg', 'png', 'gif', 'webp', 'ico'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/x-icon', 'image/vnd.microsoft.icon'], $maxSize);
                     if ($valid !== true) {
                         $_SESSION['error'] = ucfirst(str_replace('ngo_', '', $field)) . ': ' . $valid;
                         continue;
                     }
 
-                    $ext = strtolower(pathinfo($_FILES[$field]['name'], PATHINFO_EXTENSION));
-                    $fileName = time() . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
-                    $targetPath = $uploadDir . $fileName;
-                    if (move_uploaded_file($_FILES[$field]['tmp_name'], $targetPath)) {
+                    // Process image using global helper to resize and convert to webp (favicon can stay original if not webp supported, but UploadHelper handles it as webp)
+                    // If it's a favicon, we might want to keep it as .ico or .png, but let's pass it to processImage
+                    $fileName = UploadHelper::processImage($_FILES[$field], $uploadDir, 300);
+                    
+                    if ($fileName) {
                         $oldFileValue = $oldSettings[$field] ?? '';
                         $newFileValue = 'uploads/settings/' . $fileName;
                         if ($oldFileValue !== $newFileValue) {
                             $changedSettings[$field] = ['old' => $oldFileValue, 'new' => $newFileValue];
                         }
                         $this->settingModel->updateByKey($field, $newFileValue, 'organization');
+                    } else {
+                        $_SESSION['error'] = 'Failed to process image ' . $field;
                     }
                 }
             }

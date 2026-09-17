@@ -122,16 +122,16 @@
 <?php require_once 'app/views/admin/layouts/footer.php'; ?>
 <style>
     .btn-accent {
-        background: #FFBF00;
+        background: var(--accent);
         border: none;
-        color: #003566;
+        color: var(--primary);
         font-weight: 700;
         border-radius: 50rem;
     }
 
     .btn-accent:hover {
-        background: #e6ac00;
-        color: #003566;
+        background: var(--accent-dark);
+        color: var(--primary);
     }
 
     /* Mobile: compact + no side scroll */

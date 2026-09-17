@@ -14,6 +14,20 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <meta name="csrf-token" content="<?php echo csrf_token('_default'); ?>">
     <link rel="stylesheet" href="<?php echo url('assets/css/style.css'); ?>">
+    <?php if(!empty($globalSettings['theme_primary_color']) || !empty($globalSettings['theme_secondary_color'])): ?>
+    <style>
+        :root {
+            <?php if(!empty($globalSettings['theme_primary_color'])): ?>
+            --primary: <?php echo $globalSettings['theme_primary_color']; ?>;
+            --primary-dark: <?php echo $globalSettings['theme_primary_color']; ?>;
+            <?php endif; ?>
+            <?php if(!empty($globalSettings['theme_secondary_color'])): ?>
+            --accent: <?php echo $globalSettings['theme_secondary_color']; ?>;
+            --accent-dark: <?php echo $globalSettings['theme_secondary_color']; ?>;
+            <?php endif; ?>
+        }
+    </style>
+    <?php endif; ?>
     <script>
     document.addEventListener('DOMContentLoaded', function () {
         const nav = document.querySelector('.navbar-modern');
