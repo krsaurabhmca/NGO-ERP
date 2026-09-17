@@ -475,9 +475,10 @@
             });
         });
 
-        setupLivePreview('ngo_logo_input', 'logo-preview', 'logo-placeholder', 200);
-        setupLivePreview('ngo_favicon_input', 'favicon-preview', 'favicon-placeholder', 50);
-        setupLivePreview('ngo_signature_input', 'signature-preview', 'signature-placeholder', 200);
+        // Remove frontend size constraints since the backend UploadHelper automatically resizes and compresses images to <300KB WebP
+        setupLivePreview('ngo_logo_input', 'logo-preview', 'logo-placeholder');
+        setupLivePreview('ngo_favicon_input', 'favicon-preview', 'favicon-placeholder');
+        setupLivePreview('ngo_signature_input', 'signature-preview', 'signature-placeholder');
         
         // Theme Presets functionality
         const presetButtons = document.querySelectorAll('.theme-preset');

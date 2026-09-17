@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.4] - 2026-09-17
+
+### Fixed
+- Removed frontend file size restrictions on image uploads in Organization Settings, CMS About, and CMS Media. The system will now correctly accept high-resolution images and automatically compress them using the backend WebP optimization engine.
+
 ## [1.0.3] - 2026-09-17
 
 ### Changed

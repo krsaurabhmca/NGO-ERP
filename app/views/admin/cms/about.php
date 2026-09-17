@@ -305,11 +305,7 @@
             imageInput.addEventListener('change', function() {
                 const file = this.files[0];
                 if (file) {
-                    if (file.size > maxKB * 1024) {
-                        showToast(`File is too large. Maximum size allowed is ${maxKB}KB.`, 'error', 'Upload Error');
-                        this.value = ''; // Clear input
-                        return;
-                    }
+                    // Removed frontend size restriction to allow UploadHelper to compress large images
                     
                     const reader = new FileReader();
                     reader.onload = function(e) {
@@ -342,11 +338,7 @@
             imageInput.addEventListener('change', function() {
                 const file = this.files[0];
                 if (file) {
-                    if (file.size > maxKB * 1024) {
-                        showToast(`File is too large. Maximum size allowed is ${maxKB}KB.`, 'error', 'Upload Error');
-                        this.value = ''; // Clear input
-                        return;
-                    }
+                    // Removed frontend size restriction to allow UploadHelper to compress large images
                     
                     const reader = new FileReader();
                     reader.onload = function(e) {
