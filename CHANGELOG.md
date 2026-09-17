@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.5] - 2026-09-17
+
+### Fixed
+- Fixed an issue where slider and CMS media images were bypassing the WebP image compression engine on upload.
+
 ## [1.0.4] - 2026-09-17
 
 ### Fixed

@@ -197,15 +197,16 @@ class CMSController extends Controller
                     header("Location: " . $referer);
                     exit;
                 }
-                $ext = strtolower(pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION));
-                $fileName = time() . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
-                if (move_uploaded_file($_FILES['file']['tmp_name'], $uploadDir . $fileName)) {
+                $fileName = \App\Helpers\UploadHelper::processFile($_FILES['file'], $uploadDir);
+                if ($fileName) {
                     $filePath = 'uploads/cms/' . $category . '/' . $fileName;
                     if ($this->cmsModel->addMedia($category, $title, $desc, $filePath)) {
                         $insertId = $this->cmsModel->lastInsertId();
                         AuditLog::log('create', 'cms_media', $insertId, null, ['file' => $fileName]);
                         $_SESSION['success'] = 'Media added successfully.';
                     }
+                } else {
+                    $_SESSION['error'] = 'Failed to process file.';
                 }
             }
         }
