@@ -175,7 +175,49 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            
+                                            <div class="mt-4 row g-3">
+                                                <div class="col-md-6">
+                                                    <a href="<?php echo url('admin/settings/update'); ?>" class="btn btn-outline-primary w-100 shadow-sm">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" /><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" /></svg>
+                                                        Check for Updates
+                                                    </a>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <form action="<?php echo url('admin/settings/update/run'); ?>" method="POST" id="force-update-form">
+                                                        <?php echo csrf_field('admin/settings/update'); ?>
+                                                        <button type="button" class="btn btn-outline-warning w-100 shadow-sm" onclick="confirmForceUpdate()">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M19 11v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2" /><path d="M13 13l9 3l-4 2l-2 4l-3 -9" /></svg>
+                                                            Force Reinstall
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                            
+                                            <div id="update-loading-force" class="text-center mt-4" style="display: none;">
+                                                <div class="spinner-border text-warning" role="status"></div>
+                                                <h4 class="mt-2 text-warning">Downloading and applying update... Please do not close this page.</h4>
+                                            </div>
+                                            
+                                            <script>
+                                                function confirmForceUpdate() {
+                                                    if (confirm('Are you sure you want to force a reinstall? This will overwrite system files.')) {
+                                                        document.getElementById('force-update-form').style.display = 'none';
+                                                        document.getElementById('update-loading-force').style.display = 'block';
+                                                        document.getElementById('force-update-form').submit();
+                                                    }
+                                                }
+                                            </script>
+
                                         <?php endif; ?>
+                                    </div>
+                                <?php else: ?>
+                                    <div class="mt-5 text-center">
+                                        <p class="text-muted">Could not fetch the latest release information. Please check your GitHub repository URL.</p>
+                                        <a href="<?php echo url('admin/settings/update'); ?>" class="btn btn-primary shadow-sm">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" /><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" /></svg>
+                                            Check for Updates
+                                        </a>
                                     </div>
                                 <?php endif; ?>
                             <?php endif; ?>

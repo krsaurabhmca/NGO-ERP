@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.6] - 2026-09-17
+
+### Added
+- Added "Check for Updates" and "Force Reinstall" manual action buttons to the System Updates dashboard.
+
 ## [1.0.5] - 2026-09-17
 
 ### Fixed
