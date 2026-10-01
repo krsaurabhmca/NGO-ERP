@@ -355,13 +355,13 @@
                                     form.reset();
                                     showSuccessModal(vres.message, vres.receipt_url);
                                 } else {
-                                    msgBox.innerHTML = '<div class="alert alert-danger py-2 mb-0">' + (vres.message || 'Verification failed.') + '</div>';
+                                    msgBox.innerHTML = '<div class="alert alert-danger py-2 mb-0">' + (vres.message || 'Verification failed. Response: ' + JSON.stringify(vres)) + '</div>';
                                 }
                                 btn.disabled = false;
                                 btn.innerHTML = '<i class="fas fa-heart me-2"></i> Donate Now';
                             })
-                            .catch(() => {
-                                msgBox.innerHTML = '<div class="alert alert-danger py-2 mb-0">Verification failed. Please contact support.</div>';
+                            .catch((err) => {
+                                msgBox.innerHTML = '<div class="alert alert-danger py-2 mb-0">Verification failed. Please contact support. Error: ' + err.message + '</div>';
                                 btn.disabled = false;
                                 btn.innerHTML = '<i class="fas fa-heart me-2"></i> Donate Now';
                             });
