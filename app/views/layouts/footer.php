@@ -123,14 +123,6 @@ document.addEventListener('DOMContentLoaded', function() {
             f.appendChild(input);
         });
     }
-
-    var myCarousel = document.getElementById('heroSlider');
-    if (myCarousel) {
-        new bootstrap.Carousel(myCarousel, {
-            interval: 5000,
-            ride: 'carousel'
-        });
-    }
 });
 </script>
 </body>

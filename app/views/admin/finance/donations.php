@@ -82,7 +82,8 @@
                         <div class="col-auto">
                             <select id="df-method" class="form-select form-select-sm" style="min-width:130px">
                                 <option value="">All Methods</option>
-                                <option value="razorpay">Online</option>
+                                <option value="razorpay">Razorpay</option>
+                                <option value="cashfree">Cashfree</option>
                                 <option value="offline">Cash</option>
                                 <option value="bank_transfer">Bank Transfer</option>
                                 <option value="upi">UPI</option>

@@ -144,8 +144,8 @@
                                                             <span id="logo-placeholder" class="text-muted small fw-bold" style="<?php echo !empty($settings['ngo_logo']) ? 'display:none;' : ''; ?>">No Logo</span>
                                                         </div>
                                                         <div class="flex-grow-1">
-                                                            <input type="file" name="ngo_logo" id="ngo_logo_input" class="form-control" accept="image/*" max="512000">
-                                                            <div class="text-muted mt-2 small">PNG or SVG with transparent background preferred (Max: 500KB).</div>
+                                                            <input type="file" name="ngo_logo" id="ngo_logo_input" class="form-control" accept="image/*" max="5242880">
+                                                            <div class="text-muted mt-2 small">PNG or SVG with transparent background preferred (Max: 5MB).</div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -161,8 +161,8 @@
                                                             <span id="favicon-placeholder" class="text-muted extra-small fw-bold" style="<?php echo !empty($settings['ngo_favicon']) ? 'display:none;' : ''; ?>">None</span>
                                                         </div>
                                                         <div class="flex-grow-1">
-                                                            <input type="file" name="ngo_favicon" id="ngo_favicon_input" class="form-control" accept="image/x-icon,image/png" max="512000">
-                                                            <div class="text-muted mt-2 small">Browser tab icon. 32x32 px PNG or ICO (Max: 500KB).</div>
+                                                            <input type="file" name="ngo_favicon" id="ngo_favicon_input" class="form-control" accept="image/x-icon,image/png" max="5242880">
+                                                            <div class="text-muted mt-2 small">Browser tab icon. 32x32 px PNG or ICO (Max: 5MB).</div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -178,8 +178,8 @@
                                                             <span id="signature-placeholder" class="text-muted small fw-bold" style="<?php echo !empty($settings['ngo_signature']) ? 'display:none;' : ''; ?>">No Signature</span>
                                                         </div>
                                                         <div class="flex-grow-1">
-                                                            <input type="file" name="ngo_signature" id="ngo_signature_input" class="form-control" accept="image/png,image/jpeg" max="512000">
-                                                            <div class="text-muted mt-2 small">For ID cards & certificates. Transparent PNG preferred (Max: 500KB).</div>
+                                                            <input type="file" name="ngo_signature" id="ngo_signature_input" class="form-control" accept="image/png,image/jpeg" max="5242880">
+                                                            <div class="text-muted mt-2 small">For ID cards & certificates. Transparent PNG preferred (Max: 5MB).</div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -498,3 +498,4 @@
         }
     });
 </script>
+

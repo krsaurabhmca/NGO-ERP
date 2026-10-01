@@ -118,15 +118,15 @@
                             <div class="col-lg-6">
                                 <div class="mb-3">
                                     <label class="form-label">Featured Image</label>
-                                    <input type="file" name="image" class="form-control" accept="image/*" max="512000">
-                                    <small class="text-muted">Max 500KB</small>
+                                    <input type="file" name="image" class="form-control" accept="image/*" max="5242880">
+                                    <small class="text-muted">Max 5MB</small>
                                 </div>
                             </div>
                             <div class="col-lg-6">
                                 <div class="mb-3">
                                     <label class="form-label">Project Gallery</label>
-                                    <input type="file" name="gallery[]" class="form-control" accept="image/*" multiple max="512000">
-                                    <small class="text-muted">Max 500KB per image. You can select multiple images.</small>
+                                    <input type="file" name="gallery[]" class="form-control" accept="image/*" multiple max="5242880">
+                                    <small class="text-muted">Max 5MB per image. You can select multiple images.</small>
                                 </div>
                             </div>
                         </div>
@@ -244,16 +244,16 @@
                             <div class="col-lg-6">
                                 <div class="mb-3">
                                     <label class="form-label">Change Featured Image</label>
-                                    <input type="file" name="image" class="form-control" accept="image/*" max="512000">
-                                    <small class="text-muted">Max 500KB</small>
+                                    <input type="file" name="image" class="form-control" accept="image/*" max="5242880">
+                                    <small class="text-muted">Max 5MB</small>
                                     <div id="edit_image_preview" class="mt-2"></div>
                                 </div>
                             </div>
                             <div class="col-lg-6">
                                 <div class="mb-3">
                                     <label class="form-label">Add to Gallery</label>
-                                    <input type="file" name="gallery[]" class="form-control" accept="image/*" multiple max="512000">
-                                    <small class="text-muted">Max 500KB per image. Select more images to add to the gallery.</small>
+                                    <input type="file" name="gallery[]" class="form-control" accept="image/*" multiple max="5242880">
+                                    <small class="text-muted">Max 5MB per image. Select more images to add to the gallery.</small>
                                 </div>
                             </div>
                         </div>
@@ -436,3 +436,4 @@
 
     <?php require_once 'app/views/admin/layouts/footer.php'; ?>
 </div>
+

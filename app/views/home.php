@@ -6,8 +6,12 @@
 <?php if (!empty($slider)): ?>
     <div id="heroSlider" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
         <div class="carousel-inner">
-            <?php foreach ($slider as $index => $slide): ?>
-                <div class="carousel-item <?php echo $index === 0 ? 'active' : ''; ?>">
+            <?php 
+            $activeIndex = 0;
+            foreach ($slider as $slide): 
+                if ($slide->status !== 'active') continue;
+            ?>
+                <div class="carousel-item <?php echo $activeIndex === 0 ? 'active' : ''; ?>">
                     <div class="hero-section text-center" style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('<?php echo file_url($slide->file_path); ?>'); height: 500px;">
                         <div class="container-fluid px-lg-5">
                             <h1 class="display-4 fw-bold mb-3"><?php echo htmlspecialchars($slide->title); ?></h1>
@@ -26,9 +30,12 @@
                         </div>
                     </div>
                 </div>
-            <?php endforeach; ?>
+            <?php 
+                $activeIndex++;
+                endforeach; 
+            ?>
         </div>
-        <?php if (count($slider) > 1): ?>
+        <?php if ($activeIndex > 1): ?>
             <button class="carousel-control-prev" type="button" data-bs-target="#heroSlider" data-bs-slide="prev">
                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                 <span class="visually-hidden">Previous</span>

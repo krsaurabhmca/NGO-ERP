@@ -47,7 +47,7 @@ class PartnerController extends Controller
 
         $logoPath = null;
         if (isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) {
-            $valid = validate_upload($_FILES['logo'], ['jpg', 'jpeg', 'png', 'svg', 'webp'], ['image/jpeg', 'image/png', 'image/svg+xml', 'image/webp'], 500 * 1024);
+            $valid = validate_upload($_FILES['logo'], ['jpg', 'jpeg', 'png', 'svg', 'webp'], ['image/jpeg', 'image/png', 'image/svg+xml', 'image/webp'], 5 * 1024 * 1024);
             if ($valid !== true) {
                 json_response(['status' => 'error', 'message' => 'Logo: ' . $valid]);
                 exit;
@@ -108,7 +108,7 @@ class PartnerController extends Controller
 
         $logoPath = $partner->logo;
         if (isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) {
-            $valid = validate_upload($_FILES['logo'], ['jpg', 'jpeg', 'png', 'svg', 'webp'], ['image/jpeg', 'image/png', 'image/svg+xml', 'image/webp'], 500 * 1024);
+            $valid = validate_upload($_FILES['logo'], ['jpg', 'jpeg', 'png', 'svg', 'webp'], ['image/jpeg', 'image/png', 'image/svg+xml', 'image/webp'], 5 * 1024 * 1024);
             if ($valid !== true) {
                 json_response(['status' => 'error', 'message' => 'Logo: ' . $valid]);
                 exit;
@@ -150,3 +150,4 @@ class PartnerController extends Controller
         exit;
     }
 }
+

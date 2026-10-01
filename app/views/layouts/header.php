@@ -115,6 +115,7 @@
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdownAbout">
                         <li><a class="dropdown-item" href="<?php echo url('/about'); ?>"><i class="fas fa-info-circle me-2" style="color: var(--primary); width: 16px;"></i>About Us</a></li>
                         <li><a class="dropdown-item" href="<?php echo url('/certificates'); ?>"><i class="fas fa-certificate me-2" style="color: var(--primary); width: 16px;"></i>Certificates</a></li>
+                        <li><a class="dropdown-item" href="<?php echo url('/documents'); ?>"><i class="fas fa-file-alt me-2" style="color: var(--primary); width: 16px;"></i>Documents</a></li>
                         <li><a class="dropdown-item" href="<?php echo url('/achievements'); ?>"><i class="fas fa-trophy me-2" style="color: var(--primary); width: 16px;"></i>Achievements</a></li>
                         <li><a class="dropdown-item" href="<?php echo url('/beneficiaries'); ?>"><i class="fas fa-hands-helping me-2" style="color: var(--primary); width: 16px;"></i>Beneficiaries</a></li>
                     </ul>

@@ -252,7 +252,7 @@
                             <div class="col-lg-12">
                                 <div class="mb-3">
                                     <label class="form-label">Upload Image <span class="text-muted small fw-normal">(Max 500 KB)</span></label>
-                                    <input type="file" name="image" class="form-control" accept="image/*" max="512000">
+                                    <input type="file" name="image" class="form-control" accept="image/*" max="5242880">
                                 </div>
                             </div>
                         </div>
@@ -429,7 +429,7 @@
                                     <!-- Current image will be displayed here -->
                                 </div>
                                 <label class="form-label">Change Image <span class="text-muted small fw-normal">(Max 500 KB)</span></label>
-                                <input type="file" name="image" class="form-control" accept="image/*" max="512000">
+                                <input type="file" name="image" class="form-control" accept="image/*" max="5242880">
                             </div>
                         </div>
                         <div class="row">
@@ -1055,3 +1055,4 @@
     </script>
     <?php require_once 'app/views/admin/layouts/footer.php'; ?>
 </div>
+

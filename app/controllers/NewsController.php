@@ -39,7 +39,7 @@ class NewsController extends Controller
             
             $imagePath = null;
             if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-                $valid = validate_upload($_FILES['image'], ['jpg', 'jpeg', 'png', 'gif', 'webp'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 500 * 1024);
+                $valid = validate_upload($_FILES['image'], ['jpg', 'jpeg', 'png', 'gif', 'webp'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 5 * 1024 * 1024);
                 if ($valid !== true) {
                     $_SESSION['error'] = 'News image: ' . $valid;
                     return $this->redirect('admin/news');
@@ -107,7 +107,7 @@ class NewsController extends Controller
             
             $imagePath = $news->image;
             if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-                $valid = validate_upload($_FILES['image'], ['jpg', 'jpeg', 'png', 'gif', 'webp'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 500 * 1024);
+                $valid = validate_upload($_FILES['image'], ['jpg', 'jpeg', 'png', 'gif', 'webp'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 5 * 1024 * 1024);
                 if ($valid !== true) {
                     $_SESSION['error'] = 'News image: ' . $valid;
                     return $this->redirect('admin/news');
@@ -169,3 +169,4 @@ class NewsController extends Controller
         return $this->redirect('admin/news');
     }
 }
+

@@ -57,7 +57,7 @@
                                 <div class="col-lg-6">
                                     <label class="form-label small fw-semibold">Resume/CV <span class="text-danger">*</span></label>
                                     <input type="file" name="resume" class="form-control" accept=".pdf,.doc,.docx" required>
-                                    <small class="form-text text-muted">Max 2MB (PDF, DOC, DOCX)</small>
+                                    <small class="form-text text-muted">Max 5MB (PDF, DOC, DOCX)</small>
                                 </div>
                                 <div class="col-12">
                                     <label class="form-label small fw-semibold">Address <span class="text-danger">*</span></label>
@@ -99,3 +99,4 @@
 </section>
 
 <?php require_once 'app/views/layouts/footer.php'; ?>
+

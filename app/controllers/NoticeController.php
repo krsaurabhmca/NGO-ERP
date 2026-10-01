@@ -39,7 +39,7 @@ class NoticeController extends Controller
             
             $imagePath = null;
             if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-                $valid = validate_upload($_FILES['image'], ['jpg', 'jpeg', 'png', 'gif', 'webp'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 500 * 1024);
+                $valid = validate_upload($_FILES['image'], ['jpg', 'jpeg', 'png', 'gif', 'webp'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 5 * 1024 * 1024);
                 if ($valid !== true) {
                     $_SESSION['error'] = 'Notice image: ' . $valid;
                     return $this->redirect('admin/notices');
@@ -106,7 +106,7 @@ class NoticeController extends Controller
             
             $imagePath = $notice->image;
             if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-                $valid = validate_upload($_FILES['image'], ['jpg', 'jpeg', 'png', 'gif', 'webp'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 500 * 1024);
+                $valid = validate_upload($_FILES['image'], ['jpg', 'jpeg', 'png', 'gif', 'webp'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 5 * 1024 * 1024);
                 if ($valid !== true) {
                     $_SESSION['error'] = 'Notice image: ' . $valid;
                     return $this->redirect('admin/notices');
@@ -163,3 +163,4 @@ class NoticeController extends Controller
         return $this->redirect('admin/notices');
     }
 }
+

@@ -42,7 +42,7 @@ class ProjectController extends Controller
             
             $imagePath = null;
             if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-                $valid = validate_upload($_FILES['image'], ['jpg', 'jpeg', 'png', 'gif', 'webp'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 500 * 1024);
+                $valid = validate_upload($_FILES['image'], ['jpg', 'jpeg', 'png', 'gif', 'webp'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 5 * 1024 * 1024);
                 if ($valid !== true) {
                     $_SESSION['error'] = 'Featured image: ' . $valid;
                     return $this->redirect('admin/projects');
@@ -64,7 +64,7 @@ class ProjectController extends Controller
                             'size' => $galleryFiles['size'][$key],
                             'error' => $galleryFiles['error'][$key]
                         ];
-                        $valid = validate_upload($singleFile, ['jpg', 'jpeg', 'png', 'gif', 'webp'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 500 * 1024);
+                        $valid = validate_upload($singleFile, ['jpg', 'jpeg', 'png', 'gif', 'webp'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 5 * 1024 * 1024);
                         if ($valid !== true) {
                             $_SESSION['error'] = 'Gallery image "' . $galleryFiles['name'][$key] . '": ' . $valid;
                             return $this->redirect('admin/projects');
@@ -102,7 +102,7 @@ class ProjectController extends Controller
                                 'size' => $_FILES['gallery']['size'][$key],
                                 'error' => $_FILES['gallery']['error'][$key]
                             ];
-                            $valid = validate_upload($singleFile, ['jpg', 'jpeg', 'png', 'gif', 'webp'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 500 * 1024);
+                            $valid = validate_upload($singleFile, ['jpg', 'jpeg', 'png', 'gif', 'webp'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 5 * 1024 * 1024);
                             if ($valid !== true) continue;
                             $fileName = UploadHelper::processImage($singleFile, $uploadDir);
                             if ($fileName) {
@@ -166,7 +166,7 @@ class ProjectController extends Controller
             
             $imagePath = $project->image;
             if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-                $valid = validate_upload($_FILES['image'], ['jpg', 'jpeg', 'png', 'gif', 'webp'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 500 * 1024);
+                $valid = validate_upload($_FILES['image'], ['jpg', 'jpeg', 'png', 'gif', 'webp'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 5 * 1024 * 1024);
                 if ($valid !== true) {
                     $_SESSION['error'] = 'Featured image: ' . $valid;
                     return $this->redirect('admin/projects');
@@ -189,7 +189,7 @@ class ProjectController extends Controller
                             'size' => $galleryFiles['size'][$key],
                             'error' => $galleryFiles['error'][$key]
                         ];
-                        $valid = validate_upload($singleFile, ['jpg', 'jpeg', 'png', 'gif', 'webp'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 500 * 1024);
+                        $valid = validate_upload($singleFile, ['jpg', 'jpeg', 'png', 'gif', 'webp'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 5 * 1024 * 1024);
                         if ($valid !== true) {
                             $_SESSION['error'] = 'Gallery image "' . $galleryFiles['name'][$key] . '": ' . $valid;
                             return $this->redirect('admin/projects');
@@ -226,7 +226,7 @@ class ProjectController extends Controller
                                 'size' => $_FILES['gallery']['size'][$key],
                                 'error' => $_FILES['gallery']['error'][$key]
                             ];
-                            $valid = validate_upload($singleFile, ['jpg', 'jpeg', 'png', 'gif', 'webp'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 500 * 1024);
+                            $valid = validate_upload($singleFile, ['jpg', 'jpeg', 'png', 'gif', 'webp'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 5 * 1024 * 1024);
                             if ($valid !== true) continue;
                             $fileName = UploadHelper::processImage($singleFile, $uploadDir);
                             if ($fileName) {
@@ -285,3 +285,4 @@ class ProjectController extends Controller
         return $this->redirect('admin/projects');
     }
 }
+

@@ -135,7 +135,7 @@
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="mb-3">
-                                <label class="form-label">Partner Logo <span class="text-muted small fw-normal">(Max 500KB)</span></label>
+                                <label class="form-label">Partner Logo <span class="text-muted small fw-normal">(Max 5MB)</span></label>
                                 <input type="file" name="logo" id="partner-logo" class="form-control" accept="image/*">
                                 <div id="logo-preview" class="mt-2 text-center d-none">
                                     <img src="" alt="Logo Preview" style="max-height: 60px; max-width: 100%; object-fit: contain;">
@@ -319,3 +319,4 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <?php require_once 'app/views/admin/layouts/footer.php'; ?>
+

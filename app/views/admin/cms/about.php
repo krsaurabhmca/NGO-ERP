@@ -160,8 +160,8 @@
                                                     </div>
                                                     <div class="mb-3">
                                                         <label class="form-label small fw-bold">Logo Image</label>
-                                                        <input type="file" name="value_integrity_image" class="form-control form-control-sm" accept="image/*" max="512000">
-                                                        <small class="text-muted d-block">Max 500KB</small>
+                                                        <input type="file" name="value_integrity_image" class="form-control form-control-sm" accept="image/*" max="5242880">
+                                                        <small class="text-muted d-block">Max 5MB</small>
                                                         <input type="hidden" name="integrity_icon" value="<?php echo htmlspecialchars($page->value_integrity_icon ?? 'fas fa-shield-alt'); ?>">
                                                     </div>
                                                     <div>
@@ -189,8 +189,8 @@
                                                     </div>
                                                     <div class="mb-3">
                                                         <label class="form-label small fw-bold">Logo Image</label>
-                                                        <input type="file" name="value_compassion_image" class="form-control form-control-sm" accept="image/*" max="512000">
-                                                        <small class="text-muted d-block">Max 500KB</small>
+                                                        <input type="file" name="value_compassion_image" class="form-control form-control-sm" accept="image/*" max="5242880">
+                                                        <small class="text-muted d-block">Max 5MB</small>
                                                         <input type="hidden" name="compassion_icon" value="<?php echo htmlspecialchars($page->value_compassion_icon ?? 'fas fa-heart'); ?>">
                                                     </div>
                                                     <div>
@@ -218,8 +218,8 @@
                                                     </div>
                                                     <div class="mb-3">
                                                         <label class="form-label small fw-bold">Logo Image</label>
-                                                        <input type="file" name="value_innovation_image" class="form-control form-control-sm" accept="image/*" max="512000">
-                                                        <small class="text-muted d-block">Max 500KB</small>
+                                                        <input type="file" name="value_innovation_image" class="form-control form-control-sm" accept="image/*" max="5242880">
+                                                        <small class="text-muted d-block">Max 5MB</small>
                                                         <input type="hidden" name="innovation_icon" value="<?php echo htmlspecialchars($page->value_innovation_icon ?? 'fas fa-lightbulb'); ?>">
                                                     </div>
                                                     <div>
@@ -247,8 +247,8 @@
                                                     </div>
                                                     <div class="mb-3">
                                                         <label class="form-label small fw-bold">Logo Image</label>
-                                                        <input type="file" name="value_collaboration_image" class="form-control form-control-sm" accept="image/*" max="512000">
-                                                        <small class="text-muted d-block">Max 500KB</small>
+                                                        <input type="file" name="value_collaboration_image" class="form-control form-control-sm" accept="image/*" max="5242880">
+                                                        <small class="text-muted d-block">Max 5MB</small>
                                                         <input type="hidden" name="collaboration_icon" value="<?php echo htmlspecialchars($page->value_collaboration_icon ?? 'fas fa-users'); ?>">
                                                     </div>
                                                     <div>
@@ -352,3 +352,4 @@
         }
     });
 </script>
+

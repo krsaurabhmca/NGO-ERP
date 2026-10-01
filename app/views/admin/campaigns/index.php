@@ -187,8 +187,8 @@
                             <div class="col-lg-6">
                                 <div class="mb-3">
                                     <label class="form-label">Image</label>
-                                    <input type="file" name="image" class="form-control" accept="image/*" max="512000">
-                                    <small class="text-muted">Max 500KB</small>
+                                    <input type="file" name="image" class="form-control" accept="image/*" max="5242880">
+                                    <small class="text-muted">Max 5MB</small>
                                 </div>
                             </div>
                             <div class="col-lg-6">
@@ -268,8 +268,8 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Change Image</label>
-                            <input type="file" name="image" class="form-control" accept="image/*" max="512000">
-                            <small class="text-muted">Max 500KB</small>
+                            <input type="file" name="image" class="form-control" accept="image/*" max="5242880">
+                            <small class="text-muted">Max 5MB</small>
                             <div id="edit_image_preview" class="mt-2"></div>
                         </div>
                     </div>
@@ -351,3 +351,4 @@
     </style>
     <?php require_once 'app/views/admin/layouts/footer.php'; ?>
 </div>
+

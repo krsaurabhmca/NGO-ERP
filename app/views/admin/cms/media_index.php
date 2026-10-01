@@ -26,6 +26,7 @@
                             if ($category === 'slider') echo 'Add New Display Image';
                             else if ($category === 'gallery') echo 'Add New Image';
                             else if ($category === 'certificate') echo 'Add New Certificate';
+                            else if ($category === 'document') echo 'Add New Document';
                             else if ($category === 'achievement') echo 'Add New Achievement';
                             else echo 'Add New Item'; 
                         ?>
@@ -55,16 +56,20 @@
                     <?php foreach ($items as $item): ?>
                         <div class="<?php 
                             if ($category === 'slider') echo 'col-6 col-md-4 col-lg-3';
-                            else if (in_array($category, ['certificate', 'achievement'])) echo 'col-6 col-md-3 col-lg-2';
+                            else if (in_array($category, ['certificate', 'achievement', 'document'])) echo 'col-6 col-md-3 col-lg-2';
                             else echo 'col-sm-6 col-lg-3'; 
                         ?>">
                             <div class="card card-sm border-0 shadow-sm h-100">
                                 <a href="javascript:void(0)" onclick="viewMedia('<?php echo file_url($item->file_path); ?>', '<?php echo addslashes(htmlspecialchars($item->title)); ?>', '<?php echo addslashes(htmlspecialchars($item->description)); ?>')" class="d-block">
                                     <?php if ($category === 'slider'): ?>
                                         <img src="<?php echo file_url($item->file_path); ?>" class="card-img-top" style="aspect-ratio: 16 / 9; object-fit: cover; width: 100%;">
-                                    <?php elseif (in_array($category, ['certificate', 'achievement'])): ?>
+                                    <?php elseif (in_array($category, ['certificate', 'achievement', 'document'])): ?>
                                         <div class="bg-light d-flex align-items-center justify-content-center p-1" style="aspect-ratio: 3 / 4; width: 100%;">
-                                            <img src="<?php echo file_url($item->file_path); ?>" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+                                            <?php if (in_array(strtolower(pathinfo($item->file_path, PATHINFO_EXTENSION)), ['pdf', 'doc', 'docx'])): ?>
+                                                <i class="fas fa-file-alt fa-4x text-muted" style="color: var(--primary) !important;"></i>
+                                            <?php else: ?>
+                                                <img src="<?php echo file_url($item->file_path); ?>" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+                                            <?php endif; ?>
                                         </div>
                                     <?php else: ?>
                                         <img src="<?php echo file_url($item->file_path); ?>" class="card-img-top" style="aspect-ratio: 1 / 1; object-fit: cover; width: 100%;">
@@ -76,17 +81,19 @@
                                             <div class="fw-bold small text-truncate" title="<?php echo htmlspecialchars($item->title); ?>"><?php echo htmlspecialchars($item->title); ?></div>
                                             <?php if ($category === 'slider'): ?>
                                                 <div class="text-muted extra-small" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;"><?php echo htmlspecialchars($item->description); ?></div>
-                                            <?php elseif (!in_array($category, ['certificate', 'achievement', 'gallery'])): ?>
+                                            <?php elseif (!in_array($category, ['certificate', 'achievement', 'document', 'gallery'])): ?>
                                                 <div class="text-muted extra-small text-truncate"><?php echo htmlspecialchars($item->description); ?></div>
                                             <?php endif; ?>
                                             
                                             <div class="mt-2 d-flex align-items-center">
                                                 <?php if ($category === 'slider'): ?>
-                                                    <label class="form-check form-switch mb-0">
-                                                        <input class="form-check-input" type="checkbox" <?php echo ($item->status ?? 'active') === 'active' ? 'checked' : ''; ?> 
-                                                               onchange="window.location.href='<?php echo url('admin/cms/toggle-media-status/' . ($item->uuid ?? $item->id)); ?>'">
-                                                        <span class="form-check-label extra-small">Visible on Home</span>
-                                                    </label>
+                                                    <form action="<?php echo url('admin/cms/toggle-media-status/' . ($item->uuid ?? $item->id)); ?>" method="POST" class="m-0 p-0">
+                                                        <label class="form-check form-switch mb-0">
+                                                            <input class="form-check-input" type="checkbox" <?php echo ($item->status ?? 'active') === 'active' ? 'checked' : ''; ?> 
+                                                                   onchange="this.form.submit()">
+                                                            <span class="form-check-label extra-small">Visible on Home</span>
+                                                        </label>
+                                                    </form>
                                                 <?php else: ?>
                                                     <span class="badge <?php echo ($item->status ?? 'active') === 'active' ? 'bg-success' : 'bg-secondary'; ?>-lt extra-small">
                                                         <?php echo ucfirst($item->status ?? 'active'); ?>
@@ -136,13 +143,13 @@
                         <?php endif; ?>
                         <div class="mb-3">
                             <label class="form-label">Upload File</label>
-                            <input type="file" name="file" id="media_file_input" class="form-control" accept="image/*" required max="512000">
+                            <input type="file" name="file" id="media_file_input" class="form-control" accept="<?php echo $category === 'document' ? '.pdf,.doc,.docx,image/*' : 'image/*'; ?>" required max="5242880">
                             <small class="form-hint">
                                 <?php if ($category === 'slider'): ?>
                                     Recommended Aspect Ratio: <span class="fw-bold text-info">16:9</span>. 
                                 <?php endif; ?>
-                                Max file size: <span class="fw-bold text-primary">500KB</span>. 
-                                Format: JPG, PNG, WebP.
+                                Max file size: <span class="fw-bold text-primary">5MB</span>. 
+                                <?php if ($category === 'document') echo 'Format: PDF, DOC, DOCX, JPG, PNG.'; else echo 'Format: JPG, PNG, WebP.'; ?>
                             </small>
                         </div>
                     </div>
@@ -181,6 +188,10 @@
 
 <script>
     function viewMedia(url, title, desc) {
+        if (url.match(/\.(pdf|doc|docx)$/i)) {
+            window.open(url, '_blank');
+            return;
+        }
         document.getElementById('view-media-img').src = url;
         document.getElementById('view-media-title').innerText = title;
         document.getElementById('view-media-desc').innerText = desc || 'No description provided.';
@@ -204,3 +215,4 @@
         }
     });
 </script>
+

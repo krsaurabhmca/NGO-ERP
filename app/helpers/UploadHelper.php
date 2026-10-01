@@ -6,7 +6,7 @@ class UploadHelper {
     /**
      * General file processing: resizes/compresses images, normally uploads other files.
      */
-    public static function processFile($fileArray, $uploadDir, $maxSizeKb = 300, $maxWidth = 1200) {
+    public static function processFile($fileArray, $uploadDir, $maxSizeKb = 5120, $maxWidth = 2400) {
         if (!isset($fileArray['tmp_name']) || empty($fileArray['tmp_name'])) {
             return false;
         }
@@ -45,10 +45,13 @@ class UploadHelper {
      * @param int $maxWidth The maximum width to resize to if larger (default 1200)
      * @return string|false The final uploaded filename (e.g., 'image_123.webp') on success, or false on failure.
      */
-    public static function processImage($fileArray, $uploadDir, $maxSizeKb = 300, $maxWidth = 1200) {
+    public static function processImage($fileArray, $uploadDir, $maxSizeKb = 5120, $maxWidth = 2400) {
         if (!isset($fileArray['tmp_name']) || empty($fileArray['tmp_name'])) {
             return false;
         }
+
+        // Increase memory limit for large image processing
+        ini_set('memory_limit', '512M');
 
         $tmpName = $fileArray['tmp_name'];
         $originalName = $fileArray['name'];

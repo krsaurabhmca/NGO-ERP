@@ -55,6 +55,7 @@ class FinanceController extends Controller
         $countCompleted = $this->donationModel->countCompleted();
 
         $razorpayTotal = $this->donationModel->totalByPaymentMethod('razorpay');
+        $cashfreeTotal = $this->donationModel->totalByPaymentMethod('cashfree');
         $offlineTotal = $this->donationModel->totalByPaymentMethod('offline');
         
         $donorModel = new \App\Models\Donor();
@@ -68,6 +69,7 @@ class FinanceController extends Controller
             'totalFailed' => $totalFailed,
             'countCompleted' => $countCompleted,
             'razorpayTotal' => $razorpayTotal,
+            'cashfreeTotal' => $cashfreeTotal,
             'offlineTotal' => $offlineTotal,
             'registeredDonors' => $registeredDonors,
             'filters' => $filters,
@@ -151,7 +153,7 @@ class FinanceController extends Controller
         }
 
         if (isset($_FILES['receipt']) && $_FILES['receipt']['error'] === UPLOAD_ERR_OK) {
-            $valid = validate_upload($_FILES['receipt'], ['pdf', 'jpg', 'jpeg', 'png'], ['application/pdf', 'image/jpeg', 'image/png'], 2 * 1024 * 1024);
+            $valid = validate_upload($_FILES['receipt'], ['pdf', 'jpg', 'jpeg', 'png'], ['application/pdf', 'image/jpeg', 'image/png'], 5 * 1024 * 1024);
             if ($valid !== true) {
                 json_response(['status' => 'error', 'message' => 'Receipt: ' . $valid]);
                 exit;
@@ -214,7 +216,7 @@ class FinanceController extends Controller
         }
 
         if (isset($_FILES['receipt']) && $_FILES['receipt']['error'] === UPLOAD_ERR_OK) {
-            $valid = validate_upload($_FILES['receipt'], ['pdf', 'jpg', 'jpeg', 'png'], ['application/pdf', 'image/jpeg', 'image/png'], 2 * 1024 * 1024);
+            $valid = validate_upload($_FILES['receipt'], ['pdf', 'jpg', 'jpeg', 'png'], ['application/pdf', 'image/jpeg', 'image/png'], 5 * 1024 * 1024);
             if ($valid !== true) {
                 json_response(['status' => 'error', 'message' => 'Receipt: ' . $valid]);
                 exit;
@@ -586,3 +588,4 @@ class FinanceController extends Controller
         return $this->redirect('admin/finance/donations');
     }
 }
+

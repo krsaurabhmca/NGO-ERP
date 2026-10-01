@@ -12,6 +12,8 @@ class CryptoHelper
         'razorpay_test_key_secret',
         'razorpay_live_key_secret',
         'phonepe_salt_key',
+        'cashfree_test_secret_key',
+        'cashfree_live_secret_key',
     ];
 
     private static function getKey(): string

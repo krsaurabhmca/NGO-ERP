@@ -140,8 +140,8 @@
                                         <img id="bene-photo-preview" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;">
                                         <svg id="bene-photo-placeholder" xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user text-muted" width="40" height="40" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" /><path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" /></svg>
                                     </div>
-                                    <input type="file" name="photo" id="bene_photo_input" class="form-control form-control-sm" accept="image/*" max="512000">
-                                    <small class="text-muted">Max: 500KB &middot; Ratio: 2:3</small>
+                                    <input type="file" name="photo" id="bene_photo_input" class="form-control form-control-sm" accept="image/*" max="5242880">
+                                    <small class="text-muted">Max: 5MB &middot; Ratio: 2:3</small>
                                 </div>
                             </div>
                             <div class="col-md-9">
@@ -201,7 +201,7 @@
                                 <div class="mb-3">
                                     <label class="form-label">Supporting Documents</label>
                                     <input type="file" name="documents" class="form-control" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
-                                    <small class="text-muted">PDF or Image (Max: 2MB)</small>
+                                    <small class="text-muted">PDF or Image (Max: 5MB)</small>
                                 </div>
                             </div>
                         </div>
@@ -296,8 +296,8 @@
                                         <img id="edit-photo-preview" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;">
                                         <svg id="edit-photo-placeholder" xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user text-muted" width="40" height="40" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" /><path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" /></svg>
                                     </div>
-                                    <input type="file" name="photo" id="edit_photo_input" class="form-control form-control-sm" accept="image/*" max="512000">
-                                    <small class="text-muted">Max: 500KB &middot; Ratio: 2:3</small>
+                                    <input type="file" name="photo" id="edit_photo_input" class="form-control form-control-sm" accept="image/*" max="5242880">
+                                    <small class="text-muted">Max: 5MB &middot; Ratio: 2:3</small>
                                 </div>
                             </div>
                             <div class="col-md-9">
@@ -469,3 +469,4 @@
             });
     }
 </script>
+

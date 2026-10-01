@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.7] - 2026-10-01
+
+### Added
+- Integrated Cashfree payment gateway for online donations.
+- Added dynamic Active Gateway selector in admin payment settings.
+- Added "Cashfree" filtering capability in Admin Donations list and aggregate Cashfree total tracking in Dashboard.
+
+### Changed
+- Improved Payment Settings UI (`admin/settings/payments`) by compartmentalizing gateway configurations. Now securely hides/shows Razorpay and Cashfree specific credential fields based on the selected Active Gateway using Javascript toggles.
+- Handled localized SSL configuration (`CURLOPT_SSL_VERIFYPEER, false`) across the application to prevent `curl_error` blocks when testing APIs from environments without default SSL CA bundles (e.g. Laragon).
+- Increased upload constraints and memory limit from standard configurations (5MB file support).
+
+### Fixed
+- Fixed an issue where the slider and CMS media images "Visible on Homepage" toggle logic failed to persist. Changed from `GET` endpoint architecture to a proper form `POST` submission in `media_index.php` and `web.php`.
+
 ## [1.0.6] - 2026-09-17
 
 ### Added

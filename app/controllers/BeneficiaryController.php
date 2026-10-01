@@ -55,7 +55,7 @@ class BeneficiaryController extends Controller
 
             // Photo upload
             if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
-                $valid = validate_upload($_FILES['photo'], ['jpg', 'jpeg', 'png', 'gif', 'webp'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 500 * 1024);
+                $valid = validate_upload($_FILES['photo'], ['jpg', 'jpeg', 'png', 'gif', 'webp'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 5 * 1024 * 1024);
                 if ($valid !== true) {
                     $_SESSION['error'] = 'Photo: ' . $valid;
                     return $this->redirect('admin/beneficiaries');
@@ -69,7 +69,7 @@ class BeneficiaryController extends Controller
 
             // Document upload
             if (isset($_FILES['documents']) && $_FILES['documents']['error'] === UPLOAD_ERR_OK) {
-                $valid = validate_upload($_FILES['documents'], ['pdf', 'jpg', 'jpeg', 'png'], ['application/pdf', 'image/jpeg', 'image/png'], 2 * 1024 * 1024);
+                $valid = validate_upload($_FILES['documents'], ['pdf', 'jpg', 'jpeg', 'png'], ['application/pdf', 'image/jpeg', 'image/png'], 5 * 1024 * 1024);
                 if ($valid !== true) {
                     $_SESSION['error'] = 'Documents: ' . $valid;
                     return $this->redirect('admin/beneficiaries');
@@ -143,7 +143,7 @@ class BeneficiaryController extends Controller
             $uploadDir = UPLOAD_PATH . 'beneficiaries/';
 
             if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
-                $valid = validate_upload($_FILES['photo'], ['jpg', 'jpeg', 'png', 'gif', 'webp'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 500 * 1024);
+                $valid = validate_upload($_FILES['photo'], ['jpg', 'jpeg', 'png', 'gif', 'webp'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 5 * 1024 * 1024);
                 if ($valid !== true) {
                     $_SESSION['error'] = 'Photo: ' . $valid;
                     return $this->redirect('admin/beneficiaries');
@@ -159,7 +159,7 @@ class BeneficiaryController extends Controller
             }
 
             if (isset($_FILES['documents']) && $_FILES['documents']['error'] === UPLOAD_ERR_OK) {
-                $valid = validate_upload($_FILES['documents'], ['pdf', 'jpg', 'jpeg', 'png'], ['application/pdf', 'image/jpeg', 'image/png'], 2 * 1024 * 1024);
+                $valid = validate_upload($_FILES['documents'], ['pdf', 'jpg', 'jpeg', 'png'], ['application/pdf', 'image/jpeg', 'image/png'], 5 * 1024 * 1024);
                 if ($valid !== true) {
                     $_SESSION['error'] = 'Documents: ' . $valid;
                     return $this->redirect('admin/beneficiaries');
@@ -249,3 +249,4 @@ class BeneficiaryController extends Controller
         return $this->redirect('admin/beneficiaries');
     }
 }
+

@@ -60,6 +60,16 @@ class CMSController extends Controller
         ]);
     }
 
+    public function documents()
+    {
+        $items = $this->cmsModel->getMedia('document');
+        return $this->view('admin/cms/media_index', [
+            'title' => 'Legal Documents',
+            'category' => 'document',
+            'items' => $items
+        ]);
+    }
+
     public function achievements()
     {
         $items = $this->cmsModel->getMedia('achievement');
@@ -119,7 +129,7 @@ class CMSController extends Controller
             
             // Handle Main Page Banner Upload
             if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-                $valid = validate_upload($_FILES['image'], ['jpg', 'jpeg', 'png', 'gif', 'webp'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 500 * 1024);
+                $valid = validate_upload($_FILES['image'], ['jpg', 'jpeg', 'png', 'gif', 'webp'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 5 * 1024 * 1024);
                 if ($valid !== true) {
                     $_SESSION['error'] = 'Banner image: ' . $valid;
                     return $this->redirect('admin/cms/about');
@@ -136,7 +146,7 @@ class CMSController extends Controller
             foreach ($valueKeys as $vk) {
                 $fileKey = 'value_' . $vk . '_image';
                 if (isset($_FILES[$fileKey]) && $_FILES[$fileKey]['error'] === UPLOAD_ERR_OK) {
-                    $valid = validate_upload($_FILES[$fileKey], ['jpg', 'jpeg', 'png', 'gif', 'webp'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 500 * 1024);
+                    $valid = validate_upload($_FILES[$fileKey], ['jpg', 'jpeg', 'png', 'gif', 'webp'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 5 * 1024 * 1024);
                     if ($valid !== true) {
                         $_SESSION['error'] = 'Value image "' . ucfirst($vk) . '": ' . $valid;
                         continue;
@@ -197,7 +207,7 @@ class CMSController extends Controller
                     header("Location: " . $referer);
                     exit;
                 }
-                $fileName = \App\Helpers\UploadHelper::processFile($_FILES['file'], $uploadDir);
+                $fileName = \App\Helpers\UploadHelper::processFile($_FILES['file'], $uploadDir, 5120, 2400);
                 if ($fileName) {
                     $filePath = 'uploads/cms/' . $category . '/' . $fileName;
                     if ($this->cmsModel->addMedia($category, $title, $desc, $filePath)) {
@@ -321,3 +331,4 @@ class CMSController extends Controller
         return $this->redirect('admin/cms/policies');
     }
 }
+

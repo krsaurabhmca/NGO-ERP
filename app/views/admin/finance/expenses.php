@@ -232,7 +232,7 @@
                     <div class="mb-3">
                         <label class="form-label">Receipt / Document</label>
                         <input type="file" name="receipt" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
-                        <div class="form-text text-muted small">Max 2MB. Allowed: PDF, JPG, PNG</div>
+                        <div class="form-text text-muted small">Max 5MB. Allowed: PDF, JPG, PNG</div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Notes</label>
@@ -355,7 +355,7 @@
                     <div class="mb-3">
                         <label class="form-label">Change Receipt / Document</label>
                         <input type="file" name="receipt" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
-                        <div class="form-text text-muted small">Max 2MB. Leave empty to keep existing.</div>
+                        <div class="form-text text-muted small">Max 5MB. Leave empty to keep existing.</div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Notes</label>

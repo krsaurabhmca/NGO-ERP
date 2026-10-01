@@ -322,8 +322,8 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Profile Image</label>
-                        <input type="file" name="profile_image" class="form-control" accept=".jpg,.jpeg,.png,.gif,.webp" max="512000">
-                        <div class="form-text text-muted small">Max 500KB. Allowed: JPG, PNG, GIF, WebP</div>
+                        <input type="file" name="profile_image" class="form-control" accept=".jpg,.jpeg,.png,.gif,.webp" max="5242880">
+                        <div class="form-text text-muted small">Max 5MB. Allowed: JPG, PNG, GIF, WebP</div>
                     </div>
                 </form>
                 <div id="add-intern-msg" class="mt-2"></div>
@@ -445,17 +445,17 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="mb-3">
                             <label class="form-label">KYC Documents <span class="text-muted small">(Aadhaar, PAN, etc.)</span></label>
                             <input type="file" name="documents[]" class="form-control" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" multiple>
-                            <div class="form-text text-muted small">Max 2MB per file. Allowed: PDF, DOC, DOCX, JPG, PNG</div>
+                            <div class="form-text text-muted small">Max 5MB per file. Allowed: PDF, DOC, DOCX, JPG, PNG</div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Offer Letter</label>
                             <input type="file" name="offer_letter" class="form-control" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
-                            <div class="form-text text-muted small">Max 2MB. Allowed: PDF, DOC, DOCX, JPG, PNG</div>
+                            <div class="form-text text-muted small">Max 5MB. Allowed: PDF, DOC, DOCX, JPG, PNG</div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Profile Image</label>
                             <input type="file" name="profile_image" class="form-control" accept=".jpg,.jpeg,.png,.gif,.webp">
-                            <div class="form-text text-muted small">Max 500KB. Allowed: JPG, PNG, GIF, WebP</div>
+                            <div class="form-text text-muted small">Max 5MB. Allowed: JPG, PNG, GIF, WebP</div>
                         </div>
                         <button type="submit" class="btn btn-primary w-100">
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 4h10l4 4v10a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2" /><path d="M12 14m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M14 4l0 4l-6 0l0 -4" /></svg>
@@ -898,3 +898,4 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <?php require_once 'app/views/admin/layouts/footer.php'; ?>
+

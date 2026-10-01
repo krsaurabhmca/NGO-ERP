@@ -115,7 +115,7 @@
                                     <?php endif; ?>
                                 </div>
                                 <label class="form-label">Change Image <span class="text-muted small fw-normal">(Max 500 KB)</span></label>
-                                <input type="file" name="image" class="form-control" accept="image/*" max="512000">
+                                <input type="file" name="image" class="form-control" accept="image/*" max="5242880">
                             </div>
                         </div>
                         <div class="row">
@@ -239,3 +239,4 @@
 
     <?php require_once 'app/views/admin/layouts/footer.php'; ?>
 </div>
+

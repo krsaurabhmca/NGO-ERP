@@ -185,9 +185,9 @@ class SettingsController extends Controller
             }
 
             $fileFields = [
-                'ngo_logo' => 500 * 1024,
-                'ngo_favicon' => 500 * 1024,
-                'ngo_signature' => 500 * 1024
+                'ngo_logo' => 5 * 1024 * 1024,
+                'ngo_favicon' => 5 * 1024 * 1024,
+                'ngo_signature' => 5 * 1024 * 1024
             ];
             
             foreach ($fileFields as $field => $maxSize) {
@@ -307,3 +307,4 @@ class SettingsController extends Controller
         }
     }
 }
+

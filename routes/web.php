@@ -12,11 +12,15 @@ $router->add('GET', '/contact', [App\Controllers\HomeController::class, 'contact
 $router->add('POST', '/contact/submit', [App\Controllers\HomeController::class, 'submitContact']);
 $router->add('GET', '/gallery', [App\Controllers\HomeController::class, 'gallery']);
 $router->add('GET', '/certificates', [App\Controllers\HomeController::class, 'certificates']);
+$router->add('GET', '/documents', [App\Controllers\HomeController::class, 'documents']);
 $router->add('GET', '/donate', [App\Controllers\HomeController::class, 'donate']);
 $router->add('POST', '/donate', [App\Controllers\HomeController::class, 'submitDonation']);
 $router->add('POST', '/donate/razorpay-order', [App\Controllers\HomeController::class, 'createRazorpayOrder']);
 $router->add('POST', '/donate/razorpay-verify', [App\Controllers\HomeController::class, 'verifyRazorpayPayment']);
 $router->add('POST', '/donate/razorpay-fail', [App\Controllers\HomeController::class, 'markRazorpayFailed']);
+$router->add('POST', '/donate/cashfree-order', [App\Controllers\HomeController::class, 'createCashfreeOrder']);
+$router->add('POST', '/donate/cashfree-verify', [App\Controllers\HomeController::class, 'verifyCashfreePayment']);
+$router->add('POST', '/donate/cashfree-fail', [App\Controllers\HomeController::class, 'markCashfreeFailed']);
 $router->add('GET', '/donate/receipt/{uuid}', [App\Controllers\HomeController::class, 'receipt']);
 
 $router->add('GET', '/achievements', [App\Controllers\HomeController::class, 'achievements']);
@@ -62,6 +66,7 @@ $router->add('GET', '/admin/cms/about', [App\Controllers\CMSController::class, '
 $router->add('GET', '/admin/cms/slider', [App\Controllers\CMSController::class, 'slider']);
 $router->add('GET', '/admin/cms/gallery', [App\Controllers\CMSController::class, 'gallery']);
 $router->add('GET', '/admin/cms/certificates', [App\Controllers\CMSController::class, 'certificates']);
+$router->add('GET', '/admin/cms/documents', [App\Controllers\CMSController::class, 'documents']);
 $router->add('GET', '/admin/cms/achievements', [App\Controllers\CMSController::class, 'achievements']);
 $router->add('GET', '/admin/cms/policies', [App\Controllers\CMSController::class, 'policies']);
 $router->add('POST', '/admin/cms/update-policies', [App\Controllers\CMSController::class, 'updatePolicies']);

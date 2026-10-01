@@ -111,7 +111,7 @@ class CareerController extends Controller
 
         // Handle profile image upload
         if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === UPLOAD_ERR_OK) {
-            $valid = validate_upload($_FILES['profile_image'], ['jpg', 'jpeg', 'png', 'gif', 'webp'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 500 * 1024);
+            $valid = validate_upload($_FILES['profile_image'], ['jpg', 'jpeg', 'png', 'gif', 'webp'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 5 * 1024 * 1024);
             if ($valid !== true) {
                 json_response(['status' => 'error', 'message' => 'Profile image: ' . $valid]);
                 exit;
@@ -190,7 +190,7 @@ class CareerController extends Controller
 
         // Handle profile image upload
         if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === UPLOAD_ERR_OK) {
-            $valid = validate_upload($_FILES['profile_image'], ['jpg', 'jpeg', 'png', 'gif', 'webp'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 500 * 1024);
+            $valid = validate_upload($_FILES['profile_image'], ['jpg', 'jpeg', 'png', 'gif', 'webp'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 5 * 1024 * 1024);
             if ($valid !== true) {
                 json_response(['status' => 'error', 'message' => 'Profile image: ' . $valid]);
                 exit;
@@ -363,7 +363,7 @@ class CareerController extends Controller
 
         // Handle profile image upload
         if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === UPLOAD_ERR_OK) {
-            $valid = validate_upload($_FILES['profile_image'], ['jpg', 'jpeg', 'png', 'gif', 'webp'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 500 * 1024);
+            $valid = validate_upload($_FILES['profile_image'], ['jpg', 'jpeg', 'png', 'gif', 'webp'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 5 * 1024 * 1024);
             if ($valid !== true) {
                 json_response(['status' => 'error', 'message' => 'Profile image: ' . $valid]);
                 exit;
@@ -383,7 +383,7 @@ class CareerController extends Controller
         // Handle multiple KYC document upload
         $allowedExts = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'];
         $allowedMimes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'image/jpeg', 'image/png'];
-        $maxSize = 2 * 1024 * 1024; // 2MB per file
+        $maxSize = 5 * 1024 * 1024; // 5MB per file
         $uploadedDocs = [];
 
         // Load existing documents from DB
@@ -445,7 +445,7 @@ class CareerController extends Controller
 
         // Handle offer letter upload
         if (isset($_FILES['offer_letter']) && $_FILES['offer_letter']['error'] === UPLOAD_ERR_OK) {
-            $valid = validate_upload($_FILES['offer_letter'], ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'], ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'image/jpeg', 'image/png'], 2 * 1024 * 1024);
+            $valid = validate_upload($_FILES['offer_letter'], ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'], ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'image/jpeg', 'image/png'], 5 * 1024 * 1024);
             if ($valid !== true) {
                 json_response(['status' => 'error', 'message' => 'Offer letter: ' . $valid]);
                 exit;
@@ -764,3 +764,4 @@ class CareerController extends Controller
         require_once __DIR__ . '/../views/admin/careers/certificate_pdf.php';
     }
 }
+
