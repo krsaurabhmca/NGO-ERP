@@ -954,6 +954,9 @@ CREATE TABLE IF NOT EXISTS students (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=INNODB;
+
+-- Backfill status for existing cms_media items
+UPDATE cms_media SET status = 'active' WHERE status IS NULL OR status = '';
 SQL;
                 $pdo->exec($sql);
 
