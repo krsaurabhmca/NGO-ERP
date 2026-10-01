@@ -61,7 +61,7 @@
             'x-api-version: 2023-08-01'
         ]);
         curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         $response = curl_exec($ch);
         $curlError = curl_error($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -152,6 +152,7 @@
             'x-client-secret: ' . $secretKey,
             'x-api-version: 2023-08-01'
         ]);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
@@ -174,9 +175,14 @@
                         exit;
                     }
                 }
+            } else {
+                json_response(['status' => 'error', 'message' => 'Order status is ' . ($orderData['order_status'] ?? 'unknown')]);
+                exit;
             }
         }
-        json_response(['status' => 'error', 'message' => 'Payment verification failed.']);
+        
+        $errorMsg = curl_error($ch) ?: 'Payment verification failed.';
+        json_response(['status' => 'error', 'message' => $errorMsg, 'debug' => ['http_code' => $httpCode, 'response' => $response]]);
         exit;
     }
 
