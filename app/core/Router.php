@@ -33,9 +33,12 @@ class Router
                 $body = json_decode(file_get_contents('php://input'), true) ?? [];
             }
 
-            // Skip CSRF for Razorpay AJAX endpoints (they have HMAC + session security)
+            // Skip CSRF for Razorpay/Cashfree AJAX endpoints (they have HMAC + session security)
             $currentPath = trim($_GET['url'] ?? '', '/');
-            $csrfExempt = ['donate/razorpay-order', 'donate/razorpay-verify', 'donate/razorpay-fail'];
+            $csrfExempt = [
+                'donate/razorpay-order', 'donate/razorpay-verify', 'donate/razorpay-fail',
+                'donate/cashfree-order', 'donate/cashfree-verify', 'donate/cashfree-fail'
+            ];
             if (!in_array($currentPath, $csrfExempt)) {
                 $action = $_POST['_csrf_action'] ?? $body['_csrf_action'] ?? '_default';
                 $token = $_POST['_csrf_token'] ?? $body['_csrf_token'] ?? ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? '');
