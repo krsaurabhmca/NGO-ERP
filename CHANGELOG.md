@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.4] - 2026-10-01
+
+### Fixed
+- Fixed a 404 error on the Cashfree Webhook URL by explicitly handling `GET` requests gracefully (returns `200 OK` for browser and basic ping tests) while `POST` continues handling the core logic.
+
 ## [1.1.3] - 2026-10-01
 
 ### Added
