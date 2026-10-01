@@ -1,12 +1,14 @@
 <?php
 namespace App\Helpers;
 
-class UploadHelper {
-    
+class UploadHelper
+{
+
     /**
      * General file processing: resizes/compresses images, normally uploads other files.
      */
-    public static function processFile($fileArray, $uploadDir, $maxSizeKb = 5120, $maxWidth = 2400) {
+    public static function processFile($fileArray, $uploadDir, $maxSizeKb = 5120, $maxWidth = 2400)
+    {
         if (!isset($fileArray['tmp_name']) || empty($fileArray['tmp_name'])) {
             return false;
         }
@@ -19,16 +21,17 @@ class UploadHelper {
         }
 
         // Standard upload for non-images (PDFs, DOCs, etc)
-        if ($fileArray['error'] !== UPLOAD_ERR_OK) return false;
-        
+        if ($fileArray['error'] !== UPLOAD_ERR_OK)
+            return false;
+
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0755, true);
         }
-        
+
         $baseName = preg_replace('/[^a-zA-Z0-9_-]/', '_', pathinfo($fileArray['name'], PATHINFO_FILENAME));
         $newFilename = $baseName . '_' . time() . '_' . uniqid() . '.' . $ext;
         $destination = rtrim($uploadDir, '/') . '/' . $newFilename;
-        
+
         if (move_uploaded_file($fileArray['tmp_name'], $destination)) {
             return $newFilename;
         }
@@ -45,7 +48,8 @@ class UploadHelper {
      * @param int $maxWidth The maximum width to resize to if larger (default 1200)
      * @return string|false The final uploaded filename (e.g., 'image_123.webp') on success, or false on failure.
      */
-    public static function processImage($fileArray, $uploadDir, $maxSizeKb = 5120, $maxWidth = 2400) {
+    public static function processImage($fileArray, $uploadDir, $maxSizeKb = 5120, $maxWidth = 2400)
+    {
         if (!isset($fileArray['tmp_name']) || empty($fileArray['tmp_name'])) {
             return false;
         }
@@ -96,7 +100,7 @@ class UploadHelper {
         // Calculate new dimensions if resizing is needed
         if ($width > $maxWidth) {
             $newWidth = $maxWidth;
-            $newHeight = (int)(($height / $width) * $newWidth);
+            $newHeight = (int) (($height / $width) * $newWidth);
         } else {
             $newWidth = $width;
             $newHeight = $height;
@@ -104,7 +108,7 @@ class UploadHelper {
 
         // Create new image resource for resized/processed image
         $newImage = imagecreatetruecolor($newWidth, $newHeight);
-        
+
         // Preserve transparency for PNG and GIF
         if ($type == IMAGETYPE_PNG || $type == IMAGETYPE_GIF) {
             imagecolortransparent($newImage, imagecolorallocatealpha($newImage, 0, 0, 0, 127));

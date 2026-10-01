@@ -66,7 +66,7 @@ class CMS extends Model
     public function addMedia($category, $title, $description, $file_path)
     {
         $uuid = self::uuid();
-        $stmt = $this->db->prepare("INSERT INTO cms_media (uuid, category, title, description, file_path) VALUES (:uuid, :category, :title, :description, :file_path)");
+        $stmt = $this->db->prepare("INSERT INTO cms_media (uuid, category, title, description, file_path, status) VALUES (:uuid, :category, :title, :description, :file_path, 'active')");
         return $stmt->execute([
             ':uuid' => $uuid,
             ':category' => $category,

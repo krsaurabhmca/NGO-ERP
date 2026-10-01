@@ -7,12 +7,12 @@
 
         $mode = $this->globalSettings['cashfree_mode'] ?? 'test';
         if ($mode === 'live') {
-            $appId = $this->globalSettings['cashfree_live_app_id'] ?? '';
-            $secretKey = $this->globalSettings['cashfree_live_secret_key'] ?? '';
+            $appId = trim($this->globalSettings['cashfree_live_app_id'] ?? '');
+            $secretKey = trim($this->globalSettings['cashfree_live_secret_key'] ?? '');
             $url = 'https://api.cashfree.com/pg/orders';
         } else {
-            $appId = $this->globalSettings['cashfree_test_app_id'] ?? '';
-            $secretKey = $this->globalSettings['cashfree_test_secret_key'] ?? '';
+            $appId = trim($this->globalSettings['cashfree_test_app_id'] ?? '');
+            $secretKey = trim($this->globalSettings['cashfree_test_secret_key'] ?? '');
             $url = 'https://sandbox.cashfree.com/pg/orders';
         }
 
@@ -127,12 +127,12 @@
 
         $mode = $this->globalSettings['cashfree_mode'] ?? 'test';
         if ($mode === 'live') {
-            $appId = $this->globalSettings['cashfree_live_app_id'] ?? '';
-            $secretKey = $this->globalSettings['cashfree_live_secret_key'] ?? '';
+            $appId = trim($this->globalSettings['cashfree_live_app_id'] ?? '');
+            $secretKey = trim($this->globalSettings['cashfree_live_secret_key'] ?? '');
             $url = 'https://api.cashfree.com/pg/orders/';
         } else {
-            $appId = $this->globalSettings['cashfree_test_app_id'] ?? '';
-            $secretKey = $this->globalSettings['cashfree_test_secret_key'] ?? '';
+            $appId = trim($this->globalSettings['cashfree_test_app_id'] ?? '');
+            $secretKey = trim($this->globalSettings['cashfree_test_secret_key'] ?? '');
             $url = 'https://sandbox.cashfree.com/pg/orders/';
         }
 

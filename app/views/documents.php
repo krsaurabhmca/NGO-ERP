@@ -18,7 +18,7 @@
         <?php if (!empty($media)): ?>
             <div class="row g-4 justify-content-center">
                 <?php foreach ($media as $item): ?>
-                    <?php if ($item->status === 'active'): ?>
+                    <?php if (($item->status ?? 'active') === 'active'): ?>
                     <div class="col-sm-6 col-md-4 col-lg-3">
                         <div class="card h-100 shadow-sm border-0 rounded-4 hover-lift" style="transition: transform 0.2s ease, box-shadow 0.2s ease;">
                             <div class="card-body text-center p-4 d-flex flex-column align-items-center justify-content-center">

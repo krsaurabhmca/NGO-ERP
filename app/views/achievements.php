@@ -18,7 +18,7 @@
         <?php if (!empty($media)): ?>
             <div class="row g-4">
                 <?php foreach ($media as $item): ?>
-                    <?php if ($item->status === 'active'): ?>
+                    <?php if (($item->status ?? 'active') === 'active'): ?>
                     <div class="col-6 col-md-4 col-lg-3">
                         <div class="card border-0 shadow-sm h-100 overflow-hidden hover-lift rounded-4" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#achieveModal" data-src="<?php echo file_url($item->file_path); ?>" data-title="<?php echo htmlspecialchars($item->title); ?>">
                             <div class="d-flex align-items-center justify-content-center bg-white" style="height: 260px; overflow: hidden;">

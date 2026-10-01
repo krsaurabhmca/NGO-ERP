@@ -17,7 +17,7 @@
         <?php if (!empty($gallery)): ?>
             <div class="row g-3">
                 <?php foreach ($gallery as $idx => $item): ?>
-                    <?php if ($item->status === 'active'): ?>
+                    <?php if (($item->status ?? 'active') === 'active'): ?>
                     <div class="col-6 col-md-4 col-lg-3">
                         <div class="card border-0 shadow-sm overflow-hidden h-100 hover-lift gallery-item" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#galleryModal" data-src="<?php echo file_url($item->file_path); ?>" data-title="<?php echo htmlspecialchars($item->title); ?>" data-desc="<?php echo htmlspecialchars($item->description ?? ''); ?>">
                             <div class="position-relative overflow-hidden" style="aspect-ratio: 1 / 1;">
