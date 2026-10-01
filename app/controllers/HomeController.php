@@ -1275,7 +1275,7 @@ class HomeController extends Controller
                     $donationModel = new \App\Models\Donation();
                     $donation = $donationModel->find($donationId);
                     if ($donation && $donation->status === 'pending') {
-                        $donationModel->updateStatus($donationId, 'completed');
+                        $donationModel->update($donationId, ['status' => 'completed']);
                         unset($_SESSION['cashfree_donation_id'], $_SESSION['cashfree_order_amount'], $_SESSION['cashfree_order_id']);
                         json_response([
                             'status' => 'success',
@@ -1298,7 +1298,7 @@ class HomeController extends Controller
             $donationModel = new \App\Models\Donation();
             $donation = $donationModel->find($donationId);
             if ($donation && $donation->status === 'pending') {
-                $donationModel->updateStatus($donationId, 'failed');
+                $donationModel->update($donationId, ['status' => 'failed']);
             }
         }
         unset($_SESSION['cashfree_donation_id'], $_SESSION['cashfree_order_amount'], $_SESSION['cashfree_order_id']);
@@ -1355,7 +1355,7 @@ class HomeController extends Controller
                 if (!empty($donations)) {
                     $donation = $donations[0];
                     if ($donation->status === 'pending') {
-                        $donationModel->updateStatus($donation->id, 'completed');
+                        $donationModel->update($donation->id, ['status' => 'completed']);
                     }
                 }
             } elseif (in_array(($orderData['order_status'] ?? ''), ['FAILED', 'EXPIRED'])) {
@@ -1364,7 +1364,7 @@ class HomeController extends Controller
                 if (!empty($donations)) {
                     $donation = $donations[0];
                     if ($donation->status === 'pending') {
-                        $donationModel->updateStatus($donation->id, 'failed');
+                        $donationModel->update($donation->id, ['status' => 'failed']);
                     }
                 }
             }
