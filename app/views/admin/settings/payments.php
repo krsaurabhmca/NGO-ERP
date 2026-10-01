@@ -149,6 +149,15 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        
+                                        <div class="mt-4 border-top pt-3">
+                                            <label class="form-label text-muted mb-2"><i class="fas fa-link me-1"></i> Webhook URL</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control form-control-sm bg-light" value="<?php echo url('webhook/cashfree'); ?>" readonly id="cashfreeWebhookUrl">
+                                                <button class="btn btn-sm btn-outline-secondary" type="button" onclick="navigator.clipboard.writeText(document.getElementById('cashfreeWebhookUrl').value); alert('Copied to clipboard!');"><i class="fas fa-copy"></i> Copy</button>
+                                            </div>
+                                            <small class="text-muted mt-1 d-block">Configure this URL in your Cashfree Developer Dashboard to receive real-time payment updates.</small>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

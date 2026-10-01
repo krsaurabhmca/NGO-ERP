@@ -37,7 +37,8 @@ class Router
             $currentPath = trim($_GET['url'] ?? '', '/');
             $csrfExempt = [
                 'donate/razorpay-order', 'donate/razorpay-verify', 'donate/razorpay-fail',
-                'donate/cashfree-order', 'donate/cashfree-verify', 'donate/cashfree-fail'
+                'donate/cashfree-order', 'donate/cashfree-verify', 'donate/cashfree-fail',
+                'webhook/cashfree'
             ];
             if (!in_array($currentPath, $csrfExempt)) {
                 $action = $_POST['_csrf_action'] ?? $body['_csrf_action'] ?? '_default';

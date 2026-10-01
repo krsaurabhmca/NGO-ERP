@@ -21,6 +21,7 @@ $router->add('POST', '/donate/razorpay-fail', [App\Controllers\HomeController::c
 $router->add('POST', '/donate/cashfree-order', [App\Controllers\HomeController::class, 'createCashfreeOrder']);
 $router->add('POST', '/donate/cashfree-verify', [App\Controllers\HomeController::class, 'verifyCashfreePayment']);
 $router->add('POST', '/donate/cashfree-fail', [App\Controllers\HomeController::class, 'markCashfreeFailed']);
+$router->add('POST', '/webhook/cashfree', [App\Controllers\HomeController::class, 'cashfreeWebhook']);
 $router->add('GET', '/donate/receipt/{uuid}', [App\Controllers\HomeController::class, 'receipt']);
 
 $router->add('GET', '/achievements', [App\Controllers\HomeController::class, 'achievements']);

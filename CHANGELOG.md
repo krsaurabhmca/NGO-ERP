@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.3] - 2026-10-01
+
+### Added
+- Added Cashfree webhook integration for real-time payment status updates (`/webhook/cashfree`).
+- Displayed the Cashfree Webhook URL inside the admin Payment Settings page for easy configuration.
+
+### Fixed
+- Fixed an issue where the CSRF token was consumed during Cashfree order creation, causing the subsequent verification request to fail with an "Invalid or expired form token" error.
+- Ensured Cashfree verification correctly uses `CURLOPT_SSL_VERIFYPEER` settings to support local and varied SSL environments without curl errors.
+- Cleaned up redundant implementation in `HomeController` to properly route all Cashfree callbacks.
+
 ## [1.0.7] - 2026-10-01
 
 ### Added

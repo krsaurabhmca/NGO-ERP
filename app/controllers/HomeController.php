@@ -1305,4 +1305,67 @@ class HomeController extends Controller
         json_response(['status' => 'success']);
         exit;
     }
+
+    public function cashfreeWebhook()
+    {
+        $rawPayload = file_get_contents('php://input');
+        $data = json_decode($rawPayload, true);
+        
+        $orderId = $data['data']['order']['order_id'] ?? null;
+        if (!$orderId) {
+            http_response_code(400);
+            exit('Missing order_id');
+        }
+
+        // Fetch actual order status from Cashfree to prevent spoofing
+        $mode = $this->globalSettings['cashfree_mode'] ?? 'test';
+        if ($mode === 'live') {
+            $appId = $this->globalSettings['cashfree_live_app_id'] ?? '';
+            $secretKey = $this->globalSettings['cashfree_live_secret_key'] ?? '';
+            $url = 'https://api.cashfree.com/pg/orders/';
+        } else {
+            $appId = $this->globalSettings['cashfree_test_app_id'] ?? '';
+            $secretKey = $this->globalSettings['cashfree_test_secret_key'] ?? '';
+            $url = 'https://sandbox.cashfree.com/pg/orders/';
+        }
+
+        $ch = curl_init($url . $orderId);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'x-client-id: ' . $appId,
+            'x-client-secret: ' . $secretKey,
+            'x-api-version: 2023-08-01'
+        ]);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($httpCode === 200) {
+            $orderData = json_decode($response, true);
+            if (($orderData['order_status'] ?? '') === 'PAID') {
+                $donationModel = new \App\Models\Donation();
+                $donations = $donationModel->where('transaction_id', $orderId);
+                if (!empty($donations)) {
+                    $donation = $donations[0];
+                    if ($donation->status === 'pending') {
+                        $donationModel->updateStatus($donation->id, 'completed');
+                    }
+                }
+            } elseif (in_array(($orderData['order_status'] ?? ''), ['FAILED', 'EXPIRED'])) {
+                $donationModel = new \App\Models\Donation();
+                $donations = $donationModel->where('transaction_id', $orderId);
+                if (!empty($donations)) {
+                    $donation = $donations[0];
+                    if ($donation->status === 'pending') {
+                        $donationModel->updateStatus($donation->id, 'failed');
+                    }
+                }
+            }
+        }
+        
+        http_response_code(200);
+        exit('OK');
+    }
 }
