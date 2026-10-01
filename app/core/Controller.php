@@ -56,6 +56,10 @@ class Controller
 
         // Fallback to role-based permission
         if (!$permModel->roleHasModuleAccess($roleId, $module)) {
+            if ($module === 'dashboard') {
+                $this->loadErrorPage(403, 'You do not have permission to access the admin dashboard.');
+                exit;
+            }
             $_SESSION['error'] = 'You do not have permission to access this module.';
             return $this->redirect('admin/dashboard');
         }
