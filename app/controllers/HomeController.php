@@ -1308,6 +1308,11 @@ class HomeController extends Controller
 
     public function cashfreeWebhook()
     {
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            http_response_code(200);
+            exit('Cashfree Webhook Endpoint Active');
+        }
+
         $rawPayload = file_get_contents('php://input');
         $data = json_decode($rawPayload, true);
         
