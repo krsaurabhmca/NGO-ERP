@@ -16,7 +16,7 @@ $theme = $_SESSION['theme'] ?? 'light';
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
     <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
-    <title><?php echo e($title ?? 'Dashboard'); ?> - <?php echo e($globalSettings['ngo_name'] ?? 'Admin Panel'); ?></title>
+    <title>Welcome to NGO</title>
     <!-- Favicon -->
     <?php if(!empty($globalSettings['ngo_favicon'])): ?>
         <link rel="icon" href="<?php echo file_url($globalSettings['ngo_favicon']); ?>" type="image/x-icon"/>

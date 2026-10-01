@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo e($title ?? 'NGO Management System'); ?></title>
+    <title>Welcome to NGO</title>
     <!-- Favicon -->
     <?php if(!empty($globalSettings['ngo_favicon'])): ?>
         <link rel="icon" href="<?php echo file_url($globalSettings['ngo_favicon']); ?>" type="image/x-icon"/>

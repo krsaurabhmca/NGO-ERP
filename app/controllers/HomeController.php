@@ -140,6 +140,15 @@ class HomeController extends Controller
         ]);
     }
 
+    public function documents()
+    {
+        $media = $this->cmsModel->getMedia('document');
+        return $this->view('documents', [
+            'title' => 'Documents',
+            'media' => $media
+        ]);
+    }
+
     public function news()
     {
         $newsModel = new \App\Models\News();

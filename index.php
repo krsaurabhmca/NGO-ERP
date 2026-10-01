@@ -111,6 +111,49 @@ spl_autoload_register(function ($class) {
     }
 });
 
+if (defined('APP_VERSION') && file_exists(__DIR__ . '/.env')) {
+    $versionFile = STORAGE_PATH . '.version';
+    $currentVersion = file_exists($versionFile) ? trim(file_get_contents($versionFile)) : '';
+    
+    if ($currentVersion !== APP_VERSION) {
+        $folders = [
+            STORAGE_PATH,
+            UPLOAD_PATH,
+            UPLOAD_PATH . 'careers/resumes/',
+            UPLOAD_PATH . 'members/',
+            UPLOAD_PATH . 'donors/',
+            UPLOAD_PATH . 'beneficiaries/',
+            UPLOAD_PATH . 'news/',
+            UPLOAD_PATH . 'expenses/'
+        ];
+        foreach ($folders as $f) {
+            if (!is_dir($f)) @mkdir($f, 0777, true);
+        }
+        
+        $installFile = __DIR__ . '/install.php';
+        if (file_exists($installFile)) {
+            $content = file_get_contents($installFile);
+            if (preg_match("/\\\$sql\s*=\s*<<<'SQL'(.*?)SQL;/s", $content, $matches)) {
+                $sql = $matches[1];
+                $statements = array_filter(array_map('trim', explode(';', $sql)));
+                try {
+                    $pdo = \App\Core\Database::getInstance();
+                    foreach ($statements as $stmt) {
+                        if (empty($stmt)) continue;
+                        try {
+                            $pdo->exec($stmt);
+                        } catch (\Exception $e) {
+                        }
+                    }
+                } catch (\Exception $e) {
+                    error_log("[NGO Upgrade] Database upgrade failed: " . $e->getMessage());
+                }
+            }
+        }
+        file_put_contents($versionFile, APP_VERSION);
+    }
+}
+
 $router = new App\Core\Router();
 require_once __DIR__ . '/routes/web.php';
 $router->resolve();
