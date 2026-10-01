@@ -54,7 +54,7 @@ define('PUBLIC_PATH', BASE_PATH . 'public/');
 define('STORAGE_PATH', BASE_PATH . 'storage/');
 define('UPLOAD_PATH', STORAGE_PATH . 'uploads/');
 define('APP_NAME', 'NGO Management System');
-define('APP_VERSION', '1.1.0');
+define('APP_VERSION', '1.1.1');
 
 // Localization
 date_default_timezone_set('Asia/Kolkata');
