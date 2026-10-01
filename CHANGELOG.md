@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.5] - 2026-10-01
+
+### Fixed
+- Fixed a 500 Internal Server Error in the Cashfree webhook callback caused by a call to an undefined database method (`updateStatus`), ensuring real-time database payment status syncing.
+
+
 ## [1.1.4] - 2026-10-01
 
 ### Fixed
