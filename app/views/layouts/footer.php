@@ -123,6 +123,19 @@ document.addEventListener('DOMContentLoaded', function() {
             f.appendChild(input);
         });
     }
+
+    // Auto-initialize Hero Slider if present
+    var heroSlider = document.getElementById('heroSlider');
+    if (heroSlider && typeof bootstrap !== 'undefined' && bootstrap.Carousel) {
+        var heroCarousel = bootstrap.Carousel.getOrCreateInstance(heroSlider, {
+            interval: 5000,
+            ride: 'carousel',
+            pause: 'hover',
+            wrap: true,
+            touch: true
+        });
+        heroCarousel.cycle();
+    }
 });
 </script>
 </body>

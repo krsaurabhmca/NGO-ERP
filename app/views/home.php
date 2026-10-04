@@ -3,21 +3,37 @@
 
 
 <!-- Hero / Slider Section -->
-<?php if (!empty($slider)): ?>
-    <div id="heroSlider" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+<?php 
+$activeSlides = [];
+if (!empty($slider)) {
+    foreach ($slider as $slide) {
+        if ($slide->status === 'active') {
+            $activeSlides[] = $slide;
+        }
+    }
+}
+?>
+<?php if (!empty($activeSlides)): ?>
+    <div id="heroSlider" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="5000" data-bs-pause="hover" data-bs-touch="true">
+        <?php if (count($activeSlides) > 1): ?>
+        <div class="carousel-indicators">
+            <?php foreach ($activeSlides as $idx => $slide): ?>
+                <button type="button" data-bs-target="#heroSlider" data-bs-slide-to="<?php echo $idx; ?>" class="<?php echo $idx === 0 ? 'active' : ''; ?>" aria-current="<?php echo $idx === 0 ? 'true' : 'false'; ?>" aria-label="Slide <?php echo $idx + 1; ?>"></button>
+            <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
+
         <div class="carousel-inner">
-            <?php 
-            $activeIndex = 0;
-            foreach ($slider as $slide): 
-                if ($slide->status !== 'active') continue;
-            ?>
-                <div class="carousel-item <?php echo $activeIndex === 0 ? 'active' : ''; ?>">
-                    <div class="hero-section text-center" style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('<?php echo file_url($slide->file_path); ?>'); height: 500px;">
+            <?php foreach ($activeSlides as $idx => $slide): ?>
+                <div class="carousel-item <?php echo $idx === 0 ? 'active' : ''; ?>" data-bs-interval="5000">
+                    <div class="hero-section hero-slide-bg text-center" style="background-image: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)), url('<?php echo file_url($slide->file_path); ?>');">
                         <div class="container-fluid px-lg-5">
                             <h1 class="display-4 fw-bold mb-3"><?php echo htmlspecialchars($slide->title); ?></h1>
-                            <p class="fs-5 mb-4 opacity-75"><?php echo htmlspecialchars($slide->description); ?></p>
+                            <?php if (!empty($slide->description)): ?>
+                                <p class="fs-5 mb-4 opacity-75"><?php echo htmlspecialchars($slide->description); ?></p>
+                            <?php endif; ?>
                             <div class="text-center mt-2">
-                                <a href="<?php echo url('/donate'); ?>" class="btn btn-accent btn-lg rounded-pill d-inline-block" style="width: auto; min-width: 150px;">Donate Now</a>
+                                <a href="<?php echo url('/donate'); ?>" class="btn btn-accent btn-lg rounded-pill d-inline-block shadow" style="width: auto; min-width: 150px;">Donate Now</a>
                             </div>
                         </div>
                         <img src="<?php echo file_url($slide->file_path); ?>" alt="<?php echo htmlspecialchars($slide->title); ?>" class="hero-mobile-img d-none">
@@ -30,17 +46,14 @@
                         </div>
                     </div>
                 </div>
-            <?php 
-                $activeIndex++;
-                endforeach; 
-            ?>
+            <?php endforeach; ?>
         </div>
-        <?php if ($activeIndex > 1): ?>
-            <button class="carousel-control-prev" type="button" data-bs-target="#heroSlider" data-bs-slide="prev">
+        <?php if (count($activeSlides) > 1): ?>
+            <button class="carousel-control-prev" type="button" data-bs-target="#heroSlider" data-bs-slide="prev" aria-label="Previous Slide">
                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                 <span class="visually-hidden">Previous</span>
             </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#heroSlider" data-bs-slide="next">
+            <button class="carousel-control-next" type="button" data-bs-target="#heroSlider" data-bs-slide="next" aria-label="Next Slide">
                 <span class="carousel-control-next-icon" aria-hidden="true"></span>
                 <span class="visually-hidden">Next</span>
             </button>

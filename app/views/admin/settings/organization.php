@@ -368,6 +368,30 @@
                                                             <span style="background-color: #f43f5e; width: 14px; height: 14px; display: inline-block; border-radius: 50%; margin-left: -6px; z-index: 1; border: 1px solid rgba(0,0,0,0.1);"></span>
                                                         </span> Deep Crimson & Rose
                                                     </button>
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary theme-preset" data-primary="#1e3a8a" data-secondary="#06b6d4">
+                                                        <span class="d-inline-flex align-items-center me-2">
+                                                            <span style="background-color: #1e3a8a; width: 14px; height: 14px; display: inline-block; border-radius: 50%; z-index: 2; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                                            <span style="background-color: #06b6d4; width: 14px; height: 14px; display: inline-block; border-radius: 50%; margin-left: -6px; z-index: 1; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                                        </span> Sapphire & Cyan
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary theme-preset" data-primary="#c2410c" data-secondary="#fb7185">
+                                                        <span class="d-inline-flex align-items-center me-2">
+                                                            <span style="background-color: #c2410c; width: 14px; height: 14px; display: inline-block; border-radius: 50%; z-index: 2; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                                            <span style="background-color: #fb7185; width: 14px; height: 14px; display: inline-block; border-radius: 50%; margin-left: -6px; z-index: 1; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                                        </span> Sunset Orange & Coral
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary theme-preset" data-primary="#134e4a" data-secondary="#84cc16">
+                                                        <span class="d-inline-flex align-items-center me-2">
+                                                            <span style="background-color: #134e4a; width: 14px; height: 14px; display: inline-block; border-radius: 50%; z-index: 2; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                                            <span style="background-color: #84cc16; width: 14px; height: 14px; display: inline-block; border-radius: 50%; margin-left: -6px; z-index: 1; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                                        </span> Dark Teal & Lime Glow
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary theme-preset" data-primary="#18181b" data-secondary="#d946ef">
+                                                        <span class="d-inline-flex align-items-center me-2">
+                                                            <span style="background-color: #18181b; width: 14px; height: 14px; display: inline-block; border-radius: 50%; z-index: 2; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                                            <span style="background-color: #d946ef; width: 14px; height: 14px; display: inline-block; border-radius: 50%; margin-left: -6px; z-index: 1; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                                        </span> Charcoal & Neon Fuchsia
+                                                    </button>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">

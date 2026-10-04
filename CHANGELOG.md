@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.7] - 2026-10-04
+
+### Added
+- Added 4 new curated theme color presets in admin settings (Sapphire & Cyan, Sunset Orange & Coral, Dark Teal & Lime Glow, Charcoal & Neon Fuchsia).
+
+### Fixed
+- Fixed Home Page Slider functionality, including automatic Bootstrap carousel initialization, interactive indicator dots, proper z-index elevation, and background style conflicts.
+
 ## [1.1.6] - 2026-10-04
 
 ### Fixed
@@ -83,7 +91,7 @@ All notable changes to this project will be documented in this file.
 - New **Animated & Vibrant** hero section with dynamic breathing gradients and floating glowing shapes.
 - New smooth vector wave dividers using mathematically perfect inline SVGs for the Hero slider and Footer sections.
 - Comprehensive dynamic color theming across the entire application using CSS variables.
-- Six new curated premium color presets (Midnight & Teal, Slate & Neon Blue, Forest & Mint, Obsidian & Amber, Royal Purple & Gold, Deep Crimson & Rose).
+- Ten curated premium color presets (Midnight & Teal, Slate & Neon Blue, Forest & Mint, Obsidian & Amber, Royal Purple & Gold, Deep Crimson & Rose, Sapphire & Cyan, Sunset Orange & Coral, Dark Teal & Lime Glow, Charcoal & Neon Fuchsia).
 - Dual-color overlapping swatches in the admin theme settings UI.
 
 ### Changed
