@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.6] - 2026-10-04
+
+### Fixed
+- Fixed "Invalid or expired form token" error during admin project creation, updates, and image uploads by adding dedicated CSRF token fields to project forms.
+- Enhanced `Router.php` to detect when PHP's `post_max_size` limit is exceeded during file uploads and display a clear, informative error message instead of failing with a misleading CSRF token error.
+- Fixed project gallery image deletion by sending JSON `POST` requests with CSRF tokens and exempting the gallery delete endpoint from single-use token consumption.
+- Added explicit CSRF fields to campaign, news, notice, partner, and CMS media upload forms.
+- Enhanced fallback CSRF auto-attacher in admin footer to inject `_csrf_action` alongside `_csrf_token`.
+
 ## [1.1.5] - 2026-10-01
 
 ### Fixed

@@ -116,6 +116,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="partner-form" method="POST" enctype="multipart/form-data">
+                <?php echo csrf_field('admin/partners/store'); ?>
                 <input type="hidden" name="id" id="partner-id">
                 <div class="modal-body">
                     <div class="row">

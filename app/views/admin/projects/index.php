@@ -97,6 +97,7 @@
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
             <div class="modal-content">
                 <form action="<?php echo url('admin/projects/store'); ?>" method="POST" enctype="multipart/form-data">
+                    <?php echo csrf_field('admin/projects/store'); ?>
                     <div class="modal-header">
                         <h5 class="modal-title">Create Project</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -223,6 +224,7 @@
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
             <div class="modal-content">
                 <form id="edit-project-form" action="" method="POST" enctype="multipart/form-data">
+                    <?php echo csrf_field('admin/projects/update'); ?>
                     <div class="modal-header">
                         <h5 class="modal-title">Edit Project</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -419,17 +421,31 @@
 
         function deleteGalleryImage(id) {
             if (confirm('Are you sure you want to remove this image from the gallery?')) {
-                fetch('<?php echo url('admin/projects/delete-gallery/'); ?>' + id)
-                    .then(response => response.json())
-                    .then(result => {
-                        if (result.status === 'success') {
-                            const item = document.getElementById('gallery-img-' + id);
-                            item.remove();
-                            showToast('Gallery image removed successfully.', 'success', 'Success');
-                        } else {
-                            showToast('Failed to remove image.', 'error', 'Error');
-                        }
-                    });
+                fetch('<?php echo url('admin/projects/delete-gallery/'); ?>' + id, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        _csrf_action: 'admin/projects/delete-gallery',
+                        _csrf_token: '<?php echo csrf_token('admin/projects/delete-gallery'); ?>'
+                    })
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.status === 'success') {
+                        const item = document.getElementById('gallery-img-' + id);
+                        if (item) item.remove();
+                        showToast('Gallery image removed successfully.', 'success', 'Success');
+                    } else {
+                        showToast(result.message || 'Failed to remove image.', 'error', 'Error');
+                    }
+                })
+                .catch(err => {
+                    console.error('Error:', err);
+                    showToast('Failed to remove image.', 'error', 'Error');
+                });
             }
         }
     </script>

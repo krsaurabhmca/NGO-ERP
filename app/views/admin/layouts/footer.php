@@ -205,12 +205,20 @@
         if (csrfMeta) {
             var token = csrfMeta.getAttribute('content');
             document.querySelectorAll('form[method="POST"]').forEach(function(f) {
-                if (f.querySelector('[name="_csrf_token"]')) return;
-                var input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = '_csrf_token';
-                input.value = token;
-                f.appendChild(input);
+                if (!f.querySelector('[name="_csrf_token"]')) {
+                    var input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = '_csrf_token';
+                    input.value = token;
+                    f.appendChild(input);
+                }
+                if (!f.querySelector('[name="_csrf_action"]')) {
+                    var actionInput = document.createElement('input');
+                    actionInput.type = 'hidden';
+                    actionInput.name = '_csrf_action';
+                    actionInput.value = '_default';
+                    f.appendChild(actionInput);
+                }
             });
         }
 

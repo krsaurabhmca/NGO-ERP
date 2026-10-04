@@ -125,6 +125,7 @@
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <form action="<?php echo url('admin/cms/store-media'); ?>" method="POST" enctype="multipart/form-data">
+                    <?php echo csrf_field('admin/cms/store-media'); ?>
                     <input type="hidden" name="category" value="<?php echo $category; ?>">
                     <div class="modal-header">
                         <h5 class="modal-title">Add to <?php echo ucfirst($category); ?></h5>

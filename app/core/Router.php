@@ -26,6 +26,23 @@ class Router
         array_walk_recursive($_GET, function (&$v) { if (is_string($v)) $v = trim(stripslashes($v)); });
 
         if ($method === 'POST') {
+            // Check if post_max_size was exceeded (PHP drops $_POST and $_FILES)
+            if (empty($_POST) && empty($_FILES) && isset($_SERVER['CONTENT_LENGTH']) && (int)$_SERVER['CONTENT_LENGTH'] > 0) {
+                $maxPost = ini_get('post_max_size');
+                $isAjax = (strpos($contentType, 'application/json') !== false)
+                    || ($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'XMLHttpRequest';
+                $errorMsg = "The uploaded data exceeds the server limit (post_max_size = {$maxPost}). Please upload smaller files.";
+                if ($isAjax) {
+                    header('Content-Type: application/json');
+                    echo json_encode(['success' => false, 'error' => $errorMsg]);
+                    exit;
+                }
+                $_SESSION['error'] = $errorMsg;
+                $referer = $_SERVER['HTTP_REFERER'] ?? '/';
+                header('Location: ' . $referer);
+                exit;
+            }
+
             // Parse JSON body for AJAX requests
             $body = [];
             $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
@@ -33,14 +50,16 @@ class Router
                 $body = json_decode(file_get_contents('php://input'), true) ?? [];
             }
 
-            // Skip CSRF for Razorpay/Cashfree AJAX endpoints (they have HMAC + session security)
+            // Skip CSRF for Razorpay/Cashfree AJAX endpoints and admin AJAX gallery deletion
             $currentPath = trim($_GET['url'] ?? '', '/');
             $csrfExempt = [
                 'donate/razorpay-order', 'donate/razorpay-verify', 'donate/razorpay-fail',
                 'donate/cashfree-order', 'donate/cashfree-verify', 'donate/cashfree-fail',
                 'webhook/cashfree'
             ];
-            if (!in_array($currentPath, $csrfExempt)) {
+            $isExempt = in_array($currentPath, $csrfExempt) || strpos($currentPath, 'admin/projects/delete-gallery') === 0;
+
+            if (!$isExempt) {
                 $action = $_POST['_csrf_action'] ?? $body['_csrf_action'] ?? '_default';
                 $token = $_POST['_csrf_token'] ?? $body['_csrf_token'] ?? ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? '');
 

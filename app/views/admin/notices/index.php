@@ -116,6 +116,7 @@
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
             <div class="modal-content">
                 <form action="<?php echo url('admin/notices/store'); ?>" method="POST" enctype="multipart/form-data">
+                    <?php echo csrf_field('admin/notices/store'); ?>
                     <div class="modal-header">
                         <h5 class="modal-title">Create Notice</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -162,6 +163,7 @@
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
             <div class="modal-content">
                 <form id="edit-notice-form" action="" method="POST" enctype="multipart/form-data">
+                    <?php echo csrf_field('admin/notices/update'); ?>
                     <div class="modal-header">
                         <h5 class="modal-title">Edit Notice</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
