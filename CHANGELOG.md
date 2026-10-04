@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.8] - 2026-10-04
+
+### Fixed
+- Fixed 500 error ("Something went wrong") during project edit and image upload by resolving project UUID to integer foreign key `project_id` in `project_gallery` table queries and uploads.
+- Enhanced `Project` model gallery methods (`getGallery`, `addGalleryImage`, `getGalleryImage`, `deleteGalleryImage`) to seamlessly support both UUID and integer IDs.
+- Enhanced `safe_unlink()` helper to properly normalize relative upload paths and delete old featured/gallery images cleanly.
+
 ## [1.1.7] - 2026-10-04
 
 ### Added

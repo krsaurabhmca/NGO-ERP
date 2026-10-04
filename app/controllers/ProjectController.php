@@ -129,7 +129,7 @@ class ProjectController extends Controller
             return $this->redirect('admin/projects');
         }
 
-        $gallery = $this->projectModel->getGallery($id);
+        $gallery = $this->projectModel->getGallery($project->id);
         json_response([
             'status' => 'success', 
             'data' => $project,
@@ -230,8 +230,8 @@ class ProjectController extends Controller
                             if ($valid !== true) continue;
                             $fileName = UploadHelper::processImage($singleFile, $uploadDir);
                             if ($fileName) {
-                                $this->projectModel->addGalleryImage($id, 'uploads/projects/gallery/' . $fileName);
-                                AuditLog::log('create', 'project_gallery', $id, null, ['image' => 'uploads/projects/gallery/' . $fileName]);
+                                $this->projectModel->addGalleryImage($project->id, 'uploads/projects/gallery/' . $fileName);
+                                AuditLog::log('create', 'project_gallery', $project->id, null, ['image' => 'uploads/projects/gallery/' . $fileName]);
                             }
                         }
                     }

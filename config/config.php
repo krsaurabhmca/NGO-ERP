@@ -54,7 +54,7 @@ define('PUBLIC_PATH', BASE_PATH . 'public/');
 define('STORAGE_PATH', BASE_PATH . 'storage/');
 define('UPLOAD_PATH', STORAGE_PATH . 'uploads/');
 define('APP_NAME', 'NGO Management System');
-define('APP_VERSION', '1.1.7');
+define('APP_VERSION', '1.1.8');
 
 // Localization
 date_default_timezone_set('Asia/Kolkata');
@@ -176,14 +176,26 @@ function safe_unlink($path)
 {
     if (empty($path))
         return false;
-    $real = realpath($path);
+
+    // Strip legacy uploads/ prefix if present
+    $relPath = preg_replace('#^uploads/+#', '', $path);
+    $fullPath = (strpos($path, DIRECTORY_SEPARATOR) === 0 || preg_match('#^[A-Za-z]:#', $path))
+        ? $path
+        : UPLOAD_PATH . ltrim($relPath, '/');
+
+    $real = realpath($fullPath);
     $allowed = realpath(UPLOAD_PATH);
     if ($real === false || $allowed === false || strpos($real, $allowed) !== 0) {
-        error_log("safe_unlink: blocked deletion of '$path' (outside upload path)");
+        // Fallback for legacy files stored in public/uploads/
+        $legacy = realpath(BASE_PATH . 'public/uploads/' . ltrim($relPath, '/'));
+        $allowedLegacy = realpath(BASE_PATH . 'public/uploads');
+        if ($legacy !== false && $allowedLegacy !== false && strpos($legacy, $allowedLegacy) === 0) {
+            return @unlink($legacy);
+        }
         return false;
     }
-    if (file_exists($real)) {
-        return unlink($real);
+    if (file_exists($real) && !is_dir($real)) {
+        return @unlink($real);
     }
     return false;
 }

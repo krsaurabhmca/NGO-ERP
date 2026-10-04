@@ -32,15 +32,27 @@ class Project extends Model
 
     public function getGallery($projectId)
     {
-        $stmt = $this->db->prepare("SELECT * FROM project_gallery WHERE project_id = :project_id");
+        if (is_string($projectId) && strlen($projectId) === 36 && preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $projectId)) {
+            $project = $this->findByUuid($projectId);
+            if (!$project) return [];
+            $projectId = $project->id;
+        }
+        $stmt = $this->db->prepare("SELECT * FROM project_gallery WHERE project_id = :project_id ORDER BY id ASC");
         $stmt->execute([':project_id' => $projectId]);
         return $stmt->fetchAll();
     }
 
     public function addGalleryImage($projectId, $imagePath)
     {
-        $stmt = $this->db->prepare("INSERT INTO project_gallery (project_id, image_path) VALUES (:project_id, :image_path)");
+        if (is_string($projectId) && strlen($projectId) === 36 && preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $projectId)) {
+            $project = $this->findByUuid($projectId);
+            if (!$project) return false;
+            $projectId = $project->id;
+        }
+        $uuid = self::uuid();
+        $stmt = $this->db->prepare("INSERT INTO project_gallery (uuid, project_id, image_path) VALUES (:uuid, :project_id, :image_path)");
         return $stmt->execute([
+            ':uuid' => $uuid,
             ':project_id' => $projectId,
             ':image_path' => $imagePath
         ]);
@@ -48,22 +60,27 @@ class Project extends Model
 
     public function getGalleryImage($id)
     {
-        $stmt = $this->db->prepare("SELECT * FROM project_gallery WHERE id = :id");
-        $stmt->execute([':id' => $id]);
+        if (is_string($id) && strlen($id) === 36 && preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $id)) {
+            $stmt = $this->db->prepare("SELECT * FROM project_gallery WHERE uuid = :id");
+            $stmt->execute([':id' => $id]);
+        } else {
+            $stmt = $this->db->prepare("SELECT * FROM project_gallery WHERE id = :id");
+            $stmt->execute([':id' => $id]);
+        }
         return $stmt->fetch();
     }
 
     public function deleteGalleryImage($id)
     {
-        // Get file path first
-        $stmt = $this->db->prepare("SELECT image_path FROM project_gallery WHERE id = :id");
-        $stmt->execute([':id' => $id]);
-        $image = $stmt->fetch();
-        
-        if ($image && file_exists($image->image_path)) {
-            unlink($image->image_path);
+        $image = $this->getGalleryImage($id);
+        if ($image && !empty($image->image_path)) {
+            safe_unlink($image->image_path);
         }
 
+        if (is_string($id) && strlen($id) === 36 && preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $id)) {
+            $stmt = $this->db->prepare("DELETE FROM project_gallery WHERE uuid = :id");
+            return $stmt->execute([':id' => $id]);
+        }
         $stmt = $this->db->prepare("DELETE FROM project_gallery WHERE id = :id");
         return $stmt->execute([':id' => $id]);
     }
