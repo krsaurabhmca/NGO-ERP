@@ -401,6 +401,15 @@ class FinanceController extends Controller
                 if ($status === 'completed') {
                     $donorModel = new \App\Models\Donor();
                     $donorModel->addDonationAmount($data['donor_email'], $data['donor_phone'], $amount);
+
+                    $createdDonation = $this->donationModel->find($donationId);
+                    if ($createdDonation) {
+                        try {
+                            \App\Helpers\ReceiptMailHelper::sendReceipt($createdDonation, $this->globalSettings);
+                        } catch (\Throwable $te) {
+                            error_log('[Mail] Failed to send receipt on store: ' . $te->getMessage());
+                        }
+                    }
                 }
 
                 if (!empty($data['campaign_id']) && $status === 'completed') {
@@ -459,6 +468,15 @@ class FinanceController extends Controller
             if (!empty($donation->campaign_id)) {
                 $campaignModel = new \App\Models\Campaign();
                 $campaignModel->updateRaisedAmount($donation->campaign_id);
+            }
+
+            $approvedDonation = $this->donationModel->find($id);
+            if ($approvedDonation) {
+                try {
+                    \App\Helpers\ReceiptMailHelper::sendReceipt($approvedDonation, $this->globalSettings);
+                } catch (\Throwable $te) {
+                    error_log('[Mail] Failed to send receipt on approval: ' . $te->getMessage());
+                }
             }
 
             try { AuditLog::log('approve', 'donations', $id, $oldData, ['status' => 'completed', 'approved_by' => $_SESSION['user_id'] ?? null]); } catch (\Exception $e) {}
@@ -541,27 +559,10 @@ class FinanceController extends Controller
             exit;
         }
 
-        $ngoName = $this->globalSettings['ngo_name'] ?? 'NGO HELP';
-        $rn = 'DON-' . str_pad($donation->id, 5, '0', STR_PAD_LEFT);
-        $receiptUrl = url('admin/finance/donations/receipt/' . $donation->id);
-        $htmlReceiptUrl = url('admin/finance/donations/receipt/' . $donation->id . '?html=1');
-
-        $subject = "Donation Receipt - {$rn} - {$ngoName}";
-        $message = "Dear {$donation->donor_name},\n\n";
-        $message .= "Thank you for your generous donation of Rs. " . number_format($donation->amount, 2) . " to {$ngoName}.\n\n";
-        $message .= "Receipt No: {$rn}\n";
-        $message .= "Date: " . date('d M Y, h:i A', strtotime($donation->created_at)) . "\n\n";
-        $message .= "You can view/download your receipt here:\n";
-        $message .= "PDF: {$receiptUrl}\n";
-        $message .= "HTML: {$htmlReceiptUrl}\n\n";
-        $message .= "Thank you for your support!\n";
-        $message .= $ngoName;
-
-        $mailer = new Mailer($this->globalSettings);
-        if ($mailer->send($to, $subject, $message)) {
-            json_response(['status' => 'success', 'message' => 'Receipt sent to ' . $to]);
+        if (\App\Helpers\ReceiptMailHelper::sendReceipt($donation, $this->globalSettings)) {
+            json_response(['status' => 'success', 'message' => 'Donation receipt email sent successfully to ' . $to]);
         } else {
-            json_response(['status' => 'error', 'message' => 'Failed to send email. Check server mail configuration.']);
+            json_response(['status' => 'error', 'message' => 'Failed to send receipt email. Please check your SMTP mail settings.']);
         }
         exit;
     }

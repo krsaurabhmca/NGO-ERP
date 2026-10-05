@@ -253,11 +253,31 @@
       <?php echo ucfirst(strtolower(convertNumberToWords($d->amount))); ?> Only</div>
 
     <div class="tax-section">
-      <strong>Tax Exemption:</strong> Donations to
-      <?php echo htmlspecialchars($globalSettings['ngo_name'] ?? 'NGO HELP'); ?> are exempt under Section 80G of the
-      Income Tax Act, 1961. This receipt is valid for claiming deduction.<br><br>
-      <strong>Disclaimer:</strong> This is a system-generated receipt and does not require a physical signature or
-      stamp.
+      <div style="font-weight: bold; font-size: 13px; margin-bottom: 6px; color: #1a1a2e;">
+        Tax Exemption & Registration Details:
+      </div>
+      <?php if (!empty($globalSettings['ngo_80g_reg_no']) || !empty($globalSettings['ngo_12a_reg_no']) || !empty($globalSettings['ngo_pan']) || !empty($globalSettings['ngo_80g_validity'])): ?>
+      <table style="width: 100%; font-size: 11px; margin-bottom: 8px; border-collapse: collapse;">
+        <tr>
+          <?php if (!empty($globalSettings['ngo_80g_reg_no'])): ?>
+            <td style="padding: 2px 0; width: 50%;"><strong>80G Reg / URN:</strong> <?php echo htmlspecialchars($globalSettings['ngo_80g_reg_no']); ?></td>
+          <?php endif; ?>
+          <?php if (!empty($globalSettings['ngo_12a_reg_no'])): ?>
+            <td style="padding: 2px 0; width: 50%;"><strong>12A Reg / URN:</strong> <?php echo htmlspecialchars($globalSettings['ngo_12a_reg_no']); ?></td>
+          <?php endif; ?>
+        </tr>
+        <tr>
+          <?php if (!empty($globalSettings['ngo_pan'])): ?>
+            <td style="padding: 2px 0; width: 50%;"><strong>NGO PAN:</strong> <?php echo htmlspecialchars($globalSettings['ngo_pan']); ?></td>
+          <?php endif; ?>
+          <?php if (!empty($globalSettings['ngo_80g_validity'])): ?>
+            <td style="padding: 2px 0; width: 50%;"><strong>80G Validity:</strong> <?php echo htmlspecialchars($globalSettings['ngo_80g_validity']); ?></td>
+          <?php endif; ?>
+        </tr>
+      </table>
+      <?php endif; ?>
+      <strong>Tax Exemption Note:</strong> <?php echo !empty($globalSettings['ngo_tax_exemption_note']) ? htmlspecialchars($globalSettings['ngo_tax_exemption_note']) : 'Donations to ' . htmlspecialchars($globalSettings['ngo_name'] ?? 'NGO HELP') . ' are exempt under Section 80G of the Income Tax Act, 1961. This receipt is valid for claiming deduction.'; ?><br><br>
+      <strong>Disclaimer:</strong> This is a system-generated receipt and does not require a physical signature or stamp.
     </div>
 
     <div class="footer">

@@ -36,6 +36,10 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" /><path d="M12 9h.01" /><path d="M11 12h1v4h1" /></svg>
                                     General Info
                                 </a>
+                                <a href="#tab-tax" class="list-group-item list-group-item-action d-flex align-items-center" data-bs-toggle="tab">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 5h10l2 2l-2 2h-10a1 1 0 0 1 -1 -1v-2a1 1 0 0 1 1 -1z" /><path d="M13 13h7l2 2l-2 2h-7a1 1 0 0 1 -1 -1v-2a1 1 0 0 1 1 -1z" /><path d="M6 13v7a1 1 0 0 0 1 1h2" /><path d="M6 5v2" /></svg>
+                                    Tax & Legal (80G/12A)
+                                </a>
                                 <a href="#tab-branding" class="list-group-item list-group-item-action d-flex align-items-center" data-bs-toggle="tab">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z" /><path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /></svg>
                                     Branding Settings
@@ -120,6 +124,94 @@
                                             <button type="submit" class="btn btn-primary px-4 shadow-sm">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-inline me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 4h10l4 4v10a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2" /><path d="M12 14m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M14 4l0 4l-6 0l0 -4" /></svg>
                                                 Save General Info
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <!-- Tax & Legal (80G / 12A) Settings -->
+                                <div class="tab-pane" id="tab-tax">
+                                    <form action="<?php echo url('admin/settings/organization'); ?>" method="POST">
+                                        <input type="hidden" name="_csrf_token" value="<?php echo csrf_token(); ?>">
+                                        <input type="hidden" name="active_tab" value="tab-tax">
+                                        
+                                        <h3 class="card-title mb-1">Tax Exemption & Legal Registrations (80G / 12A)</h3>
+                                        <p class="text-muted small mb-4">Configure your NGO's PAN, 12A, and 80G registration details. These will appear automatically on donation receipts (PDF & HTML) and receipt emails.</p>
+
+                                        <div class="row g-4">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">
+                                                        <i class="fas fa-id-card text-primary me-1"></i> NGO PAN Number
+                                                    </label>
+                                                    <input type="text" name="ngo_pan" class="form-control text-uppercase" value="<?php echo htmlspecialchars($settings['ngo_pan'] ?? ''); ?>" placeholder="e.g. AAATN1234F" maxlength="10">
+                                                    <div class="form-text text-muted small">Permanent Account Number (PAN) of the organization.</div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">
+                                                        <i class="fas fa-certificate text-success me-1"></i> 80G Registration No. / URN
+                                                    </label>
+                                                    <input type="text" name="ngo_80g_reg_no" class="form-control" value="<?php echo htmlspecialchars($settings['ngo_80g_reg_no'] ?? ''); ?>" placeholder="e.g. AAATN1234FE20212">
+                                                    <div class="form-text text-muted small">Unique Registration Number (URN) or Order Number for 80G tax exemption.</div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">
+                                                        <i class="fas fa-file-invoice-dollar text-warning me-1"></i> 12A Registration No. / URN
+                                                    </label>
+                                                    <input type="text" name="ngo_12a_reg_no" class="form-control" value="<?php echo htmlspecialchars($settings['ngo_12a_reg_no'] ?? ''); ?>" placeholder="e.g. AAATN1234FE20211">
+                                                    <div class="form-text text-muted small">Unique Registration Number (URN) or Order Number for 12A registration.</div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">
+                                                        <i class="fas fa-calendar-check text-info me-1"></i> 80G Validity / Assessment Years
+                                                    </label>
+                                                    <input type="text" name="ngo_80g_validity" class="form-control" value="<?php echo htmlspecialchars($settings['ngo_80g_validity'] ?? ''); ?>" placeholder="e.g. From AY 2022-23 to AY 2026-27 or Perpetual">
+                                                    <div class="form-text text-muted small">Validity period or assessment years mentioned on the 80G certificate.</div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">
+                                                        <i class="fas fa-globe text-secondary me-1"></i> FCRA Registration No. (Optional)
+                                                    </label>
+                                                    <input type="text" name="ngo_fcra_reg_no" class="form-control" value="<?php echo htmlspecialchars($settings['ngo_fcra_reg_no'] ?? ''); ?>" placeholder="e.g. 083781234">
+                                                    <div class="form-text text-muted small">Foreign Contribution Regulation Act registration number (if applicable).</div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">
+                                                        <i class="fas fa-building text-secondary me-1"></i> CSR Registration No. (Optional)
+                                                    </label>
+                                                    <input type="text" name="ngo_csr_reg_no" class="form-control" value="<?php echo htmlspecialchars($settings['ngo_csr_reg_no'] ?? ''); ?>" placeholder="e.g. CSR00012345">
+                                                    <div class="form-text text-muted small">MCA CSR registration number for corporate donations (if applicable).</div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-12">
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">Tax Exemption Note / Disclaimer</label>
+                                                    <textarea name="ngo_tax_exemption_note" class="form-control" rows="3" placeholder="e.g. Donations to this organization are eligible for 50% tax exemption under Section 80G of the Income Tax Act, 1961."><?php echo htmlspecialchars($settings['ngo_tax_exemption_note'] ?? ''); ?></textarea>
+                                                    <div class="form-text text-muted small">Custom note printed at the bottom of tax receipts and in receipt emails. Leave blank for default standard note.</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="mt-4 pt-3 border-top d-flex justify-content-end">
+                                            <button type="submit" class="btn btn-primary px-4 shadow-sm">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-inline me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 4h10l4 4v10a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2" /><path d="M12 14m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M14 4l0 4l-6 0l0 -4" /></svg>
+                                                Save Tax & Legal Info
                                             </button>
                                         </div>
                                     </form>

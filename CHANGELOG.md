@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0] - 2026-10-05
+
+### Added
+- Automated branded donation receipts sent directly to donor email upon successful donation (Razorpay, Cashfree, and Admin Approval).
+- Added Tax & Legal Settings tab in Organization Settings with fields for 12A Registration No./URN, 80G Registration No./URN, NGO PAN, 80G Validity period, FCRA No., CSR No., and custom tax exemption disclaimer notes.
+- Included 12A No., 80G No., NGO PAN, and 80G validity period on both PDF and HTML donation receipts.
+- Created `ReceiptMailHelper` with responsive HTML template, instant download and view links with cryptographic signatures.
+
 ## [1.1.9] - 2026-10-05
 
 ### Fixed

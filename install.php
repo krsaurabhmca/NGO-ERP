@@ -213,7 +213,14 @@ INSERT IGNORE INTO settings (key_name, key_value, group_name) VALUES
 -- Add Logo and Favicon to settings
 INSERT IGNORE INTO settings (key_name, key_value, group_name) VALUES 
 ('ngo_logo', '', 'organization'),
-('ngo_favicon', '', 'organization');
+('ngo_favicon', '', 'organization'),
+('ngo_pan', '', 'organization'),
+('ngo_12a_reg_no', '', 'organization'),
+('ngo_80g_reg_no', '', 'organization'),
+('ngo_80g_validity', '', 'organization'),
+('ngo_fcra_reg_no', '', 'organization'),
+('ngo_csr_reg_no', '', 'organization'),
+('ngo_tax_exemption_note', '', 'organization');
 
 
 -- Add Sender Details to SMTP settings

@@ -608,6 +608,11 @@ class HomeController extends Controller
                 $campaignModel = new \App\Models\Campaign();
                 $campaignModel->updateRaisedAmount($donation->campaign_id);
             }
+            try {
+                \App\Helpers\ReceiptMailHelper::sendReceipt($donation, $this->globalSettings);
+            } catch (\Throwable $te) {
+                error_log('[Mail] Failed to send receipt: ' . $te->getMessage());
+            }
             $receiptUrl = \App\Helpers\SignedUrlHelper::generateReceiptUrl($donationUuid, 86400);
             unset($_SESSION['razorpay_donation_id'], $_SESSION['razorpay_order_amount'], $_SESSION['razorpay_order_id']);
             json_response([
@@ -690,6 +695,7 @@ class HomeController extends Controller
         $ngoAddr = $this->globalSettings['ngo_address'] ?? '';
         $ngoEmail = $this->globalSettings['ngo_email'] ?? '';
         $ngoPhone = $this->globalSettings['ngo_phone'] ?? '';
+        $ngoPan = $this->globalSettings['ngo_pan'] ?? '';
 
         $pw = 186;      // content width
         $ml = 12;       // left margin
@@ -717,7 +723,7 @@ class HomeController extends Controller
         $pdf->cell($leftW, 8, $ngoName, 0, 1, 'L');
         $y = $pdf->getY();
 
-        if ($ngoAddr || $ngoEmail || $ngoPhone) {
+        if ($ngoAddr || $ngoEmail || $ngoPhone || $ngoPan) {
             $pdf->setFont('Helvetica', '', 9);
             $pdf->setTextColor(100, 100, 100);
             if ($ngoAddr) {
@@ -728,6 +734,7 @@ class HomeController extends Controller
             $contactStr = '';
             if ($ngoEmail) $contactStr .= 'Email: ' . $ngoEmail;
             if ($ngoPhone) $contactStr .= ($contactStr ? '  |  ' : '') . 'Phone: ' . $ngoPhone;
+            if ($ngoPan) $contactStr .= ($contactStr ? '  |  ' : '') . 'PAN: ' . $ngoPan;
             if ($contactStr) {
                 $pdf->setXY($ml, $y);
                 $pdf->cell($leftW, 5, $contactStr, 0, 1, 'L');
@@ -841,20 +848,52 @@ class HomeController extends Controller
 
         // === TAX EXEMPTION SECTION ===
         $taxY = $y;
-        $taxH = 24;
+        $ngoPan = $this->globalSettings['ngo_pan'] ?? '';
+        $ngo12a = $this->globalSettings['ngo_12a_reg_no'] ?? '';
+        $ngo80g = $this->globalSettings['ngo_80g_reg_no'] ?? '';
+        $ngo80gValidity = $this->globalSettings['ngo_80g_validity'] ?? '';
+        $ngoTaxNote = $this->globalSettings['ngo_tax_exemption_note'] ?? '';
+
+        $hasMeta = ($ngo80g || $ngo12a || $ngoPan || $ngo80gValidity);
+        $taxH = $hasMeta ? 32 : 24;
+
         // Red left border
         $pdf->filledRect($ml, $taxY, 1.5, $taxH, 231, 76, 60);
         // Light red background
         $pdf->filledRect($ml + 1.5, $taxY, $pw - 1.5, $taxH, 253, 246, 246);
+
+        $curY = $taxY + 3;
+        if ($hasMeta) {
+            $pdf->setFont('Helvetica', 'B', 8);
+            $pdf->setTextColor(40, 40, 40);
+            $metaRow1 = '';
+            if ($ngo80g) $metaRow1 .= '80G Reg / URN: ' . $ngo80g;
+            if ($ngo12a) $metaRow1 .= ($metaRow1 ? '   |   ' : '') . '12A Reg / URN: ' . $ngo12a;
+            if ($metaRow1) {
+                $pdf->setXY($ml + 6, $curY);
+                $pdf->cell($pw - 12, 4, $metaRow1, 0, 1, 'L');
+                $curY += 4.5;
+            }
+
+            $metaRow2 = '';
+            if ($ngoPan) $metaRow2 .= 'NGO PAN: ' . $ngoPan;
+            if ($ngo80gValidity) $metaRow2 .= ($metaRow2 ? '   |   ' : '') . '80G Validity: ' . $ngo80gValidity;
+            if ($metaRow2) {
+                $pdf->setXY($ml + 6, $curY);
+                $pdf->cell($pw - 12, 4, $metaRow2, 0, 1, 'L');
+                $curY += 5;
+            }
+        }
+
         $pdf->setFont('Helvetica', '', 8);
         $pdf->setTextColor(100, 100, 100);
-        $pdf->setXY($ml + 6, $taxY + 3);
-        $pdf->cell($pw - 12, 4, 'Donations to ' . $ngoName . ' are exempt under Section 80G of the Income Tax Act, 1961.', 0, 1, 'L');
-        $pdf->setXY($ml + 6, $taxY + 9);
-        $pdf->cell($pw - 12, 4, 'This receipt is valid for claiming deduction. This is a system-generated receipt', 0, 1, 'L');
-        $pdf->setXY($ml + 6, $taxY + 14);
-        $pdf->cell($pw - 12, 4, 'and does not require a physical signature.', 0, 1, 'L');
-        $y = $taxY + $taxH + 14;
+        $taxMsg = $ngoTaxNote ? $ngoTaxNote : ('Donations to ' . $ngoName . ' are exempt under Section 80G of the Income Tax Act, 1961.');
+        $pdf->setXY($ml + 6, $curY);
+        $pdf->cell($pw - 12, 4, $taxMsg, 0, 1, 'L');
+        $curY += 4;
+        $pdf->setXY($ml + 6, $curY);
+        $pdf->cell($pw - 12, 4, 'This receipt is valid for claiming deduction. System-generated receipt (no physical signature required).', 0, 1, 'L');
+        $y = $taxY + $taxH + 12;
 
         // === FOOTER ===
         $fy = $pageH - 30;
@@ -1330,9 +1369,15 @@ class HomeController extends Controller
             $orderStatus = $orderData['order_status'] ?? '';
             if ($orderStatus === 'PAID') {
                 $donationModel->update($donation->id, ['status' => 'completed']);
+                $donation = $donationModel->find($donation->id);
                 if (!empty($donation->campaign_id)) {
                     $campaignModel = new \App\Models\Campaign();
                     $campaignModel->updateRaisedAmount($donation->campaign_id);
+                }
+                try {
+                    \App\Helpers\ReceiptMailHelper::sendReceipt($donation, $this->globalSettings);
+                } catch (\Throwable $te) {
+                    error_log('[Mail] Cashfree receipt error: ' . $te->getMessage());
                 }
                 $receiptUrl = \App\Helpers\SignedUrlHelper::generateReceiptUrl($donation->uuid, 86400);
                 unset($_SESSION['cashfree_donation_id'], $_SESSION['cashfree_order_amount'], $_SESSION['cashfree_order_id']);
@@ -1434,9 +1479,15 @@ class HomeController extends Controller
             if ($donation) {
                 if ($donation->status !== 'completed') {
                     $donationModel->update($donation->id, ['status' => 'completed']);
+                    $donation = $donationModel->find($donation->id);
                     if (!empty($donation->campaign_id)) {
                         $campaignModel = new \App\Models\Campaign();
                         $campaignModel->updateRaisedAmount($donation->campaign_id);
+                    }
+                    try {
+                        \App\Helpers\ReceiptMailHelper::sendReceipt($donation, $this->globalSettings);
+                    } catch (\Throwable $te) {
+                        error_log('[Mail] Cashfree return receipt error: ' . $te->getMessage());
                     }
                 }
                 $receiptUrl = \App\Helpers\SignedUrlHelper::generateReceiptUrl($donation->uuid, 86400);
@@ -1514,9 +1565,15 @@ class HomeController extends Controller
                     $donation = $donations[0];
                     if ($donation->status === 'pending') {
                         $donationModel->update($donation->id, ['status' => 'completed']);
+                        $donation = $donationModel->find($donation->id);
                         if (!empty($donation->campaign_id)) {
                             $campaignModel = new \App\Models\Campaign();
                             $campaignModel->updateRaisedAmount($donation->campaign_id);
+                        }
+                        try {
+                            \App\Helpers\ReceiptMailHelper::sendReceipt($donation, $this->globalSettings);
+                        } catch (\Throwable $te) {
+                            error_log('[Mail] Cashfree webhook receipt error: ' . $te->getMessage());
                         }
                     }
                 }
