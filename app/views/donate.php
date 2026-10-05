@@ -263,27 +263,26 @@
     }
 
     <?php if (isset($_GET['success']) && $_GET['success'] == 1):
-        if (($_GET['status'] ?? '') === 'completed'):
-            if (isset($_GET['receipt_url'])) {
-                $receiptUrl = json_encode($_GET['receipt_url']); ?>
-                document.addEventListener('DOMContentLoaded', function () {
-                    var link = document.getElementById('receiptLink');
-                    link.href = <?php echo $receiptUrl; ?>;
-                    link.style.display = 'inline-flex';
-                    document.getElementById('successModalMsg').textContent = 'Your donation has been completed successfully! Thank you for your generous support!';
-                    var modal = new bootstrap.Modal(document.getElementById('successModal'));
-                    modal.show();
-                });
-            <?php } elseif (isset($_GET['donation_uuid'])) {
-                $donationUuid = json_encode($_GET['donation_uuid']); ?>
-                document.addEventListener('DOMContentLoaded', function () {
-                    showSuccessModal('Your donation has been completed successfully! Thank you for your generous support!', <?php echo $donationUuid; ?>);
-                });
-            <?php } else { ?>
-                document.addEventListener('DOMContentLoaded', function () {
-                    showSuccessModal('Your donation has been submitted successfully! We will contact you shortly.', null);
-                });
-            <?php }endif; endif; ?>
+        $receiptUrl = !empty($_GET['receipt_url']) ? $_GET['receipt_url'] : (!empty($_GET['donation_uuid']) ? \App\Helpers\SignedUrlHelper::generateReceiptUrl($_GET['donation_uuid'], 86400) : null);
+        $receiptUrlJson = json_encode($receiptUrl);
+        if (($_GET['status'] ?? '') === 'completed' || !empty($_GET['donation_uuid'])): ?>
+            document.addEventListener('DOMContentLoaded', function () {
+                showSuccessModal('Your donation has been completed successfully! Thank you for your generous support!', <?php echo $receiptUrlJson; ?>);
+            });
+        <?php else: ?>
+            document.addEventListener('DOMContentLoaded', function () {
+                showSuccessModal('Your donation has been submitted successfully! We will contact you shortly.', null);
+            });
+        <?php endif;
+    endif; ?>
+    <?php if (!empty($_GET['error'])): ?>
+        document.addEventListener('DOMContentLoaded', function () {
+            var msgBox = document.getElementById('donate-msg');
+            if (msgBox) {
+                msgBox.innerHTML = '<div class="alert alert-warning py-2 mb-3"><?php echo htmlspecialchars($_GET['error']); ?></div>';
+            }
+        });
+    <?php endif; ?>
 </script>
 
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -343,6 +342,9 @@
                         if (result.paymentDetails) {
                             var fd = new FormData(form);
                             fd.append('cashfree_order_id', res.order_id);
+                            if (res.donation_uuid) {
+                                fd.append('donation_uuid', res.donation_uuid);
+                            }
                             btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Verifying...';
                             fetch('<?php echo url('donate/cashfree-verify'); ?>', {
                                 method: 'POST',

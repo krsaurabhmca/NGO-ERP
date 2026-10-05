@@ -145,17 +145,40 @@ class SignedUrlHelper
             ];
         }
 
-        // Rebuild payload
-        $payload = $path . '|' . $expires;
-        if (!empty($queryParams)) {
-            ksort($queryParams);
-            $payload .= '|' . http_build_query($queryParams);
+        // Build candidate paths to test against signature for subdirectory / rewrite resilience
+        $candidatePaths = [];
+        if (!empty($_GET['url'])) {
+            $candidatePaths[] = trim($_GET['url'], '/');
+        }
+        $candidatePaths[] = $path;
+        if (preg_match('#(donate/receipt/[a-zA-Z0-9\-]+)#', $requestUri, $m)) {
+            $candidatePaths[] = $m[1];
+        }
+        if (preg_match('#(admin/[a-zA-Z0-9\-_/]+)#', $requestUri, $m)) {
+            $candidatePaths[] = $m[1];
+        }
+        $candidatePaths = array_unique(array_filter($candidatePaths));
+
+        $secretKey = self::getSecretKey();
+        $isValid = false;
+        $matchedPath = $path;
+
+        foreach ($candidatePaths as $candidate) {
+            $payload = $candidate . '|' . $expires;
+            if (!empty($queryParams)) {
+                $copyParams = $queryParams;
+                ksort($copyParams);
+                $payload .= '|' . http_build_query($copyParams);
+            }
+            $expectedSignature = hash_hmac('sha256', $payload, $secretKey);
+            if (hash_equals($expectedSignature, $signature)) {
+                $isValid = true;
+                $matchedPath = $candidate;
+                break;
+            }
         }
 
-        // Verify signature using timing-safe comparison
-        $expectedSignature = hash_hmac('sha256', $payload, self::getSecretKey());
-        
-        if (!hash_equals($expectedSignature, $signature)) {
+        if (!$isValid) {
             return [
                 'valid' => false,
                 'error' => 'invalid_signature',
@@ -166,7 +189,7 @@ class SignedUrlHelper
         // Success
         return [
             'valid' => true,
-            'path' => $path,
+            'path' => $matchedPath,
             'expires_at' => (int)$expires,
             'params' => $queryParams
         ];

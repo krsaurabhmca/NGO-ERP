@@ -123,16 +123,30 @@ if ($campaign->end_date) {
                                 <input type="hidden" name="campaign_id" value="<?php echo $campaign->id; ?>">
                                 <input type="hidden" name="campaign_slug" value="<?php echo $campaign->slug; ?>">
                                 <?php
-                                $cmpActiveGw = $globalSettings['active_online_gateway'] ?? '';
-                                $cmpRzpMode = $globalSettings['razorpay_mode'] ?? 'test';
-                                $cmpRzpKeyId = $cmpRzpMode === 'live'
-                                    ? ($globalSettings['razorpay_live_key_id'] ?? $globalSettings['razorpay_key_id'] ?? '')
-                                    : ($globalSettings['razorpay_test_key_id'] ?? $globalSettings['razorpay_key_id'] ?? '');
-                                $cmpRzpKeySecret = $cmpRzpMode === 'live'
-                                    ? ($globalSettings['razorpay_live_key_secret'] ?? $globalSettings['razorpay_key_secret'] ?? '')
-                                    : ($globalSettings['razorpay_test_key_secret'] ?? $globalSettings['razorpay_key_secret'] ?? '');
-                                if ($cmpActiveGw !== 'razorpay' || empty($cmpRzpKeyId) || empty($cmpRzpKeySecret))
+                                $cmpActiveGw = $globalSettings['active_online_gateway'] ?? 'razorpay';
+                                if ($cmpActiveGw === 'razorpay') {
+                                    $cmpRzpMode = $globalSettings['razorpay_mode'] ?? 'test';
+                                    $cmpRzpKeyId = $cmpRzpMode === 'live'
+                                        ? ($globalSettings['razorpay_live_key_id'] ?? $globalSettings['razorpay_key_id'] ?? '')
+                                        : ($globalSettings['razorpay_test_key_id'] ?? $globalSettings['razorpay_key_id'] ?? '');
+                                    $cmpRzpKeySecret = $cmpRzpMode === 'live'
+                                        ? ($globalSettings['razorpay_live_key_secret'] ?? $globalSettings['razorpay_key_secret'] ?? '')
+                                        : ($globalSettings['razorpay_test_key_secret'] ?? $globalSettings['razorpay_key_secret'] ?? '');
+                                    if (empty($cmpRzpKeyId) || empty($cmpRzpKeySecret))
+                                        $cmpActiveGw = '';
+                                } elseif ($cmpActiveGw === 'cashfree') {
+                                    $cmpCfMode = $globalSettings['cashfree_mode'] ?? 'test';
+                                    $cmpCfAppId = $cmpCfMode === 'live'
+                                        ? ($globalSettings['cashfree_live_app_id'] ?? '')
+                                        : ($globalSettings['cashfree_test_app_id'] ?? '');
+                                    $cmpCfSecret = $cmpCfMode === 'live'
+                                        ? ($globalSettings['cashfree_live_secret_key'] ?? '')
+                                        : ($globalSettings['cashfree_test_secret_key'] ?? '');
+                                    if (empty($cmpCfAppId) || empty($cmpCfSecret))
+                                        $cmpActiveGw = '';
+                                } else {
                                     $cmpActiveGw = '';
+                                }
                                 ?>
                                 <input type="hidden" name="payment_method"
                                     value="<?php echo $cmpActiveGw ?: 'offline'; ?>">
@@ -323,8 +337,9 @@ if ($campaign->end_date) {
     }
 </script>
 
-<?php if ($cmpActiveGw === 'razorpay'): ?>
+<?php if (!empty($cmpActiveGw)): ?>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
     <script>
         document.getElementById('campaign-donate-form').addEventListener('submit', function (e) {
             var method = this.querySelector('[name="payment_method"]').value;
@@ -347,7 +362,10 @@ if ($campaign->end_date) {
             btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Processing...';
             msgBox.innerHTML = '';
 
-            fetch('<?php echo url('donate/razorpay-order'); ?>', {
+            var activeGateway = '<?php echo $cmpActiveGw; ?>';
+            var endpoint = activeGateway === 'cashfree' ? '<?php echo url('donate/cashfree-order'); ?>' : '<?php echo url('donate/razorpay-order'); ?>';
+
+            fetch(endpoint, {
                 method: 'POST',
                 headers: { 'X-Requested-With': 'XMLHttpRequest' },
                 body: formData
@@ -361,34 +379,33 @@ if ($campaign->end_date) {
                         return;
                     }
 
-                    var donationUuid = res.donation_uuid || '';
-                    var options = {
-                        key: res.key_id,
-                        amount: res.amount,
-                        currency: 'INR',
-                        name: '<?php echo !empty($globalSettings['ngo_name']) ? $globalSettings['ngo_name'] : 'NGO HELP'; ?>',
-                        description: 'Campaign Donation',
-                        order_id: res.order_id,
-                        prefill: {
-                            name: form.querySelector('[name="donor_name"]').value,
-                            email: form.querySelector('[name="donor_email"]').value || '',
-                            contact: form.querySelector('[name="donor_phone"]').value || ''
-                        },
-                        handler: function (paymentRes) {
-                            var fd = new FormData(form);
-                            fd.append('razorpay_order_id', paymentRes.razorpay_order_id);
-                            fd.append('razorpay_payment_id', paymentRes.razorpay_payment_id);
-                            fd.append('razorpay_signature', paymentRes.razorpay_signature);
-
-                            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Verifying...';
-
-                            fetch('<?php echo url('donate/razorpay-verify'); ?>', {
-                                method: 'POST',
-                                headers: { 'X-Requested-With': 'XMLHttpRequest' },
-                                body: fd
-                            })
-                                .then(function (r) { return r.json(); })
-                                .then(function (vres) {
+                    if (activeGateway === 'cashfree') {
+                        const cashfree = Cashfree({ mode: '<?php echo ($globalSettings['cashfree_mode'] ?? 'test') === 'live' ? 'production' : 'sandbox'; ?>' });
+                        let checkoutOptions = {
+                            paymentSessionId: res.payment_session_id,
+                            redirectTarget: "_modal"
+                        };
+                        cashfree.checkout(checkoutOptions).then(function(result) {
+                            if (result.error) {
+                                btn.disabled = false;
+                                btn.innerHTML = '<i class="fas fa-heart me-2"></i> Donate Now';
+                                msgBox.innerHTML = '<div class="alert alert-warning py-2 mb-0">Payment cancelled or failed.</div>';
+                                fetch('<?php echo url('donate/cashfree-fail'); ?>', { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                            }
+                            if (result.paymentDetails) {
+                                var fd = new FormData(form);
+                                fd.append('cashfree_order_id', res.order_id);
+                                if (res.donation_uuid) {
+                                    fd.append('donation_uuid', res.donation_uuid);
+                                }
+                                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Verifying...';
+                                fetch('<?php echo url('donate/cashfree-verify'); ?>', {
+                                    method: 'POST',
+                                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                                    body: fd
+                                })
+                                .then(r => r.json())
+                                .then(vres => {
                                     if (vres.status === 'success') {
                                         form.reset();
                                         showCampaignSuccessModal(vres.message || 'Donation successful!', vres.receipt_url || null);
@@ -398,31 +415,78 @@ if ($campaign->end_date) {
                                     btn.disabled = false;
                                     btn.innerHTML = '<i class="fas fa-heart me-2"></i> Donate Now';
                                 })
-                                .catch(function (err) {
-                                    msgBox.innerHTML = '<div class="alert alert-danger py-2 mb-0">Verification request failed. Check console for details.</div>';
-                                    console.error('Verify error:', err);
+                                .catch((err) => {
+                                    msgBox.innerHTML = '<div class="alert alert-danger py-2 mb-0">Verification failed. Please contact support.</div>';
                                     btn.disabled = false;
                                     btn.innerHTML = '<i class="fas fa-heart me-2"></i> Donate Now';
                                 });
-                        },
-                        modal: {
-                            ondismiss: function () {
-                                btn.disabled = false;
-                                btn.innerHTML = '<i class="fas fa-heart me-2"></i> Donate Now';
-                                if (msgBox) msgBox.innerHTML = '<div class="alert alert-warning py-2 mb-0">Payment cancelled.</div>';
-                                var fd = new FormData();
+                            }
+                        });
+                    } else {
+                        var donationUuid = res.donation_uuid || '';
+                        var options = {
+                            key: res.key_id,
+                            amount: res.amount,
+                            currency: 'INR',
+                            name: '<?php echo !empty($globalSettings['ngo_name']) ? $globalSettings['ngo_name'] : 'NGO HELP'; ?>',
+                            description: 'Campaign Donation',
+                            order_id: res.order_id,
+                            prefill: {
+                                name: form.querySelector('[name="donor_name"]').value,
+                                email: form.querySelector('[name="donor_email"]').value || '',
+                                contact: form.querySelector('[name="donor_phone"]').value || ''
+                            },
+                            handler: function (paymentRes) {
+                                var fd = new FormData(form);
+                                fd.append('razorpay_order_id', paymentRes.razorpay_order_id);
+                                fd.append('razorpay_payment_id', paymentRes.razorpay_payment_id);
+                                fd.append('razorpay_signature', paymentRes.razorpay_signature);
                                 fd.append('donation_uuid', donationUuid);
-                                fetch('<?php echo url('donate/razorpay-fail'); ?>', {
+
+                                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Verifying...';
+
+                                fetch('<?php echo url('donate/razorpay-verify'); ?>', {
                                     method: 'POST',
                                     headers: { 'X-Requested-With': 'XMLHttpRequest' },
                                     body: fd
-                                }).catch(function () { });
+                                })
+                                    .then(function (r) { return r.json(); })
+                                    .then(function (vres) {
+                                        if (vres.status === 'success') {
+                                            form.reset();
+                                            showCampaignSuccessModal(vres.message || 'Donation successful!', vres.receipt_url || null);
+                                        } else {
+                                            msgBox.innerHTML = '<div class="alert alert-danger py-2 mb-0">' + (vres.message || 'Verification failed.') + '</div>';
+                                        }
+                                        btn.disabled = false;
+                                        btn.innerHTML = '<i class="fas fa-heart me-2"></i> Donate Now';
+                                    })
+                                    .catch(function (err) {
+                                        msgBox.innerHTML = '<div class="alert alert-danger py-2 mb-0">Verification request failed. Check console for details.</div>';
+                                        console.error('Verify error:', err);
+                                        btn.disabled = false;
+                                        btn.innerHTML = '<i class="fas fa-heart me-2"></i> Donate Now';
+                                    });
+                            },
+                            modal: {
+                                ondismiss: function () {
+                                    btn.disabled = false;
+                                    btn.innerHTML = '<i class="fas fa-heart me-2"></i> Donate Now';
+                                    if (msgBox) msgBox.innerHTML = '<div class="alert alert-warning py-2 mb-0">Payment cancelled.</div>';
+                                    var fd = new FormData();
+                                    fd.append('donation_uuid', donationUuid);
+                                    fetch('<?php echo url('donate/razorpay-fail'); ?>', {
+                                        method: 'POST',
+                                        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                                        body: fd
+                                    }).catch(function () { });
+                                }
                             }
-                        }
-                    };
+                        };
 
-                    var rzp = new Razorpay(options);
-                    rzp.open();
+                        var rzp = new Razorpay(options);
+                        rzp.open();
+                    }
                 })
                 .catch(function () {
                     msgBox.innerHTML = '<div class="alert alert-danger py-2 mb-0">Something went wrong. Please try again.</div>';

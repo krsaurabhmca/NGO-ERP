@@ -521,95 +521,103 @@ class HomeController extends Controller
         $keySecret = $mode === 'live'
             ? ($this->globalSettings['razorpay_live_key_secret'] ?? $this->globalSettings['razorpay_key_secret'] ?? '')
             : ($this->globalSettings['razorpay_test_key_secret'] ?? $this->globalSettings['razorpay_key_secret'] ?? '');
-        $orderId = $_POST['razorpay_order_id'] ?? '';
-        $paymentId = $_POST['razorpay_payment_id'] ?? '';
-        $signature = $_POST['razorpay_signature'] ?? '';
-
-        $expected = hash_hmac('sha256', $orderId . '|' . $paymentId, $keySecret);
-
-        if (!hash_equals($expected, $signature)) {
-            json_response(['status' => 'error', 'message' => 'Payment verification failed.']);
-            exit;
-        }
-
-        // Verify that the order amount matches what was stored during order creation
-        $expectedAmount = $_SESSION['razorpay_order_amount'] ?? null;
-        $expectedOrderId = $_SESSION['razorpay_order_id'] ?? null;
-        
-        if ($expectedAmount === null || $expectedOrderId === null) {
-            json_response(['status' => 'error', 'message' => 'Session expired. Please try again.']);
-            exit;
-        }
-        
-        if ($expectedOrderId !== $orderId) {
-            json_response(['status' => 'error', 'message' => 'Order ID mismatch. Transaction rejected.']);
-            exit;
-        }
-        
-        // Clear stored session data to prevent replay
-        unset($_SESSION['razorpay_order_amount'], $_SESSION['razorpay_order_id']);
-
-        // Fetch order details from Razorpay to verify amount
         $keyId = $mode === 'live'
             ? ($this->globalSettings['razorpay_live_key_id'] ?? $this->globalSettings['razorpay_key_id'] ?? '')
             : ($this->globalSettings['razorpay_test_key_id'] ?? $this->globalSettings['razorpay_key_id'] ?? '');
 
-        $ch = curl_init('https://api.razorpay.com/v1/orders/' . $orderId);
-        curl_setopt($ch, CURLOPT_USERPWD, $keyId . ':' . $keySecret);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        $orderResponse = curl_exec($ch);
-        $curlError = curl_error($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
+        $orderId = trim($_POST['razorpay_order_id'] ?? '');
+        $paymentId = trim($_POST['razorpay_payment_id'] ?? '');
+        $signature = trim($_POST['razorpay_signature'] ?? '');
 
-        if ($curlError || $httpCode !== 200) {
-            json_response(['status' => 'error', 'message' => 'Failed to verify order details.']);
+        if (empty($orderId) || empty($paymentId) || empty($signature)) {
+            json_response(['status' => 'error', 'message' => 'Missing payment verification details.']);
             exit;
         }
 
-        $orderData = json_decode($orderResponse, true);
-        $razorpayOrderAmount = (int) ($orderData['amount'] ?? 0); // Amount in paise from Razorpay
-
-        $amount = (float) ($_POST['amount'] ?? 0);
-        $submittedAmountPaise = (int) round($amount * 100);
-
-        // Verify that submitted amount matches Razorpay order amount
-        if ($submittedAmountPaise !== $razorpayOrderAmount) {
-            json_response(['status' => 'error', 'message' => 'Payment amount mismatch. Transaction rejected.']);
+        // 1. Verify Razorpay cryptographic signature
+        $expected = hash_hmac('sha256', $orderId . '|' . $paymentId, $keySecret);
+        if (!hash_equals($expected, $signature)) {
+            json_response(['status' => 'error', 'message' => 'Payment verification failed. Invalid signature.']);
             exit;
         }
+
+        // 2. Find donation record
         $donationModel = new Donation();
-        $donationId = $_SESSION['razorpay_donation_id'] ?? null;
+        $donations = $donationModel->where('transaction_id', $orderId);
+        $donation = !empty($donations) ? $donations[0] : null;
 
-        if ($donationId) {
-            // Update the pending donation to completed
-            $updateData = [
-                'transaction_id' => $paymentId,
-                'status' => 'completed'
-            ];
-            if ($donationModel->update($donationId, $updateData)) {
-                $donation = $donationModel->find($donationId);
-                $donationUuid = $donation->uuid;
-                if (!empty($donation->campaign_id)) {
-                    $campaignModel = new \App\Models\Campaign();
-                    $campaignModel->updateRaisedAmount($donation->campaign_id);
+        if (!$donation && !empty($_SESSION['razorpay_donation_id'])) {
+            $donation = $donationModel->find($_SESSION['razorpay_donation_id']);
+        }
+
+        if (!$donation && !empty($_POST['donation_uuid'])) {
+            $donation = $donationModel->findByUuid($_POST['donation_uuid']);
+        }
+
+        if (!$donation) {
+            json_response(['status' => 'error', 'message' => 'No donation record found for this transaction.']);
+            exit;
+        }
+
+        // If already marked completed (e.g. webhook or duplicate verification call), return success
+        if ($donation->status === 'completed') {
+            $receiptUrl = \App\Helpers\SignedUrlHelper::generateReceiptUrl($donation->uuid, 86400);
+            unset($_SESSION['razorpay_donation_id'], $_SESSION['razorpay_order_amount'], $_SESSION['razorpay_order_id']);
+            json_response([
+                'status' => 'success',
+                'message' => 'Donation completed successfully!',
+                'donation_uuid' => $donation->uuid,
+                'receipt_url' => $receiptUrl
+            ]);
+            exit;
+        }
+
+        // 3. Optional order amount validation with Razorpay API
+        if (!empty($keyId) && !empty($keySecret)) {
+            $ch = curl_init('https://api.razorpay.com/v1/orders/' . $orderId);
+            curl_setopt($ch, CURLOPT_USERPWD, $keyId . ':' . $keySecret);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            $orderResponse = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            if ($httpCode === 200) {
+                $orderData = json_decode($orderResponse, true);
+                $razorpayOrderAmount = (int) ($orderData['amount'] ?? 0);
+                $donationAmountPaise = (int) round(((float)$donation->amount) * 100);
+
+                if ($razorpayOrderAmount > 0 && $donationAmountPaise !== $razorpayOrderAmount) {
+                    json_response(['status' => 'error', 'message' => 'Payment amount mismatch. Transaction rejected.']);
+                    exit;
                 }
-                $receiptUrl = \App\Helpers\SignedUrlHelper::generateReceiptUrl($donationUuid, 86400);
-                unset($_SESSION['razorpay_donation_id'], $_SESSION['razorpay_order_amount'], $_SESSION['razorpay_order_id']);
-                json_response([
-                    'status' => 'success', 
-                    'message' => 'Donation completed successfully!', 
-                    'donation_uuid' => $donationUuid,
-                    'receipt_url' => $receiptUrl
-                ]);
-            } else {
-                json_response(['status' => 'error', 'message' => 'Failed to update donation record.']);
             }
+        }
+
+        // 4. Update donation to completed
+        $updateData = [
+            'transaction_id' => $paymentId,
+            'status' => 'completed'
+        ];
+        if ($donationModel->update($donation->id, $updateData)) {
+            $donation = $donationModel->find($donation->id);
+            $donationUuid = $donation->uuid;
+            if (!empty($donation->campaign_id)) {
+                $campaignModel = new \App\Models\Campaign();
+                $campaignModel->updateRaisedAmount($donation->campaign_id);
+            }
+            $receiptUrl = \App\Helpers\SignedUrlHelper::generateReceiptUrl($donationUuid, 86400);
+            unset($_SESSION['razorpay_donation_id'], $_SESSION['razorpay_order_amount'], $_SESSION['razorpay_order_id']);
+            json_response([
+                'status' => 'success',
+                'message' => 'Donation completed successfully!',
+                'donation_uuid' => $donationUuid,
+                'receipt_url' => $receiptUrl
+            ]);
         } else {
-            json_response(['status' => 'error', 'message' => 'Session expired. No pending donation found.']);
+            json_response(['status' => 'error', 'message' => 'Failed to update donation record.']);
         }
         exit;
     }
@@ -624,17 +632,23 @@ class HomeController extends Controller
         $donationModel = new Donation();
         $donationId = $_SESSION['razorpay_donation_id'] ?? null;
         $donationUuid = $_POST['donation_uuid'] ?? '';
+        $orderId = $_POST['order_id'] ?? $_POST['razorpay_order_id'] ?? '';
 
-        if ($donationUuid) {
+        if (!empty($donationUuid)) {
             $donation = $donationModel->findByUuid($donationUuid);
             if ($donation && $donation->status === 'pending') {
                 $donationModel->update($donation->id, ['status' => 'failed']);
             }
+        } elseif (!empty($orderId)) {
+            $donations = $donationModel->where('transaction_id', $orderId);
+            if (!empty($donations) && $donations[0]->status === 'pending') {
+                $donationModel->update($donations[0]->id, ['status' => 'failed']);
+            }
         } elseif ($donationId) {
-            $donationModel->update($donationId, ['status' => 'failed']);
-        } else {
-            json_response(['status' => 'error', 'message' => 'No pending donation found.']);
-            exit;
+            $donation = $donationModel->find($donationId);
+            if ($donation && $donation->status === 'pending') {
+                $donationModel->update($donationId, ['status' => 'failed']);
+            }
         }
 
         unset($_SESSION['razorpay_donation_id'], $_SESSION['razorpay_order_amount'], $_SESSION['razorpay_order_id']);
@@ -1143,20 +1157,28 @@ class HomeController extends Controller
         $orderId = 'DON_' . time() . '_' . bin2hex(random_bytes(4));
 
         $phone = preg_replace('/[^0-9]/', '', $_POST['donor_phone'] ?? '');
-        $email = trim($_POST['donor_email'] ?? 'test@example.com');
+        $email = trim($_POST['donor_email'] ?? 'donor@example.com');
         $name = trim($_POST['donor_name'] ?? 'Donor');
-        if (empty($phone)) $phone = '9999999999';
-        if (empty($email)) $email = 'test@example.com';
+        if (empty($phone) || strlen($phone) < 10) $phone = '9999999999';
+        if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) $email = 'donor@example.com';
+        if (empty($name)) $name = 'Donor';
+
+        $returnUrl = url('donate/cashfree-return?order_id={order_id}');
+        $notifyUrl = url('webhook/cashfree');
 
         $postData = [
             'order_id' => $orderId,
-            'order_amount' => $amount,
+            'order_amount' => round($amount, 2),
             'order_currency' => 'INR',
             'customer_details' => [
-                'customer_id' => 'CUST_' . time(),
+                'customer_id' => 'CUST_' . time() . '_' . bin2hex(random_bytes(2)),
                 'customer_name' => $name,
                 'customer_email' => $email,
                 'customer_phone' => $phone
+            ],
+            'order_meta' => [
+                'return_url' => $returnUrl,
+                'notify_url' => $notifyUrl
             ]
         ];
 
@@ -1202,21 +1224,28 @@ class HomeController extends Controller
                 'transaction_id' => $orderId,
                 'member_id' => !empty($_POST['member_id']) ? (int)$_POST['member_id'] : null,
                 'is_recurring' => !empty($_POST['is_recurring']) ? 1 : 0,
+                'recurring_frequency' => !empty($_POST['is_recurring']) ? 'monthly' : null,
+                'campaign_id' => !empty($_POST['campaign_id']) ? (int)$_POST['campaign_id'] : null,
                 'status' => 'pending'
             ];
 
+            $donationUuid = '';
             $donationModel = new \App\Models\Donation();
-            $donationId = $donationModel->create($pendingData);
-
-            if ($donationId) {
+            if ($donationModel->create($pendingData)) {
+                $donationId = $donationModel->lastInsertId();
                 $_SESSION['cashfree_donation_id'] = $donationId;
                 $_SESSION['cashfree_order_amount'] = $amount;
                 $_SESSION['cashfree_order_id'] = $orderId;
-                
+                $donation = $donationModel->find($donationId);
+                $donationUuid = $donation ? $donation->uuid : '';
+            }
+
+            if (!empty($donationUuid) && !empty($order['payment_session_id'])) {
                 json_response([
                     'status' => 'success',
                     'payment_session_id' => $order['payment_session_id'],
-                    'order_id' => $orderId
+                    'order_id' => $orderId,
+                    'donation_uuid' => $donationUuid
                 ]);
             } else {
                 json_response(['status' => 'error', 'message' => 'Failed to initialize donation record.']);
@@ -1246,11 +1275,39 @@ class HomeController extends Controller
             $url = 'https://sandbox.cashfree.com/pg/orders/';
         }
 
-        $orderId = $_POST['cashfree_order_id'] ?? '';
-        $expectedOrderId = $_SESSION['cashfree_order_id'] ?? null;
+        $orderId = trim($_POST['cashfree_order_id'] ?? $_POST['order_id'] ?? $_SESSION['cashfree_order_id'] ?? '');
 
-        if (empty($orderId) || $orderId !== $expectedOrderId) {
-            json_response(['status' => 'error', 'message' => 'Invalid payment data or session expired.']);
+        if (empty($orderId)) {
+            json_response(['status' => 'error', 'message' => 'Missing Cashfree order ID.']);
+            exit;
+        }
+
+        $donationModel = new \App\Models\Donation();
+        $donations = $donationModel->where('transaction_id', $orderId);
+        $donation = !empty($donations) ? $donations[0] : null;
+
+        if (!$donation && !empty($_SESSION['cashfree_donation_id'])) {
+            $donation = $donationModel->find($_SESSION['cashfree_donation_id']);
+        }
+
+        if (!$donation && !empty($_POST['donation_uuid'])) {
+            $donation = $donationModel->findByUuid($_POST['donation_uuid']);
+        }
+
+        if (!$donation) {
+            json_response(['status' => 'error', 'message' => 'No donation record found for this order.']);
+            exit;
+        }
+
+        if ($donation->status === 'completed') {
+            $receiptUrl = \App\Helpers\SignedUrlHelper::generateReceiptUrl($donation->uuid, 86400);
+            unset($_SESSION['cashfree_donation_id'], $_SESSION['cashfree_order_amount'], $_SESSION['cashfree_order_id']);
+            json_response([
+                'status' => 'success',
+                'message' => 'Payment verified successfully.',
+                'receipt_url' => $receiptUrl,
+                'donation_uuid' => $donation->uuid
+            ]);
             exit;
         }
 
@@ -1263,47 +1320,147 @@ class HomeController extends Controller
             'x-api-version: 2023-08-01'
         ]);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 15);
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 
         if ($httpCode === 200) {
             $orderData = json_decode($response, true);
-            if (($orderData['order_status'] ?? '') === 'PAID') {
-                $donationId = $_SESSION['cashfree_donation_id'] ?? null;
-                if ($donationId) {
-                    $donationModel = new \App\Models\Donation();
-                    $donation = $donationModel->find($donationId);
-                    if ($donation && $donation->status === 'pending') {
-                        $donationModel->update($donationId, ['status' => 'completed']);
-                        unset($_SESSION['cashfree_donation_id'], $_SESSION['cashfree_order_amount'], $_SESSION['cashfree_order_id']);
-                        json_response([
-                            'status' => 'success',
-                            'message' => 'Payment verified successfully.',
-                            'receipt_url' => url('donate/receipt/' . $donation->uuid)
-                        ]);
-                        exit;
-                    }
+            $orderStatus = $orderData['order_status'] ?? '';
+            if ($orderStatus === 'PAID') {
+                $donationModel->update($donation->id, ['status' => 'completed']);
+                if (!empty($donation->campaign_id)) {
+                    $campaignModel = new \App\Models\Campaign();
+                    $campaignModel->updateRaisedAmount($donation->campaign_id);
                 }
+                $receiptUrl = \App\Helpers\SignedUrlHelper::generateReceiptUrl($donation->uuid, 86400);
+                unset($_SESSION['cashfree_donation_id'], $_SESSION['cashfree_order_amount'], $_SESSION['cashfree_order_id']);
+                json_response([
+                    'status' => 'success',
+                    'message' => 'Payment verified successfully.',
+                    'receipt_url' => $receiptUrl,
+                    'donation_uuid' => $donation->uuid
+                ]);
+                exit;
+            } elseif (in_array($orderStatus, ['FAILED', 'EXPIRED', 'USER_DROPPED', 'CANCELLED'])) {
+                $donationModel->update($donation->id, ['status' => 'failed']);
+                unset($_SESSION['cashfree_donation_id'], $_SESSION['cashfree_order_amount'], $_SESSION['cashfree_order_id']);
+                json_response(['status' => 'error', 'message' => 'Payment was cancelled or failed.']);
+                exit;
             }
         }
-        json_response(['status' => 'error', 'message' => 'Payment verification failed.']);
+
+        json_response(['status' => 'error', 'message' => 'Payment verification failed. Please try again or contact support.']);
         exit;
     }
 
     public function markCashfreeFailed()
     {
+        $donationModel = new \App\Models\Donation();
         $donationId = $_SESSION['cashfree_donation_id'] ?? null;
-        if ($donationId) {
-            $donationModel = new \App\Models\Donation();
+        $donationUuid = $_POST['donation_uuid'] ?? '';
+        $orderId = $_POST['order_id'] ?? $_POST['cashfree_order_id'] ?? '';
+
+        if (!empty($donationUuid)) {
+            $donation = $donationModel->findByUuid($donationUuid);
+            if ($donation && $donation->status === 'pending') {
+                $donationModel->update($donation->id, ['status' => 'failed']);
+            }
+        } elseif (!empty($orderId)) {
+            $donations = $donationModel->where('transaction_id', $orderId);
+            if (!empty($donations) && $donations[0]->status === 'pending') {
+                $donationModel->update($donations[0]->id, ['status' => 'failed']);
+            }
+        } elseif ($donationId) {
             $donation = $donationModel->find($donationId);
             if ($donation && $donation->status === 'pending') {
                 $donationModel->update($donationId, ['status' => 'failed']);
             }
         }
+
         unset($_SESSION['cashfree_donation_id'], $_SESSION['cashfree_order_amount'], $_SESSION['cashfree_order_id']);
         json_response(['status' => 'success']);
         exit;
+    }
+
+    public function cashfreeReturn()
+    {
+        $orderId = trim($_GET['order_id'] ?? $_POST['order_id'] ?? $_SESSION['cashfree_order_id'] ?? '');
+
+        if (empty($orderId)) {
+            $_SESSION['error'] = 'Invalid payment return request.';
+            return $this->redirect('donate');
+        }
+
+        $mode = $this->globalSettings['cashfree_mode'] ?? 'test';
+        if ($mode === 'live') {
+            $appId = $this->globalSettings['cashfree_live_app_id'] ?? '';
+            $secretKey = $this->globalSettings['cashfree_live_secret_key'] ?? '';
+            $url = 'https://api.cashfree.com/pg/orders/';
+        } else {
+            $appId = $this->globalSettings['cashfree_test_app_id'] ?? '';
+            $secretKey = $this->globalSettings['cashfree_test_secret_key'] ?? '';
+            $url = 'https://sandbox.cashfree.com/pg/orders/';
+        }
+
+        $donationModel = new \App\Models\Donation();
+        $donations = $donationModel->where('transaction_id', $orderId);
+        $donation = !empty($donations) ? $donations[0] : null;
+
+        if (!$donation && !empty($_SESSION['cashfree_donation_id'])) {
+            $donation = $donationModel->find($_SESSION['cashfree_donation_id']);
+        }
+
+        // Query Cashfree order details
+        $ch = curl_init($url . $orderId);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'x-client-id: ' . $appId,
+            'x-client-secret: ' . $secretKey,
+            'x-api-version: 2023-08-01'
+        ]);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        $orderData = ($httpCode === 200) ? json_decode($response, true) : [];
+        $orderStatus = $orderData['order_status'] ?? '';
+
+        if ($orderStatus === 'PAID') {
+            if ($donation) {
+                if ($donation->status !== 'completed') {
+                    $donationModel->update($donation->id, ['status' => 'completed']);
+                    if (!empty($donation->campaign_id)) {
+                        $campaignModel = new \App\Models\Campaign();
+                        $campaignModel->updateRaisedAmount($donation->campaign_id);
+                    }
+                }
+                $receiptUrl = \App\Helpers\SignedUrlHelper::generateReceiptUrl($donation->uuid, 86400);
+                unset($_SESSION['cashfree_donation_id'], $_SESSION['cashfree_order_amount'], $_SESSION['cashfree_order_id']);
+
+                if (!empty($donation->campaign_id)) {
+                    $campaignModel = new \App\Models\Campaign();
+                    $campaign = $campaignModel->find($donation->campaign_id);
+                    if ($campaign && !empty($campaign->slug)) {
+                        return $this->redirect('campaigns/' . $campaign->slug . '?donation_success=1&donation_uuid=' . $donation->uuid . '&receipt_url=' . urlencode($receiptUrl));
+                    }
+                }
+                return $this->redirect('donate?success=1&status=completed&donation_uuid=' . $donation->uuid . '&receipt_url=' . urlencode($receiptUrl));
+            }
+        } else {
+            if ($donation && $donation->status === 'pending') {
+                $donationModel->update($donation->id, ['status' => 'failed']);
+            }
+            unset($_SESSION['cashfree_donation_id'], $_SESSION['cashfree_order_amount'], $_SESSION['cashfree_order_id']);
+            $_SESSION['error'] = 'Payment was cancelled or could not be completed.';
+            return $this->redirect('donate');
+        }
+
+        return $this->redirect('donate');
     }
 
     public function cashfreeWebhook()
@@ -1343,6 +1500,7 @@ class HomeController extends Controller
             'x-api-version: 2023-08-01'
         ]);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 15);
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
@@ -1356,6 +1514,10 @@ class HomeController extends Controller
                     $donation = $donations[0];
                     if ($donation->status === 'pending') {
                         $donationModel->update($donation->id, ['status' => 'completed']);
+                        if (!empty($donation->campaign_id)) {
+                            $campaignModel = new \App\Models\Campaign();
+                            $campaignModel->updateRaisedAmount($donation->campaign_id);
+                        }
                     }
                 }
             } elseif (in_array(($orderData['order_status'] ?? ''), ['FAILED', 'EXPIRED'])) {

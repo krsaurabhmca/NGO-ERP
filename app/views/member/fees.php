@@ -15,6 +15,16 @@ if ($activeGw === 'razorpay') {
         : ($globalSettings['razorpay_test_key_secret'] ?? $globalSettings['razorpay_key_secret'] ?? '');
     if (empty($rzpKeyId) || empty($rzpKeySecret))
         $activeGw = '';
+} elseif ($activeGw === 'cashfree') {
+    $cfMode = $globalSettings['cashfree_mode'] ?? 'test';
+    $cfAppId = $cfMode === 'live'
+        ? ($globalSettings['cashfree_live_app_id'] ?? '')
+        : ($globalSettings['cashfree_test_app_id'] ?? '');
+    $cfSecret = $cfMode === 'live'
+        ? ($globalSettings['cashfree_live_secret_key'] ?? '')
+        : ($globalSettings['cashfree_test_secret_key'] ?? '');
+    if (empty($cfAppId) || empty($cfSecret))
+        $activeGw = '';
 }
 ?>
 
@@ -333,6 +343,7 @@ if ($activeGw === 'razorpay') {
 </div>
 
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
 <script>
     function applyMemFilters() {
         var y = document.getElementById('mYear').value;
@@ -397,7 +408,7 @@ if ($activeGw === 'razorpay') {
             if (paySuccess) location.reload();
         });
 
-        <?php if ($activeGw === 'razorpay'): ?>
+        <?php if (!empty($activeGw)): ?>
             payForm.addEventListener('submit', function (e) {
                 e.preventDefault();
                 payBtn.disabled = true;
@@ -405,8 +416,10 @@ if ($activeGw === 'razorpay') {
                 document.getElementById('modalMsg').innerHTML = '';
 
                 var formData = new FormData(payForm);
+                var activeGateway = '<?php echo $activeGw; ?>';
+                var endpoint = activeGateway === 'cashfree' ? '<?php echo url('donate/cashfree-order'); ?>' : '<?php echo url('donate/razorpay-order'); ?>';
 
-                fetch('<?php echo url('donate/razorpay-order'); ?>', {
+                fetch(endpoint, {
                     method: 'POST',
                     body: formData
                 })
@@ -419,32 +432,33 @@ if ($activeGw === 'razorpay') {
                             return;
                         }
 
-                        var donationUuid = res.donation_uuid || '';
-                        var options = {
-                            key: res.key_id,
-                            amount: res.amount,
-                            currency: 'INR',
-                            name: '<?php echo e($globalSettings['ngo_name'] ?? 'NGO HELP'); ?>',
-                            description: 'Membership Fee',
-                            order_id: res.order_id,
-                            prefill: {
-                                name: '<?php echo e($member->name); ?>',
-                                email: '<?php echo e($member->email); ?>',
-                                contact: '<?php echo e($member->phone); ?>'
-                            },
-                            handler: function (paymentRes) {
-                                var fd = new FormData(payForm);
-                                fd.append('razorpay_order_id', paymentRes.razorpay_order_id);
-                                fd.append('razorpay_payment_id', paymentRes.razorpay_payment_id);
-                                fd.append('razorpay_signature', paymentRes.razorpay_signature);
-                                payBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Verifying...';
-
-                                fetch('<?php echo url('donate/razorpay-verify'); ?>', {
-                                    method: 'POST',
-                                    body: fd
-                                })
-                                    .then(function (r) { return r.json(); })
-                                    .then(function (vres) {
+                        if (activeGateway === 'cashfree') {
+                            const cashfree = Cashfree({ mode: '<?php echo ($globalSettings['cashfree_mode'] ?? 'test') === 'live' ? 'production' : 'sandbox'; ?>' });
+                            let checkoutOptions = {
+                                paymentSessionId: res.payment_session_id,
+                                redirectTarget: "_modal"
+                            };
+                            cashfree.checkout(checkoutOptions).then(function(result) {
+                                if (result.error) {
+                                    payBtn.disabled = false;
+                                    payBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2" style="vertical-align: middle;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> Pay Now';
+                                    showFailedView('Payment cancelled or failed.');
+                                    fetch('<?php echo url('donate/cashfree-fail'); ?>', { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                                }
+                                if (result.paymentDetails) {
+                                    var fd = new FormData(payForm);
+                                    fd.append('cashfree_order_id', res.order_id);
+                                    if (res.donation_uuid) {
+                                        fd.append('donation_uuid', res.donation_uuid);
+                                    }
+                                    payBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Verifying...';
+                                    fetch('<?php echo url('donate/cashfree-verify'); ?>', {
+                                        method: 'POST',
+                                        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                                        body: fd
+                                    })
+                                    .then(r => r.json())
+                                    .then(vres => {
                                         if (vres.status === 'success') {
                                             paySuccess = true;
                                             showSuccessView(formData.get('amount') || <?php echo $totalDue; ?>, vres.receipt_url || null);
@@ -459,23 +473,68 @@ if ($activeGw === 'razorpay') {
                                         payBtn.disabled = false;
                                         payBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2" style="vertical-align: middle;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> Pay Now';
                                     });
-                            },
-                            modal: {
-                                ondismiss: function () {
-                                    payBtn.disabled = false;
-                                    payBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2" style="vertical-align: middle;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> Pay Now';
-                                    var fd = new FormData();
-                                    fd.append('donation_uuid', donationUuid);
-                                    fetch('<?php echo url('donate/razorpay-fail'); ?>', {
-                                        method: 'POST',
-                                        headers: { 'X-Requested-With': 'XMLHttpRequest' },
-                                        body: fd
-                                    }).catch(function () { });
                                 }
-                            }
-                        };
-                        var rzp = new Razorpay(options);
-                        rzp.open();
+                            });
+                        } else {
+                            var donationUuid = res.donation_uuid || '';
+                            var options = {
+                                key: res.key_id,
+                                amount: res.amount,
+                                currency: 'INR',
+                                name: '<?php echo e($globalSettings['ngo_name'] ?? 'NGO HELP'); ?>',
+                                description: 'Membership Fee',
+                                order_id: res.order_id,
+                                prefill: {
+                                    name: '<?php echo e($member->name); ?>',
+                                    email: '<?php echo e($member->email); ?>',
+                                    contact: '<?php echo e($member->phone); ?>'
+                                },
+                                handler: function (paymentRes) {
+                                    var fd = new FormData(payForm);
+                                    fd.append('razorpay_order_id', paymentRes.razorpay_order_id);
+                                    fd.append('razorpay_payment_id', paymentRes.razorpay_payment_id);
+                                    fd.append('razorpay_signature', paymentRes.razorpay_signature);
+                                    fd.append('donation_uuid', donationUuid);
+                                    payBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Verifying...';
+
+                                    fetch('<?php echo url('donate/razorpay-verify'); ?>', {
+                                        method: 'POST',
+                                        body: fd
+                                    })
+                                        .then(function (r) { return r.json(); })
+                                        .then(function (vres) {
+                                            if (vres.status === 'success') {
+                                                paySuccess = true;
+                                                showSuccessView(formData.get('amount') || <?php echo $totalDue; ?>, vres.receipt_url || null);
+                                            } else {
+                                                showFailedView(vres.message || 'Verification failed. Please contact support.');
+                                                payBtn.disabled = false;
+                                                payBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2" style="vertical-align: middle;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> Pay Now';
+                                            }
+                                        })
+                                        .catch(function () {
+                                            showFailedView('Verification failed. Please contact support.');
+                                            payBtn.disabled = false;
+                                            payBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2" style="vertical-align: middle;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> Pay Now';
+                                        });
+                                },
+                                modal: {
+                                    ondismiss: function () {
+                                        payBtn.disabled = false;
+                                        payBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2" style="vertical-align: middle;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> Pay Now';
+                                        var fd = new FormData();
+                                        fd.append('donation_uuid', donationUuid);
+                                        fetch('<?php echo url('donate/razorpay-fail'); ?>', {
+                                            method: 'POST',
+                                            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                                            body: fd
+                                        }).catch(function () { });
+                                    }
+                                }
+                            };
+                            var rzp = new Razorpay(options);
+                            rzp.open();
+                        }
                     })
                     .catch(function () {
                         showFailedView('Payment service unavailable. Please try again.');

@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.9] - 2026-10-05
+
+### Fixed
+- Fixed Cashfree donation order creation where boolean return value of `create()` caused donation lookup to fail with "Payment verification failed".
+- Added Cashfree return handler (`/donate/cashfree-return`) to handle redirects back to website after payment completion.
+- Made Razorpay and Cashfree payment verification resilient to session expiration by matching transactions via order ID in the database.
+- Fixed receipt URLs to use signed URLs for Cashfree and modal redirects, preventing "Link is invalid or expired" errors.
+- Enhanced `SignedUrlHelper::verify()` with path resolution resilience for subdirectories and rewritten URLs.
+- Added full Cashfree gateway support across Campaign donations and Member fee payment views.
+
 ## [1.1.8] - 2026-10-04
 
 ### Fixed
