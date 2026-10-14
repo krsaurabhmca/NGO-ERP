@@ -220,7 +220,16 @@ INSERT IGNORE INTO settings (key_name, key_value, group_name) VALUES
 ('ngo_80g_validity', '', 'organization'),
 ('ngo_fcra_reg_no', '', 'organization'),
 ('ngo_csr_reg_no', '', 'organization'),
-('ngo_tax_exemption_note', '', 'organization');
+('ngo_tax_exemption_note', '', 'organization'),
+('radio_enabled', '0', 'organization'),
+('radio_name', '', 'organization'),
+('radio_frequency', '', 'organization'),
+('radio_stream_url', '', 'organization'),
+('radio_logo', '', 'organization'),
+('radio_external_logo', '', 'organization'),
+('radio_default_volume', '80', 'organization'),
+('radio_autoplay', '0', 'organization'),
+('radio_position', 'bottom-left', 'organization');
 
 
 -- Add Sender Details to SMTP settings

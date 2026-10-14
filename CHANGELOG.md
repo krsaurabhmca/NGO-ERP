@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.1] - 2026-10-15
+
+### Added
+- Added Live Radio / FM stream configuration option in Organization Settings with support for stream link, station name, frequency/tagline, logo upload (with live preview and removal option), external logo URL, volume, autoplay, and widget screen position.
+- Added live audio stream tester in the admin settings to preview and verify stream connectivity directly in browser.
+- Created a professional, responsive floating Live Radio / FM Player widget (`radio_widget.php`) featuring dual-state views: docked mini capsule and expandable studio card with animated vinyl disc, dynamic equalizer visualizer, play/pause controls, and volume adjustment.
+- Fully optimized the radio player widget for mobile devices with safe-area spacing, touch-friendly controls, and screen-lock background playback support via HTML5 Audio and the Navigator MediaSession API.
+- Added live radio broadcast badges in website header topbar and Media dropdown navigation.
+
 ## [1.2.0] - 2026-10-05
 
 ### Added

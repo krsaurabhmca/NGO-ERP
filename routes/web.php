@@ -206,6 +206,7 @@ $router->add('POST', '/admin/contacts/delete/{id}', [App\Controllers\ContactCont
 
 $router->add('GET', '/admin/settings/organization', [App\Controllers\SettingsController::class, 'organization']);
 $router->add('POST', '/admin/settings/organization', [App\Controllers\SettingsController::class, 'update']);
+$router->add('GET', '/admin/settings/radio', [App\Controllers\SettingsController::class, 'radio']);
 
 $router->add('GET', '/admin/settings/update', [App\Controllers\SystemUpdateController::class, 'index']);
 $router->add('POST', '/admin/settings/update/run', [App\Controllers\SystemUpdateController::class, 'update']);

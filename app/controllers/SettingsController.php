@@ -160,6 +160,47 @@ class SettingsController extends Controller
                         $this->settingModel->updateByKey($urlKey, $_POST[$urlKey], 'organization');
                     }
                 }
+            } elseif ($activeTab === 'tab-radio') {
+                $group = 'organization';
+                $radioEnabled = isset($_POST['radio_enabled']) ? '1' : '0';
+                $oldRadioEnabled = $oldSettings['radio_enabled'] ?? '0';
+                if ($oldRadioEnabled !== $radioEnabled) {
+                    $changedSettings['radio_enabled'] = ['old' => $oldRadioEnabled, 'new' => $radioEnabled];
+                }
+                $this->settingModel->updateByKey('radio_enabled', $radioEnabled, 'organization');
+
+                $radioAutoplay = isset($_POST['radio_autoplay']) ? '1' : '0';
+                $oldAutoplay = $oldSettings['radio_autoplay'] ?? '0';
+                if ($oldAutoplay !== $radioAutoplay) {
+                    $changedSettings['radio_autoplay'] = ['old' => $oldAutoplay, 'new' => $radioAutoplay];
+                }
+                $this->settingModel->updateByKey('radio_autoplay', $radioAutoplay, 'organization');
+
+                $radioFields = [
+                    'radio_name',
+                    'radio_frequency',
+                    'radio_stream_url',
+                    'radio_external_logo',
+                    'radio_default_volume',
+                    'radio_position'
+                ];
+
+                foreach ($radioFields as $rf) {
+                    $val = isset($_POST[$rf]) ? trim($_POST[$rf]) : '';
+                    $oldVal = $oldSettings[$rf] ?? '';
+                    if ($oldVal !== $val) {
+                        $changedSettings[$rf] = ['old' => $oldVal, 'new' => $val];
+                    }
+                    $this->settingModel->updateByKey($rf, $val, 'organization');
+                }
+
+                if (!empty($_POST['remove_radio_logo'])) {
+                    $oldLogo = $oldSettings['radio_logo'] ?? '';
+                    if (!empty($oldLogo)) {
+                        $this->settingModel->updateByKey('radio_logo', '', 'organization');
+                        $changedSettings['radio_logo'] = ['old' => $oldLogo, 'new' => ''];
+                    }
+                }
             } else {
                 foreach ($_POST as $key => $value) {
                     if (!in_array($key, ['submit', 'active_tab', 'group', '_csrf_token', '_csrf_action'])) {
@@ -187,7 +228,8 @@ class SettingsController extends Controller
             $fileFields = [
                 'ngo_logo' => 5 * 1024 * 1024,
                 'ngo_favicon' => 5 * 1024 * 1024,
-                'ngo_signature' => 5 * 1024 * 1024
+                'ngo_signature' => 5 * 1024 * 1024,
+                'radio_logo' => 5 * 1024 * 1024
             ];
             
             foreach ($fileFields as $field => $maxSize) {
@@ -224,6 +266,8 @@ class SettingsController extends Controller
                     $settingsDescription = 'social media settings';
                 } elseif ($activeTab === 'tab-id-prefix') {
                     $settingsDescription = 'ID prefix settings';
+                } elseif ($activeTab === 'tab-radio') {
+                    $settingsDescription = 'live radio settings';
                 } elseif ($group === 'template') {
                     $settingsDescription = 'email template settings';
                 }
@@ -246,7 +290,7 @@ class SettingsController extends Controller
             
             $allOk = true;
             foreach ($_POST as $key => $value) {
-                if (!in_array($key, ['submit', 'active_tab', 'group', '_csrf_token', '_csrf_action'])) {
+                if (!in_array($key, ['submit', 'active_tab', 'group', '_csrf_token', '_csrf_action', 'remove_radio_logo'])) {
                     // Skip sensitive keys — they are encrypted in DB so comparison with plaintext always fails
                     if (CryptoHelper::isSensitiveKey($key)) {
                         continue;
@@ -275,6 +319,11 @@ class SettingsController extends Controller
         $referer = $_SERVER['HTTP_REFERER'] ?? url('admin/dashboard');
         header("Location: " . $referer);
         exit;
+    }
+
+    public function radio()
+    {
+        $this->redirect('admin/settings/organization#tab-radio');
     }
 
     public function testSmtp()

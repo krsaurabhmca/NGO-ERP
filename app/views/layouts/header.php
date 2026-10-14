@@ -67,6 +67,14 @@
                 ?>
             </div>
             <div class="col-auto topbar-social d-flex align-items-center">
+                <?php if (!empty($globalSettings['radio_enabled']) && $globalSettings['radio_enabled'] == '1' && !empty($globalSettings['radio_stream_url'])): ?>
+                    <button type="button" class="btn btn-sm text-white px-2.5 py-0.5 d-inline-flex align-items-center gap-1.5 me-3 rounded-pill" onclick="window.ngoToggleRadio && window.ngoToggleRadio(true);" style="background: rgba(239, 68, 68, 0.25); border: 1px solid rgba(239, 68, 68, 0.5); font-size: 0.72rem; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(239,68,68,0.45)'" onmouseout="this.style.background='rgba(239,68,68,0.25)'" title="Listen to Live FM Radio">
+                        <span style="width: 7px; height: 7px; background: #ef4444; border-radius: 50%; display: inline-block;"></span>
+                        <i class="fas fa-broadcast-tower" style="font-size: 0.7rem; color: #ef4444;"></i>
+                        <span class="fw-bold"><?php echo htmlspecialchars($globalSettings['radio_name'] ?? 'Live FM'); ?></span>
+                        <span class="badge bg-danger text-white ms-1 px-1 py-0" style="font-size: 0.6rem;">LIVE</span>
+                    </button>
+                <?php endif; ?>
                 <?php
                 $socialLinks = [
                     'facebook'  => ['icon' => 'fab fa-facebook-f',  'title' => 'Facebook'],
@@ -85,7 +93,7 @@
                 <?php
                     endif;
                 endforeach;
-                if (!$hasAny): echo '<span class="text-white-50 small">No social links configured</span>';
+                if (!$hasAny && (empty($globalSettings['radio_enabled']) || $globalSettings['radio_enabled'] != '1')): echo '<span class="text-white-50 small">No social links configured</span>';
                 endif;
                 ?>
             </div>
@@ -127,6 +135,10 @@
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdownMedia">
                         <li><a class="dropdown-item" href="<?php echo url('/gallery'); ?>"><i class="fas fa-images me-2" style="color: var(--primary); width: 16px;"></i>Gallery</a></li>
                         <li><a class="dropdown-item" href="<?php echo url('/news'); ?>"><i class="fas fa-newspaper me-2" style="color: var(--primary); width: 16px;"></i>News</a></li>
+                        <?php if (!empty($globalSettings['radio_enabled']) && $globalSettings['radio_enabled'] == '1' && !empty($globalSettings['radio_stream_url'])): ?>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="javascript:void(0)" onclick="window.ngoToggleRadio && window.ngoToggleRadio(true);"><i class="fas fa-broadcast-tower me-2 text-danger" style="width: 16px;"></i>Live Radio FM <span class="badge bg-danger ms-1" style="font-size: 0.65rem;">LIVE</span></a></li>
+                        <?php endif; ?>
                     </ul>
                 </li>
                 <li class="nav-item dropdown">

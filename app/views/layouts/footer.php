@@ -96,7 +96,8 @@
     </div>
 </footer>
 
-
+<!-- Live Radio Player Widget -->
+<?php require_once BASE_PATH . 'app/views/layouts/radio_widget.php'; ?>
 
 <!-- Floating WhatsApp Button -->
 <?php

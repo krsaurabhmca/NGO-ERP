@@ -48,6 +48,13 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z" /><path d="M8 11l0 5" /><path d="M8 8l0 .01" /><path d="M12 16l0 -5" /><path d="M16 16v-3a2 2 0 0 0 -4 0" /></svg>
                                     Social Links
                                 </a>
+                                <a href="#tab-radio" class="list-group-item list-group-item-action d-flex align-items-center" data-bs-toggle="tab">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-danger" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3a9 9 0 0 1 0 18" /><path d="M10 6a5 5 0 0 1 0 12" /><path d="M6 9a1 1 0 0 1 0 6" /><circle cx="4.5" cy="12" r="1.5" fill="currentColor" /></svg>
+                                    Live Radio / FM
+                                    <?php if (!empty($settings['radio_enabled']) && $settings['radio_enabled'] == '1' && !empty($settings['radio_stream_url'])): ?>
+                                        <span class="badge bg-danger text-white ms-auto fw-bold px-1.5 py-0.5" style="font-size: 0.65rem; letter-spacing: 0.5px;">LIVE</span>
+                                    <?php endif; ?>
+                                </a>
                                 <a href="#tab-map" class="list-group-item list-group-item-action d-flex align-items-center" data-bs-toggle="tab">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /><path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z" /></svg>
                                     Map Settings
@@ -535,6 +542,218 @@
                                         </div>
                                     </form>
                                 </div>
+                                <!-- Page 8: Live Radio / FM Settings -->
+                                <div class="tab-pane" id="tab-radio">
+                                    <form action="<?php echo url('admin/settings/organization'); ?>" method="POST" enctype="multipart/form-data">
+                                        <input type="hidden" name="_csrf_token" value="<?php echo csrf_token(); ?>">
+                                        <input type="hidden" name="active_tab" value="tab-radio">
+
+                                        <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+                                            <div>
+                                                <h3 class="card-title mb-1 d-flex align-items-center gap-2">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon text-danger" width="28" height="28" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3a9 9 0 0 1 0 18" /><path d="M10 6a5 5 0 0 1 0 12" /><path d="M6 9a1 1 0 0 1 0 6" /><circle cx="4.5" cy="12" r="1.5" fill="currentColor" /></svg>
+                                                    Live Radio & FM Player Settings
+                                                </h3>
+                                                <p class="text-muted small mb-0">Configure your online radio stream, station details, logo, and floating web player widget.</p>
+                                            </div>
+                                            <div>
+                                                <?php if (!empty($settings['radio_enabled']) && $settings['radio_enabled'] == '1' && !empty($settings['radio_stream_url'])): ?>
+                                                    <span class="badge bg-success-lt text-success px-3 py-2 fs-6 d-inline-flex align-items-center gap-2">
+                                                        <span class="badge-dot bg-success"></span> Live Radio Widget is Active on Website
+                                                    </span>
+                                                <?php else: ?>
+                                                    <span class="badge bg-secondary-lt text-secondary px-3 py-2 fs-6 d-inline-flex align-items-center gap-2">
+                                                        <span class="badge-dot bg-secondary"></span> Widget Disabled / Offline
+                                                    </span>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+
+                                        <!-- Enable/Disable Master Toggle Card -->
+                                        <div class="card mb-4 border-0 shadow-none bg-light p-3 rounded-3">
+                                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                                                <div>
+                                                    <div class="fw-bold text-dark fs-3 mb-1 d-flex align-items-center gap-2">
+                                                        <i class="fas fa-broadcast-tower text-danger"></i> Enable Live Radio on Website
+                                                    </div>
+                                                    <div class="text-muted small">
+                                                        When toggled ON, an interactive floating FM / Radio Player widget will be displayed across all website pages for visitors.
+                                                    </div>
+                                                </div>
+                                                <div class="form-check form-switch m-0">
+                                                    <input class="form-check-input" type="checkbox" name="radio_enabled" id="radio_enabled_switch" value="1" role="switch" style="width: 3.2rem; height: 1.7rem; cursor: pointer;" <?php echo (!empty($settings['radio_enabled']) && $settings['radio_enabled'] == '1') ? 'checked' : ''; ?>>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row g-4">
+                                            <!-- Station Name -->
+                                            <div class="col-md-7">
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">
+                                                        <i class="fas fa-signature text-primary me-1"></i> Radio Station / Channel Name <span class="text-danger">*</span>
+                                                    </label>
+                                                    <input type="text" name="radio_name" id="input_radio_name" class="form-control form-control-lg" value="<?php echo htmlspecialchars($settings['radio_name'] ?? ''); ?>" placeholder="e.g. Hope FM 90.4 / Community Radio" required>
+                                                    <div class="form-text text-muted small">Name of your radio station, channel, or podcast broadcast.</div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Tagline / Frequency -->
+                                            <div class="col-md-5">
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">
+                                                        <i class="fas fa-wave-square text-success me-1"></i> Frequency / Tagline
+                                                    </label>
+                                                    <input type="text" name="radio_frequency" id="input_radio_freq" class="form-control form-control-lg" value="<?php echo htmlspecialchars($settings['radio_frequency'] ?? ''); ?>" placeholder="e.g. 90.4 MHz • Voice of Hope">
+                                                    <div class="form-text text-muted small">Displays beneath the station title (e.g. FM frequency or broadcast motto).</div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Live Stream URL with Inline Tester -->
+                                            <div class="col-12">
+                                                <div class="p-3 border rounded-3 bg-white mb-2 shadow-sm">
+                                                    <label class="form-label fw-bold d-flex align-items-center justify-content-between">
+                                                        <span><i class="fas fa-link text-info me-1"></i> Live Audio Stream Link (URL) <span class="text-danger">*</span></span>
+                                                        <span class="badge bg-blue-lt">Direct MP3 / AAC / Icecast / Shoutcast / OGG</span>
+                                                    </label>
+                                                    <div class="input-group input-group-flat mb-2">
+                                                        <span class="input-group-text"><i class="fas fa-satellite-dish text-muted"></i></span>
+                                                        <input type="url" name="radio_stream_url" id="admin_radio_stream_url" class="form-control" value="<?php echo htmlspecialchars($settings['radio_stream_url'] ?? ''); ?>" placeholder="https://stream.zeno.fm/... or https://your-icecast-server.com:8000/stream.mp3" required>
+                                                        <button type="button" class="btn btn-outline-danger px-3 d-flex align-items-center gap-2" id="admin_test_stream_btn" title="Test audio stream directly in browser">
+                                                            <i class="fas fa-play" id="admin_test_icon"></i> <span id="admin_test_text">Test Stream</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                                        <div class="text-muted small">
+                                                            <i class="fas fa-info-circle me-1"></i> Enter a direct HTTPS or HTTP live audio stream URL. Make sure the server supports audio streaming over web browsers.
+                                                        </div>
+                                                        <div id="admin_stream_status" class="small fw-bold text-muted"></div>
+                                                    </div>
+                                                    <audio id="admin_preview_audio" preload="none" style="display:none;"></audio>
+                                                </div>
+                                            </div>
+
+                                            <!-- Radio Logo Upload -->
+                                            <div class="col-md-6">
+                                                <div class="p-3 bg-light rounded-3 border h-100">
+                                                    <label class="form-label fw-bold mb-3 d-flex align-items-center justify-content-between">
+                                                        <span><i class="fas fa-image text-warning me-1"></i> Radio Station Logo / Artwork</span>
+                                                        <span class="text-muted small">Upload Image (Max: 5MB)</span>
+                                                    </label>
+                                                    
+                                                    <div class="d-flex align-items-center gap-3 mb-3">
+                                                        <div class="border rounded-circle d-flex align-items-center justify-content-center bg-dark shadow-sm overflow-hidden position-relative" style="width: 90px; height: 90px; flex-shrink: 0; border: 2px solid rgba(255,255,255,0.15) !important;">
+                                                            <?php 
+                                                            $currentLogo = !empty($settings['radio_logo']) ? file_url($settings['radio_logo']) : (!empty($settings['radio_external_logo']) ? $settings['radio_external_logo'] : ''); 
+                                                            ?>
+                                                            <img id="radio-logo-preview" src="<?php echo $currentLogo; ?>" alt="Radio Logo" style="width: 100%; height: 100%; object-fit: cover; <?php echo empty($currentLogo) ? 'display:none;' : ''; ?>">
+                                                            <span id="radio-logo-placeholder" class="text-white-50 text-center small fw-bold" style="<?php echo !empty($currentLogo) ? 'display:none;' : ''; ?>">
+                                                                <i class="fas fa-radio fs-2 mb-1 d-block text-danger"></i>No Logo
+                                                            </span>
+                                                        </div>
+                                                        <div class="flex-grow-1">
+                                                            <input type="file" name="radio_logo" id="radio_logo_input" class="form-control mb-2" accept="image/*">
+                                                            <div class="text-muted small">Square recommended (500x500 PNG, JPG, or WEBP).</div>
+                                                            <?php if (!empty($settings['radio_logo'])): ?>
+                                                                <div class="form-check mt-2">
+                                                                    <input class="form-check-input" type="checkbox" name="remove_radio_logo" id="remove_radio_logo" value="1">
+                                                                    <label class="form-check-label text-danger small fw-semibold" for="remove_radio_logo">
+                                                                        <i class="fas fa-trash-alt me-1"></i> Remove uploaded station logo
+                                                                    </label>
+                                                                </div>
+                                                            <?php endif; ?>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="mb-0">
+                                                        <label class="form-label small text-muted fw-bold">Or External Logo Image URL</label>
+                                                        <input type="url" name="radio_external_logo" id="input_external_logo" class="form-control form-control-sm" value="<?php echo htmlspecialchars($settings['radio_external_logo'] ?? ''); ?>" placeholder="https://example.com/images/radio-logo.png">
+                                                        <div class="form-text text-muted" style="font-size: 0.75rem;">Used if no file is uploaded. If both are empty, the main NGO logo is used.</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Player Widget Preferences -->
+                                            <div class="col-md-6">
+                                                <div class="p-3 bg-light rounded-3 border h-100">
+                                                    <label class="form-label fw-bold mb-3">
+                                                        <i class="fas fa-sliders-h text-primary me-1"></i> Player Preferences & Position
+                                                    </label>
+
+                                                    <div class="mb-3">
+                                                        <label class="form-label small fw-bold">Widget Screen Position</label>
+                                                        <select name="radio_position" class="form-select">
+                                                            <option value="bottom-left" <?php echo (($settings['radio_position'] ?? 'bottom-left') === 'bottom-left') ? 'selected' : ''; ?>>Bottom-Left Floating (Recommended, avoids WhatsApp)</option>
+                                                            <option value="bottom-right" <?php echo (($settings['radio_position'] ?? '') === 'bottom-right') ? 'selected' : ''; ?>>Bottom-Right Floating (Above WhatsApp)</option>
+                                                            <option value="bottom-bar" <?php echo (($settings['radio_position'] ?? '') === 'bottom-bar') ? 'selected' : ''; ?>>Bottom Dock Bar (Full Width)</option>
+                                                        </select>
+                                                        <div class="form-text text-muted small">Where the floating player pill appears on desktop & tablet screens.</div>
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label class="form-label small fw-bold d-flex justify-content-between">
+                                                            <span>Default Volume</span>
+                                                            <span id="volume_val_display" class="badge bg-secondary-lt"><?php echo htmlspecialchars($settings['radio_default_volume'] ?? '80'); ?>%</span>
+                                                        </label>
+                                                        <input type="range" name="radio_default_volume" id="radio_default_volume" class="form-range" min="10" max="100" step="5" value="<?php echo htmlspecialchars($settings['radio_default_volume'] ?? '80'); ?>" oninput="document.getElementById('volume_val_display').innerText = this.value + '%'">
+                                                    </div>
+
+                                                    <div class="form-check form-switch mb-0">
+                                                        <input class="form-check-input" type="checkbox" name="radio_autoplay" id="radio_autoplay_switch" value="1" <?php echo (!empty($settings['radio_autoplay']) && $settings['radio_autoplay'] == '1') ? 'checked' : ''; ?>>
+                                                        <label class="form-check-label fw-semibold" for="radio_autoplay_switch">
+                                                            Attempt Autoplay
+                                                        </label>
+                                                        <div class="text-muted small">Note: Most modern mobile and desktop browsers block unmuted audio until the user interacts with the page.</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Live Mockup / Preview of Widget -->
+                                            <div class="col-12">
+                                                <div class="p-3 border rounded-3 bg-dark text-white">
+                                                    <div class="d-flex align-items-center justify-content-between mb-3 border-bottom border-secondary pb-2">
+                                                        <span class="small fw-bold text-uppercase text-white-50 letter-spacing-1">
+                                                            <i class="fas fa-eye text-info me-1"></i> Live Widget Mockup (Front-End Appearance)
+                                                        </span>
+                                                        <span class="badge bg-danger text-white"><i class="fas fa-circle me-1" style="font-size: 7px; animation: pulse 1.5s infinite;"></i> ON AIR</span>
+                                                    </div>
+
+                                                    <div class="d-flex align-items-center gap-3 p-3 rounded-pill" style="background: rgba(30, 41, 59, 0.95); border: 1px solid rgba(255,255,255,0.15); max-width: 380px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+                                                        <div class="rounded-circle overflow-hidden d-flex align-items-center justify-content-center bg-black" style="width: 44px; height: 44px; flex-shrink: 0; border: 2px solid var(--accent, #f59e0b);">
+                                                            <img id="preview_widget_logo" src="<?php echo !empty($currentLogo) ? $currentLogo : ''; ?>" style="width: 100%; height: 100%; object-fit: cover; <?php echo empty($currentLogo) ? 'display:none;' : ''; ?>">
+                                                            <i id="preview_widget_icon" class="fas fa-broadcast-tower text-white" style="<?php echo !empty($currentLogo) ? 'display:none;' : ''; ?>"></i>
+                                                        </div>
+                                                        <div class="flex-grow-1 overflow-hidden" style="line-height: 1.2;">
+                                                            <div id="preview_widget_title" class="fw-bold text-truncate text-white" style="font-size: 0.92rem;">
+                                                                <?php echo htmlspecialchars($settings['radio_name'] ?? 'Community FM 90.4'); ?>
+                                                            </div>
+                                                            <div id="preview_widget_freq" class="text-white-50 text-truncate small" style="font-size: 0.75rem;">
+                                                                <?php echo htmlspecialchars($settings['radio_frequency'] ?? '90.4 MHz • Live Stream'); ?>
+                                                            </div>
+                                                        </div>
+                                                        <div class="d-flex align-items-center gap-2">
+                                                            <div class="d-flex align-items-end gap-1 px-1" style="height: 18px;">
+                                                                <span class="bg-danger rounded-pill" style="width: 3px; height: 12px; display: inline-block;"></span>
+                                                                <span class="bg-danger rounded-pill" style="width: 3px; height: 18px; display: inline-block;"></span>
+                                                                <span class="bg-danger rounded-pill" style="width: 3px; height: 8px; display: inline-block;"></span>
+                                                            </div>
+                                                            <div class="rounded-circle bg-danger text-white d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                                                <i class="fas fa-play" style="font-size: 0.8rem; margin-left: 2px;"></i>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="mt-4 pt-3 border-top d-flex justify-content-end">
+                                            <button type="submit" class="btn btn-primary px-4 shadow-sm btn-lg d-flex align-items-center gap-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 4h10l4 4v10a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2" /><path d="M12 14m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M14 4l0 4l-6 0l0 -4" /></svg>
+                                                Save Live Radio Settings
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
                         </div>
                     </div>
                 </div>
@@ -566,6 +785,15 @@
                         previewImg.src = e.target.result;
                         previewImg.style.display = 'block';
                         if (placeholder) placeholder.style.display = 'none';
+
+                        // Also update mockup if radio logo
+                        const mockImg = document.getElementById('preview_widget_logo');
+                        const mockIcon = document.getElementById('preview_widget_icon');
+                        if (mockImg && inputId === 'radio_logo_input') {
+                            mockImg.src = e.target.result;
+                            mockImg.style.display = 'block';
+                            if (mockIcon) mockIcon.style.display = 'none';
+                        }
                     }
                     reader.readAsDataURL(file);
                 }
@@ -591,10 +819,100 @@
             });
         });
 
-        // Remove frontend size constraints since the backend UploadHelper automatically resizes and compresses images to <300KB WebP
+        // Setup image previews
         setupLivePreview('ngo_logo_input', 'logo-preview', 'logo-placeholder');
         setupLivePreview('ngo_favicon_input', 'favicon-preview', 'favicon-placeholder');
         setupLivePreview('ngo_signature_input', 'signature-preview', 'signature-placeholder');
+        setupLivePreview('radio_logo_input', 'radio-logo-preview', 'radio-logo-placeholder');
+
+        // External logo URL preview sync
+        const extLogoInput = document.getElementById('input_external_logo');
+        if (extLogoInput) {
+            extLogoInput.addEventListener('input', function() {
+                const url = this.value.trim();
+                const previewImg = document.getElementById('radio-logo-preview');
+                const placeholder = document.getElementById('radio-logo-placeholder');
+                const mockImg = document.getElementById('preview_widget_logo');
+                const mockIcon = document.getElementById('preview_widget_icon');
+
+                if (url) {
+                    if (previewImg) { previewImg.src = url; previewImg.style.display = 'block'; }
+                    if (placeholder) { placeholder.style.display = 'none'; }
+                    if (mockImg) { mockImg.src = url; mockImg.style.display = 'block'; }
+                    if (mockIcon) { mockIcon.style.display = 'none'; }
+                }
+            });
+        }
+
+        // Mockup text sync
+        const inputRadioName = document.getElementById('input_radio_name');
+        const previewWidgetTitle = document.getElementById('preview_widget_title');
+        if (inputRadioName && previewWidgetTitle) {
+            inputRadioName.addEventListener('input', function() {
+                previewWidgetTitle.innerText = this.value.trim() || 'Community FM 90.4';
+            });
+        }
+
+        const inputRadioFreq = document.getElementById('input_radio_freq');
+        const previewWidgetFreq = document.getElementById('preview_widget_freq');
+        if (inputRadioFreq && previewWidgetFreq) {
+            inputRadioFreq.addEventListener('input', function() {
+                previewWidgetFreq.innerText = this.value.trim() || '90.4 MHz • Live Stream';
+            });
+        }
+
+        // Admin Stream Test Audio
+        const testBtn = document.getElementById('admin_test_stream_btn');
+        const testIcon = document.getElementById('admin_test_icon');
+        const testText = document.getElementById('admin_test_text');
+        const testAudio = document.getElementById('admin_preview_audio');
+        const testUrlInput = document.getElementById('admin_radio_stream_url');
+        const testStatus = document.getElementById('admin_stream_status');
+
+        if (testBtn && testAudio && testUrlInput) {
+            let isTesting = false;
+
+            testBtn.addEventListener('click', function() {
+                const url = testUrlInput.value.trim();
+                if (!url) {
+                    alert('Please enter a stream URL first.');
+                    testUrlInput.focus();
+                    return;
+                }
+
+                if (!isTesting) {
+                    testStatus.innerHTML = '<span class="text-warning"><i class="fas fa-spinner fa-spin me-1"></i> Connecting to audio stream...</span>';
+                    testAudio.src = url + (url.includes('?') ? '&' : '?') + 'nocache=' + Date.now();
+                    testAudio.play().then(() => {
+                        isTesting = true;
+                        testIcon.className = 'fas fa-stop';
+                        testText.innerText = 'Stop Audio';
+                        testBtn.className = 'btn btn-danger px-3 d-flex align-items-center gap-2';
+                        testStatus.innerHTML = '<span class="text-success"><i class="fas fa-volume-up me-1"></i> Playing stream successfully!</span>';
+                    }).catch(err => {
+                        testStatus.innerHTML = '<span class="text-danger"><i class="fas fa-exclamation-triangle me-1"></i> Failed to play stream: ' + err.message + '</span>';
+                    });
+                } else {
+                    testAudio.pause();
+                    testAudio.src = '';
+                    isTesting = false;
+                    testIcon.className = 'fas fa-play';
+                    testText.innerText = 'Test Stream';
+                    testBtn.className = 'btn btn-outline-danger px-3 d-flex align-items-center gap-2';
+                    testStatus.innerText = '';
+                }
+            });
+
+            testAudio.addEventListener('error', function() {
+                if (isTesting) {
+                    testStatus.innerHTML = '<span class="text-danger"><i class="fas fa-times-circle me-1"></i> Stream connection error. Check URL or CORS permissions.</span>';
+                    isTesting = false;
+                    testIcon.className = 'fas fa-play';
+                    testText.innerText = 'Test Stream';
+                    testBtn.className = 'btn btn-outline-danger px-3 d-flex align-items-center gap-2';
+                }
+            });
+        }
         
         // Theme Presets functionality
         const presetButtons = document.querySelectorAll('.theme-preset');
