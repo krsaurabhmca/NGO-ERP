@@ -259,8 +259,6 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
         <div class="footer-note">Continuous background stream &bull; Stays playing while you browse</div>
     </div>
 
-    <!-- Hidden Dedicated Frame for Streaming Isolation -->
-    <iframe id="popout-frame" src="<?php echo url('radio_frame.html'); ?>" allow="autoplay" style="display:none;" aria-hidden="true"></iframe>
     <audio id="popout-native-audio" preload="auto" playsinline style="display:none;"></audio>
 
     <script>
@@ -274,11 +272,13 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
         const volPct = document.getElementById('popout-vol-pct');
         const statusMsg = document.getElementById('popout-status');
         const liveTag = document.getElementById('popout-live-tag');
-        const frame = document.getElementById('popout-frame');
-        const nativeAudio = document.getElementById('popout-native-audio');
+        const audio = document.getElementById('popout-native-audio');
 
         let isPlaying = false;
-        let useNativeAudio = false;
+        let isConnecting = false;
+
+        audio.volume = defaultVol;
+        audio.preload = 'auto';
 
         function setStatus(text, tag = 'ON AIR') {
             statusMsg.textContent = text;
@@ -298,93 +298,99 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
             }
         }
 
-        // Native audio engine with buffer resilience
-        nativeAudio.volume = defaultVol;
-        nativeAudio.preload = 'auto';
+        function playStream() {
+            if (isPlaying) return;
+            isConnecting = true;
+            setStatus('Connecting Live...', 'CONNECTING');
 
-        function startNativeStream() {
-            if (nativeAudio.src !== streamUrl) {
-                nativeAudio.src = streamUrl;
-                nativeAudio.load();
+            if (audio.src !== streamUrl) {
+                audio.src = streamUrl;
+                audio.load();
             }
-            nativeAudio.play().then(function() {
-                setPlayingState(true);
-            }).catch(function(e) {
-                console.warn('Native audio play error:', e);
-                setPlayingState(false);
-            });
+
+            const p = audio.play();
+            if (p !== undefined) {
+                p.then(function() {
+                    isConnecting = false;
+                    setPlayingState(true);
+                }).catch(function(e) {
+                    console.warn('Audio play error:', e);
+                    isConnecting = false;
+                    setPlayingState(false);
+                    setStatus('Tap Play to start', 'OFFLINE');
+                });
+            }
         }
 
-        function stopNativeStream() {
-            nativeAudio.pause();
-            nativeAudio.removeAttribute('src');
-            nativeAudio.load();
+        function pauseStream() {
+            isConnecting = false;
+            audio.pause();
+            audio.removeAttribute('src');
+            audio.load();
             setPlayingState(false);
         }
 
-        // Try streaming via internal hidden frame first, with fallback to native
-        window.addEventListener('message', function(e) {
-            if (!e.data || e.data.source !== 'ngo-radio-frame-engine') return;
-            const type = e.data.type;
-            if (type === 'ready') {
-                frame.contentWindow.postMessage({
-                    target: 'ngo-radio-engine',
-                    action: 'init',
-                    streamUrl: streamUrl,
-                    volume: volSlider.value / 100
-                }, '*');
-                frame.contentWindow.postMessage({
-                    target: 'ngo-radio-engine',
-                    action: 'play',
-                    streamUrl: streamUrl
-                }, '*');
-            } else if (type === 'playing') {
-                setPlayingState(true);
-            } else if (type === 'buffering') {
-                setStatus('Buffering stream...', 'BUFFERING');
-            } else if (type === 'paused') {
-                setPlayingState(false);
-            } else if (type === 'blocked' || type === 'error') {
-                // Fallback to native audio
-                useNativeAudio = true;
-                startNativeStream();
-            }
-        });
-
-        // If frame fails to report in 1.2 seconds, fallback to native
-        setTimeout(function() {
-            if (!isPlaying && !useNativeAudio) {
-                useNativeAudio = true;
-                startNativeStream();
-            }
-        }, 1200);
-
         playBtn.addEventListener('click', function() {
-            if (isPlaying) {
-                if (useNativeAudio) {
-                    stopNativeStream();
-                } else {
-                    frame.contentWindow.postMessage({ target: 'ngo-radio-engine', action: 'pause' }, '*');
-                }
+            if (isPlaying || isConnecting) {
+                pauseStream();
             } else {
-                setStatus('Connecting live...', 'CONNECTING');
-                if (useNativeAudio) {
-                    startNativeStream();
-                } else {
-                    frame.contentWindow.postMessage({ target: 'ngo-radio-engine', action: 'play', streamUrl: streamUrl }, '*');
-                }
+                playStream();
             }
         });
 
         volSlider.addEventListener('input', function() {
             const val = parseInt(this.value, 10);
             volPct.textContent = val + '%';
-            const norm = val / 100;
-            nativeAudio.volume = norm;
-            if (!useNativeAudio && frame.contentWindow) {
-                frame.contentWindow.postMessage({ target: 'ngo-radio-engine', action: 'setVolume', volume: norm }, '*');
+            audio.volume = val / 100;
+        });
+
+        audio.addEventListener('playing', function() {
+            isConnecting = false;
+            setPlayingState(true);
+        });
+
+        audio.addEventListener('waiting', function() {
+            if (isPlaying) {
+                setStatus('Buffering stream...', 'BUFFERING');
             }
         });
+
+        audio.addEventListener('stalled', function() {
+            if (isPlaying) {
+                setStatus('Buffering stream...', 'BUFFERING');
+            }
+        });
+
+        audio.addEventListener('timeupdate', function() {
+            if (!isPlaying && !audio.paused && audio.currentTime > 0) {
+                setPlayingState(true);
+            }
+        });
+
+        // Live chunk boundary: seamlessly continue
+        audio.addEventListener('ended', function() {
+            if (isPlaying) {
+                audio.src = streamUrl;
+                audio.load();
+                audio.play().catch(function() {});
+            }
+        });
+
+        audio.addEventListener('error', function() {
+            if (isPlaying) {
+                setStatus('Reconnecting stream...', 'CONNECTING');
+                setTimeout(function() {
+                    if (isPlaying) {
+                        audio.src = streamUrl;
+                        audio.load();
+                        audio.play().catch(function() {});
+                    }
+                }, 1500);
+            }
+        });
+
+        // Auto-play on launch
+        playStream();
     })();
     </script>
 </body>

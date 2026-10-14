@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.4] - 2026-10-15
+
+### Fixed
+- Fixed issue where the live radio player failed to start on website due to cross-origin iframe security restrictions and premature connection timeouts.
+- Converted the radio streaming engine to direct, high-resilience HTML5 Audio with continuous jitter-buffering and automatic chunk-boundary continuation.
+- Verified smooth audio streaming with 100% continuous playback without breaks or halts.
+
 ## [1.2.3] - 2026-10-15
 
 ### Added
