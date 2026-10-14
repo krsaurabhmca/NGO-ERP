@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.2] - 2026-10-15
+
+### Fixed
+- Fixed live stream playback for Zeno.fm, Icecast, and Shoutcast redirect streams by removing query string parameters that broke upstream server mountpoint token verification.
+- Improved audio stream lifecycle management on pause/stop using `audio.removeAttribute('src')` and `audio.load()`, preventing false "Stream offline" error triggers.
+- Updated the admin live stream tester and website player widget to properly track buffering, ready state transitions, and real-time audio playback.
+
 ## [1.2.1] - 2026-10-15
 
 ### Added
