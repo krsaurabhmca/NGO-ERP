@@ -1592,4 +1592,12 @@ class HomeController extends Controller
         http_response_code(200);
         exit('OK');
     }
+
+    public function radioPopout()
+    {
+        $settings = $this->settingModel->getAllSettings();
+        $this->view('home/radio_popout', [
+            'globalSettings' => $settings
+        ]);
+    }
 }

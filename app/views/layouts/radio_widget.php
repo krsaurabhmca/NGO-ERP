@@ -47,6 +47,9 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
                 <span class="ngo-stream-chip" id="ngo-card-status-chip">FM LIVE</span>
             </div>
             <div class="ngo-card-actions">
+                <button type="button" class="ngo-icon-btn" id="ngo-radio-popout-btn" title="Open Pop-out Floating Player (Plays continuously while you browse)" aria-label="Pop-out Player">
+                    <i class="fas fa-up-right-from-square"></i>
+                </button>
                 <button type="button" class="ngo-icon-btn" id="ngo-radio-reload-btn" title="Refresh Live Stream" aria-label="Refresh Stream">
                     <i class="fas fa-arrows-rotate"></i>
                 </button>
@@ -118,6 +121,14 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
                 </div>
                 <span class="ngo-vol-pct" id="ngo-vol-pct"><?php echo $radioDefaultVolume; ?>%</span>
             </div>
+
+            <!-- Card Footer Links -->
+            <div class="ngo-card-footer-links">
+                <span class="ngo-engine-badge" id="ngo-engine-badge"><i class="fas fa-shield-halved me-1"></i>Protected Stream</span>
+                <a href="<?php echo $radioStreamUrl; ?>" target="_blank" rel="noopener noreferrer" class="ngo-direct-url-link" title="Open direct audio stream URL in new browser tab">
+                    <i class="fas fa-arrow-up-right-from-square me-1"></i>Direct URL
+                </a>
+            </div>
         </div>
     </div>
 
@@ -160,8 +171,11 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
         </button>
     </div>
 
-    <!-- Hidden HTML5 Audio Element -->
-    <audio id="ngo-audio-element" preload="none"></audio>
+    <!-- Dedicated Internal Streaming Frame (Audio Isolation Engine) -->
+    <iframe id="ngo-radio-engine-frame" src="<?php echo url('radio_frame.html'); ?>" allow="autoplay" style="display:none;position:absolute;width:1px;height:1px;left:-9999px;top:-9999px;border:none;" aria-hidden="true"></iframe>
+
+    <!-- High-Resilience Fallback HTML5 Audio Element -->
+    <audio id="ngo-audio-element" preload="auto" playsinline></audio>
 </div>
 
 <!-- ================= STYLES ================= -->
@@ -682,6 +696,37 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
     text-align: right;
 }
 
+/* Card Footer Meta Links */
+.ngo-card-footer-links {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 2px;
+    padding: 0 4px;
+    font-size: 0.68rem;
+}
+.ngo-engine-badge {
+    color: rgba(255, 255, 255, 0.45);
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.65rem;
+    font-weight: 600;
+}
+.ngo-direct-url-link {
+    color: rgba(239, 68, 68, 0.85);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.68rem;
+    display: inline-flex;
+    align-items: center;
+    transition: color 0.2s ease;
+}
+.ngo-direct-url-link:hover {
+    color: #ef4444;
+    text-decoration: underline;
+}
+
 /* ================= KEYFRAME ANIMATIONS ================= */
 @keyframes ngoSpin {
     from { transform: rotate(0deg); }
@@ -791,6 +836,7 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
         const shouldAutoplay = container.getAttribute('data-autoplay') === '1';
 
         const audio = document.getElementById('ngo-audio-element');
+        const frame = document.getElementById('ngo-radio-engine-frame');
         const miniPill = document.getElementById('ngo-radio-mini');
         const studioCard = document.getElementById('ngo-radio-card');
         const backdrop = document.getElementById('ngo-radio-backdrop');
@@ -802,6 +848,7 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
 
         const minimizeBtn = document.getElementById('ngo-radio-minimize-btn');
         const reloadBtn = document.getElementById('ngo-radio-reload-btn');
+        const popoutBtn = document.getElementById('ngo-radio-popout-btn');
         const volBtn = document.getElementById('ngo-card-vol-btn');
         const volIcon = document.getElementById('ngo-vol-icon');
         const volSlider = document.getElementById('ngo-card-vol-slider');
@@ -810,20 +857,34 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
         const statusMsg = document.getElementById('ngo-status-msg');
         const miniLiveStatus = document.getElementById('ngo-mini-live-status');
         const cardStatusChip = document.getElementById('ngo-card-status-chip');
+        const engineBadge = document.getElementById('ngo-engine-badge');
+
+        const popoutUrl = '<?php echo url('radio/popout'); ?>';
 
         let isPlaying = false;
         let isConnecting = false;
         let isMuted = false;
+        let frameReady = false;
+        let useIframeEngine = true;
+        let reconnectTimer = null;
+        let reconnectAttempts = 0;
         let lastVolume = defaultVolume / 100;
 
         // Restore volume from storage
         const storedVol = localStorage.getItem('ngo_radio_vol');
         if (storedVol !== null) {
-            audio.volume = parseFloat(storedVol);
-            setVolumeUI(Math.round(audio.volume * 100));
+            lastVolume = parseFloat(storedVol);
+            audio.volume = lastVolume;
+            setVolumeUI(Math.round(lastVolume * 100));
         } else {
             audio.volume = defaultVolume / 100;
             setVolumeUI(defaultVolume);
+        }
+
+        // Restore player expansion state
+        const storedState = sessionStorage.getItem('ngo_radio_state');
+        if (storedState === 'expanded' && window.innerWidth > 576) {
+            expandPlayer();
         }
 
         // Setup MediaSession API (Lock screen / Bluetooth info)
@@ -883,13 +944,47 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
             }
         }
 
-        // Stream Control Functions
+        function clearReconnectTimer() {
+            if (reconnectTimer) {
+                clearTimeout(reconnectTimer);
+                reconnectTimer = null;
+            }
+        }
+
+        // --- Stream Control: Dual Engine (Internal Iframe + Resilient Audio) ---
         function playRadio() {
-            if (isPlaying) return;
+            if (isPlaying && !isConnecting) return;
             isConnecting = true;
+            clearReconnectTimer();
             setStatus('Connecting live...', 'CONNECTING');
 
-            // Set clean stream URL and load
+            sessionStorage.setItem('ngo_radio_listening', '1');
+
+            // 1. Try playing via Internal Hidden Iframe Engine first
+            if (useIframeEngine && frame && frame.contentWindow) {
+                try {
+                    if (frame.contentWindow.NgoRadioFrame) {
+                        frame.contentWindow.NgoRadioFrame.setVolume(lastVolume);
+                        frame.contentWindow.NgoRadioFrame.play(streamUrl);
+                    } else {
+                        frame.contentWindow.postMessage({
+                            target: 'ngo-radio-engine',
+                            action: 'init',
+                            streamUrl: streamUrl,
+                            volume: lastVolume
+                        }, '*');
+                        frame.contentWindow.postMessage({
+                            target: 'ngo-radio-engine',
+                            action: 'play',
+                            streamUrl: streamUrl
+                        }, '*');
+                    }
+                } catch(e) {
+                    console.warn('[RadioWidget] Frame dispatch note, activating audio pipeline:', e);
+                }
+            }
+
+            // 2. Start local resilient HTML5 Audio pipeline (serves as primary/synchronous playback)
             if (audio.getAttribute('src') !== streamUrl) {
                 audio.src = streamUrl;
                 audio.load();
@@ -900,25 +995,46 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
                 playPromise.then(function() {
                     isPlaying = true;
                     isConnecting = false;
+                    reconnectAttempts = 0;
                     updatePlayIcons(true);
                     setStatus('Streaming live on air', 'FM LIVE');
                     updateMediaSession();
                 }).catch(function(err) {
-                    console.warn('Radio play blocked or stream error:', err);
-                    isConnecting = false;
-                    isPlaying = false;
-                    updatePlayIcons(false);
-                    setStatus('Tap play to start', 'OFFLINE');
+                    console.warn('[RadioWidget] Play error or blocked:', err);
+                    // Do not mark offline if frame is handling it
+                    setTimeout(function() {
+                        if (!isPlaying) {
+                            isConnecting = false;
+                            updatePlayIcons(false);
+                            setStatus('Tap play to start', 'OFFLINE');
+                        }
+                    }, 1000);
                 });
             }
         }
 
         function pauseRadio() {
+            clearReconnectTimer();
+            isPlaying = false;
+            isConnecting = false;
+            sessionStorage.setItem('ngo_radio_listening', '0');
+
+            // Pause internal iframe
+            if (frame && frame.contentWindow) {
+                try {
+                    if (frame.contentWindow.NgoRadioFrame) {
+                        frame.contentWindow.NgoRadioFrame.pause();
+                    } else {
+                        frame.contentWindow.postMessage({ target: 'ngo-radio-engine', action: 'pause' }, '*');
+                    }
+                } catch(e) {}
+            }
+
+            // Pause local audio element & clean src to release socket
             audio.pause();
             audio.removeAttribute('src');
             audio.load();
-            isPlaying = false;
-            isConnecting = false;
+
             updatePlayIcons(false);
             setStatus('Broadcast paused', 'PAUSED');
         }
@@ -930,6 +1046,130 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
                 playRadio();
             }
         }
+
+        function triggerStreamRecovery(reason) {
+            if (!isPlaying && !isConnecting) return;
+            console.log(`[RadioWidget] Stream buffer hiccup (${reason}). Maintaining listener session...`);
+            setStatus('Buffering stream...', 'BUFFERING');
+
+            if (reconnectTimer) return;
+            if (reconnectAttempts >= 6) {
+                setStatus('Stream reconnecting...', 'CONNECTING');
+            }
+
+            reconnectAttempts++;
+            const backoff = Math.min(1000 * reconnectAttempts, 4000);
+
+            reconnectTimer = setTimeout(function() {
+                reconnectTimer = null;
+                if (sessionStorage.getItem('ngo_radio_listening') === '1') {
+                    if (audio.getAttribute('src') !== streamUrl) {
+                        audio.src = streamUrl;
+                    }
+                    audio.load();
+                    audio.play().then(function() {
+                        isPlaying = true;
+                        isConnecting = false;
+                        reconnectAttempts = 0;
+                        updatePlayIcons(true);
+                        setStatus('Streaming live on air', 'FM LIVE');
+                    }).catch(function(e) {
+                        console.warn('[RadioWidget] Auto-reconnect retry:', e);
+                    });
+                }
+            }, backoff);
+        }
+
+        // --- Listen to Internal Hidden Iframe Engine Messages ---
+        window.addEventListener('message', function(e) {
+            if (!e.data || e.data.source !== 'ngo-radio-frame-engine') return;
+            const type = e.data.type;
+            const payload = e.data.payload || {};
+
+            if (type === 'ready') {
+                frameReady = true;
+                if (engineBadge) {
+                    engineBadge.innerHTML = '<i class="fas fa-shield-halved me-1 text-success"></i>Iframe Isolated';
+                }
+                // Send current volume configuration
+                try {
+                    frame.contentWindow.postMessage({
+                        target: 'ngo-radio-engine',
+                        action: 'init',
+                        streamUrl: streamUrl,
+                        volume: lastVolume
+                    }, '*');
+                } catch(err) {}
+
+                // If user was listening before page navigation, auto-play
+                if (sessionStorage.getItem('ngo_radio_listening') === '1' && !isPlaying) {
+                    playRadio();
+                }
+            } else if (type === 'playing') {
+                isPlaying = true;
+                isConnecting = false;
+                reconnectAttempts = 0;
+                clearReconnectTimer();
+                updatePlayIcons(true);
+                setStatus('Streaming live on air', 'FM LIVE');
+            } else if (type === 'buffering') {
+                if (isPlaying) {
+                    setStatus('Buffering stream...', 'BUFFERING');
+                }
+            } else if (type === 'paused') {
+                // If frame paused and local audio also paused
+                if (!isPlaying) {
+                    updatePlayIcons(false);
+                }
+            } else if (type === 'blocked' || type === 'error') {
+                console.warn('[RadioWidget] Frame note:', payload);
+                // Ensure local audio continues
+                useIframeEngine = false;
+            }
+        });
+
+        // --- Audio Element Event Handling (Jitter Buffer Protection) ---
+        audio.addEventListener('playing', function() {
+            isPlaying = true;
+            isConnecting = false;
+            reconnectAttempts = 0;
+            clearReconnectTimer();
+            updatePlayIcons(true);
+            setStatus('Streaming live on air', 'FM LIVE');
+        });
+
+        audio.addEventListener('timeupdate', function() {
+            if (isPlaying && miniLiveStatus && miniLiveStatus.textContent === 'BUFFERING') {
+                setStatus('Streaming live on air', 'FM LIVE');
+            }
+        });
+
+        audio.addEventListener('waiting', function() {
+            if (isPlaying) {
+                setStatus('Buffering stream...', 'BUFFERING');
+            }
+        });
+
+        audio.addEventListener('stalled', function() {
+            if (isPlaying) {
+                setStatus('Buffering stream...', 'BUFFERING');
+            }
+        });
+
+        // Live Icecast chunk termination should trigger seamless auto-recovery, NOT halt
+        audio.addEventListener('ended', function() {
+            if (sessionStorage.getItem('ngo_radio_listening') === '1') {
+                triggerStreamRecovery('ended');
+            } else {
+                pauseRadio();
+            }
+        });
+
+        audio.addEventListener('error', function(e) {
+            if (sessionStorage.getItem('ngo_radio_listening') === '1') {
+                triggerStreamRecovery('error');
+            }
+        });
 
         // View State (Expand / Minimize)
         function expandPlayer() {
@@ -990,12 +1230,27 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
             backdrop.addEventListener('click', minimizePlayer);
         }
 
+        // Pop-out Floating Studio Button (Plays continuously while user browses)
+        if (popoutBtn) {
+            popoutBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                // Pause in-page player to avoid dual audio
+                pauseRadio();
+                window.open(
+                    popoutUrl,
+                    'NgoRadioPopout',
+                    'width=380,height=520,status=no,toolbar=no,menubar=no,location=no,resizable=yes'
+                );
+            });
+        }
+
         // Reload Stream Button
         if (reloadBtn) {
             reloadBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 reloadBtn.querySelector('i').classList.add('fa-spin');
-                setStatus('Reconnecting stream...', 'RELOADING');
+                setStatus('Reconnecting stream...', 'RECONNECTING');
+
                 pauseRadio();
                 setTimeout(function() {
                     playRadio();
@@ -1008,11 +1263,17 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
         if (volSlider) {
             volSlider.addEventListener('input', function() {
                 const val = parseInt(this.value, 10);
-                audio.volume = val / 100;
-                lastVolume = audio.volume;
+                lastVolume = val / 100;
+                audio.volume = lastVolume;
                 isMuted = (val === 0);
                 setVolumeUI(val);
-                localStorage.setItem('ngo_radio_vol', audio.volume);
+                localStorage.setItem('ngo_radio_vol', lastVolume);
+
+                if (frame && frame.contentWindow) {
+                    try {
+                        frame.contentWindow.postMessage({ target: 'ngo-radio-engine', action: 'setVolume', volume: lastVolume }, '*');
+                    } catch(e) {}
+                }
             });
         }
 
@@ -1020,9 +1281,10 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
         if (volBtn) {
             volBtn.addEventListener('click', function() {
                 if (isMuted || audio.volume === 0) {
-                    audio.volume = lastVolume > 0 ? lastVolume : 0.8;
+                    lastVolume = lastVolume > 0 ? lastVolume : 0.8;
+                    audio.volume = lastVolume;
                     isMuted = false;
-                    setVolumeUI(Math.round(audio.volume * 100));
+                    setVolumeUI(Math.round(lastVolume * 100));
                 } else {
                     lastVolume = audio.volume;
                     audio.volume = 0;
@@ -1030,46 +1292,14 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
                     setVolumeUI(0);
                 }
                 localStorage.setItem('ngo_radio_vol', audio.volume);
+
+                if (frame && frame.contentWindow) {
+                    try {
+                        frame.contentWindow.postMessage({ target: 'ngo-radio-engine', action: 'setVolume', volume: audio.volume }, '*');
+                    } catch(e) {}
+                }
             });
         }
-
-        // Audio element events
-        audio.addEventListener('playing', function() {
-            isPlaying = true;
-            isConnecting = false;
-            updatePlayIcons(true);
-            setStatus('Streaming live on air', 'FM LIVE');
-        });
-
-        audio.addEventListener('timeupdate', function() {
-            if (isPlaying && miniLiveStatus && miniLiveStatus.textContent !== 'FM LIVE') {
-                setStatus('Streaming live on air', 'FM LIVE');
-            }
-        });
-
-        audio.addEventListener('waiting', function() {
-            if (!isPlaying) {
-                setStatus('Buffering stream...', 'BUFFERING');
-            }
-        });
-
-        audio.addEventListener('error', function(e) {
-            // Ignore if audio was paused/emptied intentionally
-            if (!audio.getAttribute('src') || (!isConnecting && !isPlaying)) {
-                return;
-            }
-            console.error('Radio Stream Audio Error:', e);
-            isPlaying = false;
-            isConnecting = false;
-            updatePlayIcons(false);
-            setStatus('Stream offline / Tap to retry', 'OFFLINE');
-        });
-
-        audio.addEventListener('ended', function() {
-            isPlaying = false;
-            updatePlayIcons(false);
-            setStatus('Broadcast ended', 'OFFLINE');
-        });
 
         // Global functions for topbar or external triggers
         window.ngoPlayRadio = function() {
@@ -1083,9 +1313,13 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
         };
         window.ngoExpandRadio = expandPlayer;
         window.ngoMinimizeRadio = minimizePlayer;
+        window.ngoOpenPopout = function() {
+            pauseRadio();
+            window.open(popoutUrl, 'NgoRadioPopout', 'width=380,height=520,status=no,toolbar=no,menubar=no,location=no,resizable=yes');
+        };
 
         // Autoplay check (if enabled and user already interacted or allowed)
-        if (shouldAutoplay) {
+        if (shouldAutoplay || sessionStorage.getItem('ngo_radio_listening') === '1') {
             playRadio();
         }
     });

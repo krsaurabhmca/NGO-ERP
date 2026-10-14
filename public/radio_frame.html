@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>NGO Live Radio Engine Frame</title>
+</head>
+<body style="margin:0;padding:0;background:transparent;overflow:hidden;">
+    <audio id="ngo-frame-audio" preload="auto" playsinline></audio>
+
+    <script>
+    (function() {
+        'use strict';
+
+        const audio = document.getElementById('ngo-frame-audio');
+        let currentUrl = '';
+        let isIntentPlaying = false;
+        let reconnectTimer = null;
+        let reconnectAttempts = 0;
+        let lastReportedTime = 0;
+        let stallCheckTimer = null;
+
+        function postToParent(type, payload) {
+            try {
+                if (window.parent && window.parent !== window) {
+                    window.parent.postMessage({
+                        source: 'ngo-radio-frame-engine',
+                        type: type,
+                        payload: payload || {}
+                    }, '*');
+                }
+            } catch (err) {
+                // Ignore cross-origin reporting error if parent is not receptive
+            }
+        }
+
+        // Global Engine Object for direct same-origin script access
+        window.NgoRadioFrame = {
+            init: function(url, vol) {
+                if (url) currentUrl = url;
+                if (vol !== undefined) {
+                    audio.volume = Math.max(0, Math.min(1, vol));
+                }
+                audio.preload = 'auto';
+            },
+
+            play: function(url) {
+                if (url) currentUrl = url;
+                if (!currentUrl) return;
+
+                isIntentPlaying = true;
+                clearReconnect();
+
+                // If source has changed or audio has no source, assign clean stream URL
+                if (audio.src !== currentUrl) {
+                    audio.src = currentUrl;
+                    audio.load();
+                }
+
+                const promise = audio.play();
+                if (promise !== undefined) {
+                    promise.then(function() {
+                        reconnectAttempts = 0;
+                        postToParent('playing', { currentTime: audio.currentTime });
+                    }).catch(function(err) {
+                        console.warn('[RadioFrame] Play promise rejected:', err);
+                        isIntentPlaying = false;
+                        postToParent('blocked', { message: err.message });
+                    });
+                }
+            },
+
+            pause: function() {
+                isIntentPlaying = false;
+                clearReconnect();
+                audio.pause();
+                // Release the stream connection so network is freed
+                audio.removeAttribute('src');
+                audio.load();
+                postToParent('paused');
+            },
+
+            setVolume: function(val) {
+                audio.volume = Math.max(0, Math.min(1, val));
+                postToParent('volume', { volume: audio.volume });
+            },
+
+            reload: function() {
+                if (isIntentPlaying) {
+                    clearReconnect();
+                    audio.pause();
+                    audio.removeAttribute('src');
+                    audio.load();
+                    setTimeout(function() {
+                        window.NgoRadioFrame.play(currentUrl);
+                    }, 250);
+                }
+            },
+
+            getState: function() {
+                return {
+                    isPlaying: !audio.paused && !audio.ended && audio.readyState > 1,
+                    isIntentPlaying: isIntentPlaying,
+                    currentTime: audio.currentTime,
+                    volume: audio.volume,
+                    readyState: audio.readyState,
+                    networkState: audio.networkState
+                };
+            }
+        };
+
+        function clearReconnect() {
+            if (reconnectTimer) {
+                clearTimeout(reconnectTimer);
+                reconnectTimer = null;
+            }
+            if (stallCheckTimer) {
+                clearInterval(stallCheckTimer);
+                stallCheckTimer = null;
+            }
+        }
+
+        function triggerAutoReconnect(reason) {
+            if (!isIntentPlaying) return;
+            postToParent('buffering', { reason: reason });
+
+            if (reconnectTimer) return;
+            if (reconnectAttempts >= 8) {
+                postToParent('error', { message: 'Stream connection lost' });
+                return;
+            }
+
+            reconnectAttempts++;
+            const backoffDelay = Math.min(1000 * reconnectAttempts, 4000);
+            console.log(`[RadioFrame] Stream recovery (${reason}). Reconnecting in ${backoffDelay}ms (attempt ${reconnectAttempts})...`);
+
+            reconnectTimer = setTimeout(function() {
+                reconnectTimer = null;
+                if (isIntentPlaying) {
+                    audio.src = currentUrl;
+                    audio.load();
+                    audio.play().catch(function(e) {
+                        console.warn('[RadioFrame] Reconnect attempt failed:', e);
+                    });
+                }
+            }, backoffDelay);
+        }
+
+        // --- Audio Element Event Handling ---
+        audio.addEventListener('playing', function() {
+            reconnectAttempts = 0;
+            clearReconnect();
+            postToParent('playing', { currentTime: audio.currentTime });
+        });
+
+        audio.addEventListener('waiting', function() {
+            if (isIntentPlaying) {
+                postToParent('buffering', { reason: 'waiting' });
+            }
+        });
+
+        audio.addEventListener('stalled', function() {
+            if (isIntentPlaying) {
+                postToParent('buffering', { reason: 'stalled' });
+            }
+        });
+
+        audio.addEventListener('timeupdate', function() {
+            if (isIntentPlaying && !audio.paused) {
+                postToParent('playing', { currentTime: audio.currentTime });
+            }
+        });
+
+        // Live chunked streams can emit 'ended' if Icecast renegotiates chunk/SSL
+        audio.addEventListener('ended', function() {
+            if (isIntentPlaying) {
+                triggerAutoReconnect('ended');
+            } else {
+                postToParent('paused');
+            }
+        });
+
+        audio.addEventListener('error', function() {
+            if (isIntentPlaying) {
+                triggerAutoReconnect('error');
+            }
+        });
+
+        // Monitor stream stall (if stream time stops moving while supposed to be playing)
+        stallCheckTimer = setInterval(function() {
+            if (isIntentPlaying && !audio.paused) {
+                if (audio.currentTime === lastReportedTime && audio.readyState < 3) {
+                    postToParent('buffering', { reason: 'stall-check' });
+                }
+                lastReportedTime = audio.currentTime;
+            }
+        }, 3000);
+
+        // Listen for postMessage from parent
+        window.addEventListener('message', function(e) {
+            const data = e.data;
+            if (!data || data.target !== 'ngo-radio-engine') return;
+
+            switch(data.action) {
+                case 'init':
+                    window.NgoRadioFrame.init(data.streamUrl, data.volume);
+                    break;
+                case 'play':
+                    window.NgoRadioFrame.play(data.streamUrl);
+                    break;
+                case 'pause':
+                    window.NgoRadioFrame.pause();
+                    break;
+                case 'setVolume':
+                    window.NgoRadioFrame.setVolume(data.volume);
+                    break;
+                case 'reload':
+                    window.NgoRadioFrame.reload();
+                    break;
+            }
+        });
+
+        // Announce ready to parent window
+        postToParent('ready');
+    })();
+    </script>
+</body>
+</html>

@@ -42,6 +42,7 @@ $router->add('GET', '/members', [App\Controllers\HomeController::class, 'members
 $router->add('GET', '/members/register', [App\Controllers\HomeController::class, 'showRegister']);
 $router->add('POST', '/members/register', [App\Controllers\HomeController::class, 'register']);
 $router->add('GET', '/members/verify-email/{token}', [App\Controllers\HomeController::class, 'verifyEmail']);
+$router->add('GET', '/radio/popout', [App\Controllers\HomeController::class, 'radioPopout']);
 
 // Auth Routes
 $router->add('GET', '/auth', [App\Controllers\AuthController::class, 'showLogin']);

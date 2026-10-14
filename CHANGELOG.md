@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.3] - 2026-10-15
+
+### Added
+- Added dedicated internal hidden iframe audio isolation engine (`radio_frame.html`) for ultra-smooth live stream playback.
+- Added Pop-out Live Studio Mini-Player window (`/radio/popout`) enabling 100% continuous, uninterrupted radio playback while visitors browse across different website pages or switch tabs.
+- Added session continuity via `sessionStorage`: automatically preserves and resumes active live radio streaming across page navigation on the website.
+- Added Direct Stream URL shortcut link in the studio card for 1-click access to the browser's raw audio stream.
+
+### Fixed
+- Fixed live stream stuttering and premature halts on chunked Icecast/Zeno.fm streams by replacing aggressive `ended` and `error` listeners with an intelligent Jitter Buffer Protection and auto-recovery backoff engine.
+- Switched default audio preload policy to `auto` with `playsinline` and seamless reconnect logic.
+
 ## [1.2.2] - 2026-10-15
 
 ### Fixed
