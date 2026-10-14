@@ -809,6 +809,7 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
         const volPct = document.getElementById('ngo-vol-pct');
         const statusMsg = document.getElementById('ngo-status-msg');
         const miniLiveStatus = document.getElementById('ngo-mini-live-status');
+        const cardStatusChip = document.getElementById('ngo-card-status-chip');
 
         let isPlaying = false;
         let isConnecting = false;
@@ -867,6 +868,7 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
         function setStatus(text, miniText = '') {
             if (statusMsg) statusMsg.textContent = text;
             if (miniLiveStatus && miniText) miniLiveStatus.textContent = miniText;
+            if (cardStatusChip && miniText) cardStatusChip.textContent = miniText;
         }
 
         function updatePlayIcons(playing) {
@@ -883,13 +885,15 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
 
         // Stream Control Functions
         function playRadio() {
-            if (isConnecting) return;
+            if (isPlaying) return;
             isConnecting = true;
             setStatus('Connecting live...', 'CONNECTING');
 
-            // Cache buster ensures we always connect to the fresh live broadcast edge
-            const delim = streamUrl.includes('?') ? '&' : '?';
-            audio.src = streamUrl + delim + '_nocache=' + Date.now();
+            // Set clean stream URL and load
+            if (audio.getAttribute('src') !== streamUrl) {
+                audio.src = streamUrl;
+                audio.load();
+            }
 
             const playPromise = audio.play();
             if (playPromise !== undefined) {
@@ -911,7 +915,8 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
 
         function pauseRadio() {
             audio.pause();
-            audio.src = ''; // Release connection
+            audio.removeAttribute('src');
+            audio.load();
             isPlaying = false;
             isConnecting = false;
             updatePlayIcons(false);
@@ -919,7 +924,7 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
         }
 
         function toggleRadio() {
-            if (isPlaying) {
+            if (isPlaying || isConnecting) {
                 pauseRadio();
             } else {
                 playRadio();
@@ -1036,16 +1041,28 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
             setStatus('Streaming live on air', 'FM LIVE');
         });
 
+        audio.addEventListener('timeupdate', function() {
+            if (isPlaying && miniLiveStatus && miniLiveStatus.textContent !== 'FM LIVE') {
+                setStatus('Streaming live on air', 'FM LIVE');
+            }
+        });
+
         audio.addEventListener('waiting', function() {
-            setStatus('Buffering stream...', 'BUFFERING');
+            if (!isPlaying) {
+                setStatus('Buffering stream...', 'BUFFERING');
+            }
         });
 
         audio.addEventListener('error', function(e) {
+            // Ignore if audio was paused/emptied intentionally
+            if (!audio.getAttribute('src') || (!isConnecting && !isPlaying)) {
+                return;
+            }
             console.error('Radio Stream Audio Error:', e);
             isPlaying = false;
             isConnecting = false;
             updatePlayIcons(false);
-            setStatus('Stream offline / Error', 'OFFLINE');
+            setStatus('Stream offline / Tap to retry', 'OFFLINE');
         });
 
         audio.addEventListener('ended', function() {

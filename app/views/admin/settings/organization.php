@@ -881,20 +881,23 @@
                 }
 
                 if (!isTesting) {
+                    isTesting = true;
                     testStatus.innerHTML = '<span class="text-warning"><i class="fas fa-spinner fa-spin me-1"></i> Connecting to audio stream...</span>';
-                    testAudio.src = url + (url.includes('?') ? '&' : '?') + 'nocache=' + Date.now();
+                    testAudio.src = url;
+                    testAudio.load();
                     testAudio.play().then(() => {
-                        isTesting = true;
                         testIcon.className = 'fas fa-stop';
                         testText.innerText = 'Stop Audio';
                         testBtn.className = 'btn btn-danger px-3 d-flex align-items-center gap-2';
                         testStatus.innerHTML = '<span class="text-success"><i class="fas fa-volume-up me-1"></i> Playing stream successfully!</span>';
                     }).catch(err => {
+                        isTesting = false;
                         testStatus.innerHTML = '<span class="text-danger"><i class="fas fa-exclamation-triangle me-1"></i> Failed to play stream: ' + err.message + '</span>';
                     });
                 } else {
                     testAudio.pause();
-                    testAudio.src = '';
+                    testAudio.removeAttribute('src');
+                    testAudio.load();
                     isTesting = false;
                     testIcon.className = 'fas fa-play';
                     testText.innerText = 'Test Stream';
@@ -904,8 +907,8 @@
             });
 
             testAudio.addEventListener('error', function() {
-                if (isTesting) {
-                    testStatus.innerHTML = '<span class="text-danger"><i class="fas fa-times-circle me-1"></i> Stream connection error. Check URL or CORS permissions.</span>';
+                if (isTesting && testAudio.getAttribute('src')) {
+                    testStatus.innerHTML = '<span class="text-danger"><i class="fas fa-times-circle me-1"></i> Stream connection error. Check URL.</span>';
                     isTesting = false;
                     testIcon.className = 'fas fa-play';
                     testText.innerText = 'Test Stream';
