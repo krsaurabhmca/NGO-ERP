@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.5] - 2026-10-16
+
+### Fixed
+- Fixed live radio playback on modern browsers by adding `media-src 'self' https: http: data: blob:;` directive to the application's Content-Security-Policy (CSP) headers, resolving `NotSupportedError: Failed to load because no supported source was found` on redirected Icecast, Zeno.fm, and Shoutcast streams.
+- Added explicit native `<source src="..." type="audio/mpeg">` and `preload="none"` inside the HTML5 audio element to ensure audio decoders detect the stream MIME type immediately on interaction.
+- Removed destructive `removeAttribute('src')` and premature `audio.load()` resets that previously interrupted play promises, caused abort errors, and triggered false offline statuses.
+- Resolved browser autoplay policy handling: gracefully prompts user interaction without false offline flags when navigating across pages.
+- Fixed working directory path resolution in `public/index.php` to ensure clean autoloading and view rendering across Apache virtual hosts and subdirectories.
+- Updated Admin Settings live stream test previewer to connect and play live audio streams seamlessly without pipeline reload conflicts.
+
+### Removed
+- Removed the standalone Pop-out Studio Player button from the radio widget top bar to simplify the listening experience.
+- Removed the external "Direct URL" shortcut link from the studio player card footer, keeping the widget clean and centered around the secure protected stream indicator.
+
 ## [1.2.4] - 2026-10-15
 
 ### Fixed

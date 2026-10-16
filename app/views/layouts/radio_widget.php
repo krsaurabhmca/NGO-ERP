@@ -47,9 +47,6 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
                 <span class="ngo-stream-chip" id="ngo-card-status-chip">FM LIVE</span>
             </div>
             <div class="ngo-card-actions">
-                <button type="button" class="ngo-icon-btn" id="ngo-radio-popout-btn" title="Open Pop-out Floating Player (Plays continuously while you browse)" aria-label="Pop-out Player">
-                    <i class="fas fa-up-right-from-square"></i>
-                </button>
                 <button type="button" class="ngo-icon-btn" id="ngo-radio-reload-btn" title="Refresh Live Stream" aria-label="Refresh Stream">
                     <i class="fas fa-arrows-rotate"></i>
                 </button>
@@ -125,9 +122,6 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
             <!-- Card Footer Links -->
             <div class="ngo-card-footer-links">
                 <span class="ngo-engine-badge" id="ngo-engine-badge"><i class="fas fa-shield-halved me-1"></i>Protected Stream</span>
-                <a href="<?php echo $radioStreamUrl; ?>" target="_blank" rel="noopener noreferrer" class="ngo-direct-url-link" title="Open direct audio stream URL in new browser tab">
-                    <i class="fas fa-arrow-up-right-from-square me-1"></i>Direct URL
-                </a>
             </div>
         </div>
     </div>
@@ -172,7 +166,10 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
     </div>
 
     <!-- High-Performance Native Live Audio Streaming Element -->
-    <audio id="ngo-audio-element" preload="auto" playsinline></audio>
+    <audio id="ngo-audio-element" preload="none" playsinline>
+        <source src="<?php echo $radioStreamUrl; ?>" type="audio/mpeg">
+        Your browser does not support HTML audio.
+    </audio>
 </div>
 
 <!-- ================= STYLES ================= -->
@@ -697,9 +694,9 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
 .ngo-card-footer-links {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     width: 100%;
-    margin-top: 2px;
+    margin-top: 4px;
     padding: 0 4px;
     font-size: 0.68rem;
 }
@@ -709,19 +706,6 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
     align-items: center;
     font-size: 0.65rem;
     font-weight: 600;
-}
-.ngo-direct-url-link {
-    color: rgba(239, 68, 68, 0.85);
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 0.68rem;
-    display: inline-flex;
-    align-items: center;
-    transition: color 0.2s ease;
-}
-.ngo-direct-url-link:hover {
-    color: #ef4444;
-    text-decoration: underline;
 }
 
 /* ================= KEYFRAME ANIMATIONS ================= */
@@ -844,7 +828,6 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
 
         const minimizeBtn = document.getElementById('ngo-radio-minimize-btn');
         const reloadBtn = document.getElementById('ngo-radio-reload-btn');
-        const popoutBtn = document.getElementById('ngo-radio-popout-btn');
         const volBtn = document.getElementById('ngo-card-vol-btn');
         const volIcon = document.getElementById('ngo-vol-icon');
         const volSlider = document.getElementById('ngo-card-vol-slider');
@@ -853,8 +836,6 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
         const statusMsg = document.getElementById('ngo-status-msg');
         const miniLiveStatus = document.getElementById('ngo-mini-live-status');
         const cardStatusChip = document.getElementById('ngo-card-status-chip');
-
-        const popoutUrl = '<?php echo url('radio/popout'); ?>';
 
         let isPlaying = false;
         let isConnecting = false;
@@ -949,14 +930,20 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
             if (isPlaying) return;
             isConnecting = true;
             clearReconnectTimer();
-            setStatus('Connecting live...', 'CONNECTING');
+            setStatus('Connecting to radio...', 'CONNECTING');
 
             sessionStorage.setItem('ngo_radio_listening', '1');
 
-            if (audio.src !== streamUrl) {
+            // Ensure audio has valid source
+            if (!audio.src && !audio.currentSrc) {
+                let srcEl = audio.querySelector('source');
+                if (!srcEl) {
+                    srcEl = document.createElement('source');
+                    srcEl.type = 'audio/mpeg';
+                    audio.appendChild(srcEl);
+                }
+                srcEl.src = streamUrl;
                 audio.src = streamUrl;
-                audio.preload = 'auto';
-                audio.load();
             }
 
             const playPromise = audio.play();
@@ -973,7 +960,12 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
                     isConnecting = false;
                     isPlaying = false;
                     updatePlayIcons(false);
-                    setStatus('Tap play to start', 'OFFLINE');
+                    if (err.name === 'NotAllowedError') {
+                        sessionStorage.removeItem('ngo_radio_listening');
+                        setStatus('Click play to listen live', 'PAUSED');
+                    } else {
+                        setStatus('Unable to play. Tap to retry.', 'OFFLINE');
+                    }
                 });
             }
         }
@@ -985,15 +977,13 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
             sessionStorage.setItem('ngo_radio_listening', '0');
 
             audio.pause();
-            audio.removeAttribute('src');
-            audio.load();
 
             updatePlayIcons(false);
             setStatus('Broadcast paused', 'PAUSED');
         }
 
         function toggleRadio() {
-            if (isPlaying || isConnecting) {
+            if (!audio.paused) {
                 pauseRadio();
             } else {
                 playRadio();
@@ -1007,13 +997,18 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
 
             if (reconnectTimer) return;
             reconnectAttempts++;
+            if (reconnectAttempts > 4) {
+                isPlaying = false;
+                isConnecting = false;
+                updatePlayIcons(false);
+                setStatus('Stream unavailable. Tap to retry.', 'OFFLINE');
+                return;
+            }
             const backoff = Math.min(1000 * reconnectAttempts, 3000);
 
             reconnectTimer = setTimeout(function() {
                 reconnectTimer = null;
                 if (sessionStorage.getItem('ngo_radio_listening') === '1') {
-                    audio.src = streamUrl;
-                    audio.load();
                     audio.play().then(function() {
                         isPlaying = true;
                         isConnecting = false;
@@ -1022,6 +1017,8 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
                         setStatus('Streaming live on air', 'FM LIVE');
                     }).catch(function(e) {
                         console.warn('[RadioWidget] Reconnect retry:', e);
+                        audio.src = streamUrl;
+                        audio.play().catch(function() {});
                     });
                 }
             }, backoff);
@@ -1035,6 +1032,14 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
             clearReconnectTimer();
             updatePlayIcons(true);
             setStatus('Streaming live on air', 'FM LIVE');
+        });
+
+        audio.addEventListener('pause', function() {
+            if (!isConnecting) {
+                isPlaying = false;
+                updatePlayIcons(false);
+                setStatus('Broadcast paused', 'PAUSED');
+            }
         });
 
         audio.addEventListener('timeupdate', function() {
@@ -1063,7 +1068,6 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
             if (sessionStorage.getItem('ngo_radio_listening') === '1' || isPlaying) {
                 console.log('[RadioWidget] Live chunk boundary reached, seamlessly continuing stream...');
                 audio.src = streamUrl;
-                audio.load();
                 audio.play().catch(function() {});
             } else {
                 pauseRadio();
@@ -1071,8 +1075,13 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
         });
 
         audio.addEventListener('error', function() {
-            if (sessionStorage.getItem('ngo_radio_listening') === '1' || isPlaying) {
+            if (sessionStorage.getItem('ngo_radio_listening') === '1' && isPlaying) {
                 triggerStreamRecovery('network-error');
+            } else {
+                isPlaying = false;
+                isConnecting = false;
+                updatePlayIcons(false);
+                setStatus('Stream unavailable. Tap to retry.', 'OFFLINE');
             }
         });
 
@@ -1135,20 +1144,6 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
             backdrop.addEventListener('click', minimizePlayer);
         }
 
-        // Pop-out Floating Studio Button (Plays continuously while user browses)
-        if (popoutBtn) {
-            popoutBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                // Pause in-page player to avoid dual audio
-                pauseRadio();
-                window.open(
-                    popoutUrl,
-                    'NgoRadioPopout',
-                    'width=380,height=520,status=no,toolbar=no,menubar=no,location=no,resizable=yes'
-                );
-            });
-        }
-
         // Reload Stream Button
         if (reloadBtn) {
             reloadBtn.addEventListener('click', function(e) {
@@ -1206,10 +1201,6 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
         };
         window.ngoExpandRadio = expandPlayer;
         window.ngoMinimizeRadio = minimizePlayer;
-        window.ngoOpenPopout = function() {
-            pauseRadio();
-            window.open(popoutUrl, 'NgoRadioPopout', 'width=380,height=520,status=no,toolbar=no,menubar=no,location=no,resizable=yes');
-        };
 
         // Autoplay check (if enabled and user already interacted or allowed)
         if (shouldAutoplay || sessionStorage.getItem('ngo_radio_listening') === '1') {

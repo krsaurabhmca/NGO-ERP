@@ -259,7 +259,10 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
         <div class="footer-note">Continuous background stream &bull; Stays playing while you browse</div>
     </div>
 
-    <audio id="popout-native-audio" preload="auto" playsinline style="display:none;"></audio>
+    <audio id="popout-native-audio" preload="none" playsinline style="display:none;">
+        <source src="<?php echo $radioStreamUrl; ?>" type="audio/mpeg">
+        Your browser does not support HTML audio.
+    </audio>
 
     <script>
     (function() {
@@ -278,7 +281,6 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
         let isConnecting = false;
 
         audio.volume = defaultVol;
-        audio.preload = 'auto';
 
         function setStatus(text, tag = 'ON AIR') {
             statusMsg.textContent = text;
@@ -303,9 +305,15 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
             isConnecting = true;
             setStatus('Connecting Live...', 'CONNECTING');
 
-            if (audio.src !== streamUrl) {
+            if (!audio.src && !audio.currentSrc) {
+                let srcEl = audio.querySelector('source');
+                if (!srcEl) {
+                    srcEl = document.createElement('source');
+                    srcEl.type = 'audio/mpeg';
+                    audio.appendChild(srcEl);
+                }
+                srcEl.src = streamUrl;
                 audio.src = streamUrl;
-                audio.load();
             }
 
             const p = audio.play();
@@ -325,8 +333,6 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
         function pauseStream() {
             isConnecting = false;
             audio.pause();
-            audio.removeAttribute('src');
-            audio.load();
             setPlayingState(false);
         }
 
@@ -371,7 +377,6 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
         audio.addEventListener('ended', function() {
             if (isPlaying) {
                 audio.src = streamUrl;
-                audio.load();
                 audio.play().catch(function() {});
             }
         });
@@ -382,7 +387,6 @@ $ngoOrgName = !empty($globalSettings['ngo_name']) ? htmlspecialchars($globalSett
                 setTimeout(function() {
                     if (isPlaying) {
                         audio.src = streamUrl;
-                        audio.load();
                         audio.play().catch(function() {});
                     }
                 }, 1500);

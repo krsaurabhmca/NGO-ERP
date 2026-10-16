@@ -1,5 +1,8 @@
 <?php
 
+// Ensure working directory is project root
+chdir(dirname(__DIR__));
+
 // Start session
 session_start();
 
@@ -31,7 +34,7 @@ register_shutdown_function(function () {
 });
 
 // Load configuration
-require_once '../config/config.php';
+require_once __DIR__ . '/../config/config.php';
 
 security_headers();
 
@@ -40,7 +43,7 @@ spl_autoload_register(function ($class) {
     $parts = explode('\\', $class);
     $className = array_pop($parts);
     $nsPath = strtolower(implode('/', $parts));
-    $file = '../' . ($nsPath ? $nsPath . '/' : '') . $className . '.php';
+    $file = __DIR__ . '/../' . ($nsPath ? $nsPath . '/' : '') . $className . '.php';
     if (file_exists($file)) {
         require_once $file;
     }
@@ -65,7 +68,7 @@ if (!isset($_GET['url']) || $_GET['url'] === '') {
 
 // Load routes
 $router = new App\Core\Router();
-require_once '../routes/web.php';
+require_once __DIR__ . '/../routes/web.php';
 
 // Resolve route
 $router->resolve();

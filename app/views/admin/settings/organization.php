@@ -884,7 +884,6 @@
                     isTesting = true;
                     testStatus.innerHTML = '<span class="text-warning"><i class="fas fa-spinner fa-spin me-1"></i> Connecting to audio stream...</span>';
                     testAudio.src = url;
-                    testAudio.load();
                     testAudio.play().then(() => {
                         testIcon.className = 'fas fa-stop';
                         testText.innerText = 'Stop Audio';
@@ -897,7 +896,6 @@
                 } else {
                     testAudio.pause();
                     testAudio.removeAttribute('src');
-                    testAudio.load();
                     isTesting = false;
                     testIcon.className = 'fas fa-play';
                     testText.innerText = 'Test Stream';

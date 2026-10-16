@@ -54,7 +54,7 @@ define('PUBLIC_PATH', BASE_PATH . 'public/');
 define('STORAGE_PATH', BASE_PATH . 'storage/');
 define('UPLOAD_PATH', STORAGE_PATH . 'uploads/');
 define('APP_NAME', 'NGO Management System');
-define('APP_VERSION', '1.2.4');
+define('APP_VERSION', '1.2.5');
 
 // Localization
 date_default_timezone_set('Asia/Kolkata');
@@ -223,6 +223,7 @@ function security_headers()
         . " font-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.gstatic.com https://rsms.me;"
         . " connect-src 'self' https:;"
         . " frame-src https://www.google.com https://maps.google.com https://www.youtube.com https://www.youtube-nocookie.com https://youtu.be https://checkout.razorpay.com https://api.razorpay.com blob:;"
+        . " media-src 'self' https: http: data: blob:;"
         . " object-src 'none';"
         . " base-uri 'self'";
     header("Content-Security-Policy: " . $csp);
